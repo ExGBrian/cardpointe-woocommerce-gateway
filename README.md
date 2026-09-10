@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/banner.jpg" width="560" alt="CardPointe Payment Gateway for WooCommerce - secure checkout integration">
+</p>
+
 # CardPointe Payment Gateway for WooCommerce
 
 WooCommerce payment gateway for [CardPointe](https://cardpointe.com) (Fiserv / CardConnect) by [Paradox Solutions](https://paradoxsolutions.io).
