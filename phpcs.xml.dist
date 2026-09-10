@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="Paradox CardPointe Gateway">
+	<description>WordPress coding standards, matched to the versions this plugin supports.</description>
+
+	<file>.</file>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress-Docs"/>
+
+	<!-- Keep these in step with the plugin headers. -->
+	<config name="minimum_wp_version" value="6.6"/>
+	<config name="testVersion" value="7.4-"/>
+	<rule ref="PHPCompatibilityWP"/>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="paradox-cardpointe-gateway"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="paradox_cardpointe"/>
+				<element value="PARADOX_CARDPOINTE"/>
+				<element value="ParadoxSolutions"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>

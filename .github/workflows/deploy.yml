@@ -1,0 +1,50 @@
+name: Deploy to WordPress.org
+
+# Publishing is driven by tags so that a release is always a deliberate act.
+# Tag the commit you want to ship as v1.0.1 and push the tag.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Publish to the plugin directory
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # A tag that disagrees with the plugin header or the readme ships a version
+      # users cannot update to, so fail loudly here instead of half-publishing.
+      - name: Check the tag, plugin header and readme agree
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME#v}"
+          HEADER="$(sed -n 's/^ \* Version:[[:space:]]*//p' paradox-cardpointe-gateway.php | head -n1 | tr -d '[:space:]')"
+          STABLE="$(sed -n 's/^Stable tag:[[:space:]]*//p' readme.txt | head -n1 | tr -d '[:space:]')"
+
+          echo "tag=$TAG plugin-header=$HEADER readme-stable-tag=$STABLE"
+
+          if [ "$TAG" != "$HEADER" ]; then
+            echo "::error::Tag $TAG does not match the Version header ($HEADER)."
+            exit 1
+          fi
+          if [ "$TAG" != "$STABLE" ]; then
+            echo "::error::Tag $TAG does not match the readme Stable tag ($STABLE)."
+            exit 1
+          fi
+          if ! grep -q "^= ${TAG} =" readme.txt; then
+            echo "::error::readme.txt has no changelog entry for $TAG."
+            exit 1
+          fi
+
+      - name: Deploy to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: paradox-cardpointe-gateway
+          ASSETS_DIR: .wordpress-org

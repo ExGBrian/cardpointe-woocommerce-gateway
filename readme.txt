@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Accept credit cards and eChecks through CardPointe with the Hosted iFrame Tokenizer. Supports authorize/capture, refunds, saved cards, Subscriptions, Pre-Orders and the block checkout.
+Accept credit cards and eChecks through CardPointe. Tokenized checkout, refunds, saved cards, Subscriptions, Pre-Orders and block checkout.
 
 == Description ==
 
