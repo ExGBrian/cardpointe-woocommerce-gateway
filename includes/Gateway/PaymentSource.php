@@ -7,6 +7,7 @@
 
 namespace ParadoxSolutions\CardPointe\Gateway;
 
+use ParadoxSolutions\CardPointe\Plugin;
 use ParadoxSolutions\CardPointe\Settings\Credentials;
 
 defined( 'ABSPATH' ) || exit;
@@ -85,9 +86,18 @@ final class PaymentSource {
 		}
 
 		if ( 'card' === $source->type ) {
-			$source->expiry = isset( $_POST[ $id . '_expiry' ] ) ? preg_replace( '/\D/', '', wc_clean( wp_unslash( $_POST[ $id . '_expiry' ] ) ) ) : '';
-			$source->expiry = self::normalise_expiry( $source->expiry );
+			$raw_expiry     = isset( $_POST[ $id . '_expiry' ] ) ? preg_replace( '/\D/', '', wc_clean( wp_unslash( $_POST[ $id . '_expiry' ] ) ) ) : '';
+			$source->expiry = self::normalise_expiry( $raw_expiry );
 			if ( '' === $source->expiry ) {
+				// Record the shape, never the value, so an unreadable expiry can be
+				// diagnosed from the log without writing cardholder data to disk.
+				Plugin::instance()->logger()->warning(
+					'Could not read the card expiry returned by the tokenizer.',
+					array(
+						'field_present' => isset( $_POST[ $id . '_expiry' ] ) ? 'yes' : 'no',
+						'digit_count'   => strlen( $raw_expiry ),
+					)
+				);
 				throw new \Exception( __( 'Please enter a valid card expiration date.', 'paradox-cardpointe-gateway' ) );
 			}
 			$hint          = isset( $_POST[ $id . '_brand_hint' ] ) ? sanitize_key( wp_unslash( $_POST[ $id . '_brand_hint' ] ) ) : '';
@@ -221,27 +231,82 @@ final class PaymentSource {
 	}
 
 	/**
-	 * Converts YYYYMM/MMYY to YYYYMM and validates it is not in the past.
+	 * Converts a tokenizer expiry into the YYYYMM the gateway expects.
 	 *
-	 * @param string $expiry Digits only.
+	 * Do not assume a field order here. The hosted tokenizer reports the expiry
+	 * differently between its dropdown and text-field modes, and reading a six digit
+	 * value as YYYYMM when it is really MMYYYY rejects every card with "please enter a
+	 * valid card expiration date". Instead try each layout the digits could represent and
+	 * keep the first that yields a real month in a plausible future year. Only one layout
+	 * can satisfy both tests, so the choice is unambiguous: "122029" is December 2029 and
+	 * never year 1220, and "202912" is the reverse.
+	 *
+	 * @param string $expiry Expiry digits, with or without separators.
+	 * @return string YYYYMM, or an empty string when no plausible date can be read.
 	 */
 	public static function normalise_expiry( string $expiry ): string {
-		if ( 4 === strlen( $expiry ) ) {
-			$month = (int) substr( $expiry, 0, 2 );
-			$year  = 2000 + (int) substr( $expiry, 2, 2 );
-		} elseif ( 6 === strlen( $expiry ) ) {
-			$year  = (int) substr( $expiry, 0, 4 );
-			$month = (int) substr( $expiry, 4, 2 );
-		} else {
-			return '';
+		$expiry = preg_replace( '/\D/', '', $expiry );
+
+		switch ( strlen( $expiry ) ) {
+			case 4:
+				// MMYY, else YYMM.
+				$layouts = array(
+					array( 2000 + (int) substr( $expiry, 2, 2 ), (int) substr( $expiry, 0, 2 ) ),
+					array( 2000 + (int) substr( $expiry, 0, 2 ), (int) substr( $expiry, 2, 2 ) ),
+				);
+				break;
+			case 5:
+				// YYYYM, else MYYYY.
+				$layouts = array(
+					array( (int) substr( $expiry, 0, 4 ), (int) substr( $expiry, 4, 1 ) ),
+					array( (int) substr( $expiry, 1, 4 ), (int) substr( $expiry, 0, 1 ) ),
+				);
+				break;
+			case 6:
+				// YYYYMM, else MMYYYY.
+				$layouts = array(
+					array( (int) substr( $expiry, 0, 4 ), (int) substr( $expiry, 4, 2 ) ),
+					array( (int) substr( $expiry, 2, 4 ), (int) substr( $expiry, 0, 2 ) ),
+				);
+				break;
+			case 8:
+				// YYYYMMDD.
+				$layouts = array(
+					array( (int) substr( $expiry, 0, 4 ), (int) substr( $expiry, 4, 2 ) ),
+				);
+				break;
+			default:
+				return '';
 		}
-		if ( $month < 1 || $month > 12 || $year < (int) gmdate( 'Y' ) || $year > (int) gmdate( 'Y' ) + 25 ) {
-			return '';
+
+		foreach ( $layouts as $layout ) {
+			list( $year, $month ) = $layout;
+			if ( self::is_plausible_expiry( $year, $month ) ) {
+				return sprintf( '%04d%02d', $year, $month );
+			}
 		}
-		if ( $year === (int) gmdate( 'Y' ) && $month < (int) gmdate( 'n' ) ) {
-			return '';
+
+		return '';
+	}
+
+	/**
+	 * Whether a year and month describe a card that has not already expired.
+	 *
+	 * Cards stay valid through the last day of their expiry month, so the current
+	 * month counts as valid.
+	 *
+	 * @param int $year  Four digit year.
+	 * @param int $month Month, 1-12.
+	 */
+	private static function is_plausible_expiry( int $year, int $month ): bool {
+		if ( $month < 1 || $month > 12 ) {
+			return false;
 		}
-		return sprintf( '%04d%02d', $year, $month );
+		$current_year = (int) gmdate( 'Y' );
+		if ( $year < $current_year || $year > $current_year + 25 ) {
+			return false;
+		}
+		return ! ( $year === $current_year && $month < (int) gmdate( 'n' ) );
 	}
 
 	/**
