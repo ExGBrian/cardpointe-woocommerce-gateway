@@ -115,7 +115,7 @@ final class FormFields {
 				'title'       => __( 'Card form CSS', 'paradox-cardpointe-gateway' ),
 				'type'        => 'textarea',
 				'css'         => 'min-height:160px;font-family:monospace;',
-				'description' => __( 'CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. Only properties allowed by CardPointe are applied.', 'paradox-cardpointe-gateway' ),
+				'description' => __( 'CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. CardPointe validates this strictly and drops the whole stylesheet if any part is rejected, so avoid quoted font names such as "Segoe UI", vendor tokens starting with a hyphen, comma-separated selector groups and shorthands like box-shadow. If the form loads with serif labels and unstyled inputs, your CSS was rejected.', 'paradox-cardpointe-gateway' ),
 				'default'     => self::default_iframe_css( 'card' ),
 			),
 			'remove_data_on_uninstall' => array(
@@ -364,22 +364,31 @@ final class FormFields {
 	/**
 	 * Default CSS injected into the hosted iframe.
 	 *
+	 * CardPointe validates this stylesheet strictly and silently discards the whole
+	 * thing when it dislikes any part of it, so keep to the conservative subset below:
+	 * no quoted font names, no leading-hyphen vendor tokens, one selector per rule
+	 * (no comma groups) and no multi-value shorthands such as box-shadow.
+	 *
 	 * @param string $type card|echeck.
 	 */
 	public static function default_iframe_css( string $type ): string {
-		$base = 'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}'
-			. 'label{display:block;font-size:14px;font-weight:600;margin:0 0 4px;color:#333;}'
-			. 'input,select{font-size:16px;line-height:1.4;padding:10px 12px;border:1px solid #c9c9c9;border-radius:4px;box-sizing:border-box;width:100%;margin:0 0 10px;background:#fff;color:#222;}'
-			. 'input:focus,select:focus{outline:none;border-color:#2271b1;box-shadow:0 0 0 1px #2271b1;}'
-			. '.error{border-color:#d63638;}';
+		$base = 'body{margin:0;padding:0;font-family:system-ui,sans-serif;font-size:14px;color:#2c3338}'
+			. 'label{display:block;font-size:14px;font-weight:600;margin:0 0 4px;line-height:1.4}'
+			. 'input{width:100%;box-sizing:border-box;font-size:16px;line-height:1.4;padding:10px 12px;margin:0 0 12px;border:1px solid #8c8f94;border-radius:4px;background:#fff;color:#2c3338}'
+			. 'select{width:100%;box-sizing:border-box;font-size:16px;line-height:1.4;padding:10px 12px;margin:0 0 12px;border:1px solid #8c8f94;border-radius:4px;background:#fff;color:#2c3338}'
+			. 'input:focus{outline:none;border-color:#2271b1}'
+			. 'select:focus{outline:none;border-color:#2271b1}'
+			. '.error{border-color:#d63638}';
 
 		if ( 'echeck' === $type ) {
 			return $base;
 		}
 
 		return $base
-			. '#ccexpiryfieldmonth,#ccexpiryfieldyear,#ccexpirymonth,#ccexpiryyear{display:inline-block;width:48%;}'
-			. '#ccexpiryfieldmonth,#ccexpirymonth{margin-right:4%;}'
-			. '#cccvvfield{width:50%;}';
+			. '#ccexpiryfieldmonth{display:inline-block;width:46%}'
+			. '#ccexpiryfieldyear{display:inline-block;width:46%}'
+			. '#ccexpirymonth{display:inline-block;width:46%}'
+			. '#ccexpiryyear{display:inline-block;width:46%}'
+			. '#cccvvfield{width:46%}';
 	}
 }
