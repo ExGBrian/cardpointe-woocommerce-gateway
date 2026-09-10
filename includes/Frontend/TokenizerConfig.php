@@ -109,10 +109,15 @@ final class TokenizerConfig {
 	/**
 	 * Suggested iframe height in pixels.
 	 *
+	 * The frame cannot resize itself to its content across origins, so this has to cover
+	 * the tallest the form gets. With the default stylesheet a card form is three
+	 * label-plus-input groups; the allowance absorbs validation messages and taller fonts
+	 * rather than clipping the security code field off the bottom.
+	 *
 	 * @param AbstractGateway $gateway Gateway.
 	 */
 	public static function height( AbstractGateway $gateway ): int {
-		$height = 'echeck' === $gateway->payment_type() ? 70 : 250;
+		$height = 'echeck' === $gateway->payment_type() ? 80 : 285;
 		/**
 		 * Filters the tokenizer iframe height.
 		 *
