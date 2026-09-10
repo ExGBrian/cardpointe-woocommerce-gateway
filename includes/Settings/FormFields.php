@@ -115,7 +115,7 @@ final class FormFields {
 				'title'       => __( 'Card form CSS', 'paradox-cardpointe-gateway' ),
 				'type'        => 'textarea',
 				'css'         => 'min-height:160px;font-family:monospace;',
-				'description' => __( 'CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. CardPointe validates this strictly and drops the whole stylesheet if any part is rejected, so avoid quoted font names such as "Segoe UI", vendor tokens starting with a hyphen, comma-separated selector groups and shorthands like box-shadow. If the form loads with serif labels and unstyled inputs, your CSS was rejected.', 'paradox-cardpointe-gateway' ),
+				'description' => __( 'CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. CardPointe only accepts a limited subset. If the form loads with serif labels and unstyled inputs the whole stylesheet was rejected, so avoid quoted font names such as "Segoe UI", vendor tokens starting with a hyphen, comma-separated selector groups and shorthands like box-shadow. CardPointe also ignores box-sizing, so a percentage width excludes padding and borders: setting width:100% on a padded field overflows and pushes the expiry fields onto separate lines. Keep the account number below 100% and give the short fields fixed pixel widths.', 'paradox-cardpointe-gateway' ),
 				'default'     => self::default_iframe_css( 'card' ),
 			),
 			'remove_data_on_uninstall' => array(
@@ -364,31 +364,32 @@ final class FormFields {
 	/**
 	 * Default CSS injected into the hosted iframe.
 	 *
-	 * CardPointe validates this stylesheet strictly and silently discards the whole
-	 * thing when it dislikes any part of it, so keep to the conservative subset below:
-	 * no quoted font names, no leading-hyphen vendor tokens, one selector per rule
-	 * (no comma groups) and no multi-value shorthands such as box-shadow.
+	 * CardPointe validates this stylesheet strictly, and two separate failure modes bite here.
+	 * It silently discards the whole sheet if it dislikes any part, so avoid quoted font names,
+	 * leading-hyphen vendor tokens, comma-separated selector groups and multi-value shorthands.
+	 * It also drops `box-sizing` on its own, which means a percentage width does NOT include
+	 * padding and borders: `width:100%` on a padded input overflows its container and pushes
+	 * the expiry month and year onto separate lines. Hence 80% for the account number, and
+	 * fixed pixel widths for the short fields. This combination is verified against the
+	 * live tokenizer; re-test in the sandbox before changing any width here.
 	 *
 	 * @param string $type card|echeck.
 	 */
 	public static function default_iframe_css( string $type ): string {
-		$base = 'body{margin:0;padding:0;font-family:system-ui,sans-serif;font-size:14px;color:#2c3338}'
-			. 'label{display:block;font-size:14px;font-weight:600;margin:0 0 4px;line-height:1.4}'
-			. 'input{width:100%;box-sizing:border-box;font-size:16px;line-height:1.4;padding:10px 12px;margin:0 0 12px;border:1px solid #8c8f94;border-radius:4px;background:#fff;color:#2c3338}'
-			. 'select{width:100%;box-sizing:border-box;font-size:16px;line-height:1.4;padding:10px 12px;margin:0 0 12px;border:1px solid #8c8f94;border-radius:4px;background:#fff;color:#2c3338}'
-			. 'input:focus{outline:none;border-color:#2271b1}'
-			. 'select:focus{outline:none;border-color:#2271b1}'
-			. '.error{border-color:#d63638}';
+		$base = 'body{font-family:system-ui,sans-serif;color:#2c3338}'
+			. 'label{font-size:15px;font-weight:600;margin:10px 0 4px}'
+			. 'input{font-family:system-ui,sans-serif;font-size:17px;padding:6px 8px;margin:0 0 14px;border:1px solid #8c8f94;border-radius:4px;color:#2c3338}'
+			. 'input:focus{border-color:#2271b1}'
+			. '.error{border-color:#d63638}'
+			. '#ccnumfield{width:80%}';
 
 		if ( 'echeck' === $type ) {
 			return $base;
 		}
 
 		return $base
-			. '#ccexpiryfieldmonth{display:inline-block;width:46%}'
-			. '#ccexpiryfieldyear{display:inline-block;width:46%}'
-			. '#ccexpirymonth{display:inline-block;width:46%}'
-			. '#ccexpiryyear{display:inline-block;width:46%}'
-			. '#cccvvfield{width:46%}';
+			. '#ccexpiryfieldmonth{width:100px}'
+			. '#ccexpiryfieldyear{width:100px}'
+			. '#cccvvfield{width:100px}';
 	}
 }
