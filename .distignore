@@ -13,4 +13,5 @@
 /composer.lock
 /phpcs.xml.dist
 /README.md
+/docs
 /RELEASING.md
