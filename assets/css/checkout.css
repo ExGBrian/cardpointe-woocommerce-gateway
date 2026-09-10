@@ -1,0 +1,93 @@
+/* CardPointe Payment Gateway - checkout styles */
+.paradox-cardpointe-form {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+.paradox-cardpointe-frame-wrap {
+	position: relative;
+	width: 100%;
+}
+.paradox-cardpointe-frame iframe,
+.paradox-cardpointe-iframe {
+	display: block;
+	width: 100%;
+	border: 0;
+}
+.paradox-cardpointe-loading {
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 0;
+	padding: 8px 0;
+	font-size: 0.9em;
+	opacity: 0.7;
+}
+.paradox-cardpointe-frame[data-ready="1"] + .paradox-cardpointe-loading {
+	display: none;
+}
+.paradox-cardpointe-errors {
+	margin: 0 0 12px;
+}
+.paradox-cardpointe-errors[hidden] {
+	display: none;
+}
+.paradox-cardpointe-status {
+	margin: 4px 0 8px;
+	font-size: 0.9em;
+	min-height: 1em;
+}
+.paradox-cardpointe-status:empty {
+	display: none;
+}
+.paradox-cardpointe-card-icon {
+	display: inline-block;
+	width: 32px;
+	height: 20px;
+	vertical-align: middle;
+	margin: 0 2px;
+}
+.paradox-cardpointe-icons {
+	display: inline-flex;
+	gap: 2px;
+	margin-left: 8px;
+	vertical-align: middle;
+}
+.paradox-cardpointe-sandbox-notice {
+	background: #fff8e5;
+	border-left: 4px solid #dba617;
+	padding: 6px 10px;
+	font-size: 0.85em;
+	margin: 0 0 12px;
+}
+.paradox-cardpointe-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+.paradox-cardpointe-radio {
+	display: inline-block;
+	margin-right: 16px;
+}
+.paradox-cardpointe-help small {
+	display: block;
+	opacity: 0.8;
+}
+.paradox-cardpointe-consent label {
+	display: block;
+	font-size: 0.9em;
+	line-height: 1.4;
+}
+.paradox-cardpointe-consent input {
+	margin-right: 6px;
+}
+.paradox-cardpointe-receipt {
+	margin-top: 2em;
+}
+.paradox-cardpointe-receipt-table th {
+	width: 40%;
+	text-align: left;
+}
+.wc-block-components-payment-method-label .paradox-cardpointe-icons img {
+	max-height: 24px;
+}

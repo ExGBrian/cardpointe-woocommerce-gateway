@@ -1,0 +1,103 @@
+/* CardPointe Payment Gateway - admin styles */
+.paradox-cardpointe-settings-header {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #2271b1;
+	padding: 12px 16px;
+	margin: 16px 0;
+}
+.paradox-cardpointe-settings-header h2 {
+	margin: 0 0 6px;
+}
+.paradox-cardpointe-badge {
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+	padding: 4px 8px;
+	border-radius: 10px;
+	vertical-align: middle;
+	text-transform: uppercase;
+}
+.paradox-cardpointe-badge-sandbox {
+	background: #fcf0d0;
+	color: #7a5200;
+}
+.paradox-cardpointe-badge-live {
+	background: #d7f0dc;
+	color: #1a5f2a;
+}
+tr.paradox-cardpointe-env-inactive th,
+tr.paradox-cardpointe-env-inactive td {
+	opacity: 0.55;
+}
+tr.paradox-cardpointe-env-active th {
+	border-left: 3px solid #2271b1;
+	padding-left: 8px;
+}
+.paradox-cardpointe-test-result {
+	margin-top: 8px;
+}
+.paradox-cardpointe-merchant-info {
+	display: grid;
+	grid-template-columns: max-content auto;
+	gap: 2px 12px;
+	margin: 6px 0;
+}
+.paradox-cardpointe-merchant-info dt {
+	font-weight: 600;
+}
+.paradox-cardpointe-merchant-info dd {
+	margin: 0;
+}
+.paradox-cardpointe-ok {
+	color: #1a5f2a;
+	font-weight: 600;
+}
+.paradox-cardpointe-fail {
+	color: #b32d2e;
+	font-weight: 600;
+}
+.paradox-cardpointe-warn {
+	color: #7a5200;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-details {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 8px 0;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-details th {
+	text-align: left;
+	padding: 3px 6px 3px 0;
+	white-space: nowrap;
+	font-weight: 600;
+	vertical-align: top;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-details td {
+	padding: 3px 0;
+	word-break: break-all;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-state {
+	margin-left: 6px;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-warning {
+	background: #fff8e5;
+	border-left: 3px solid #dba617;
+	padding: 6px 8px;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-actions label {
+	display: block;
+	margin-bottom: 4px;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-actions input.wc_input_price {
+	width: 45%;
+	margin-right: 6px;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-refunds {
+	margin: 0 0 8px 16px;
+	list-style: disc;
+}
+.paradox-cardpointe-meta-box .paradox-cardpointe-action-result {
+	margin-top: 6px;
+	min-height: 1em;
+}

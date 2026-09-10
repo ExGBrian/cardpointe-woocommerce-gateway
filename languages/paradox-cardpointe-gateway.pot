@@ -1,0 +1,1400 @@
+# Copyright (C) 2026 Paradox Solutions
+# This file is distributed under the GPL-3.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: CardPointe Payment Gateway for WooCommerce 1.0.0\n"
+"Report-Msgid-Bugs-To: https://paradoxsolutions.io\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-09T00:00:00+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: paradox-makepot\n"
+"X-Domain: paradox-cardpointe-gateway\n"
+
+#. translators: %s: settings URL
+#: includes/Admin/Notices.php:51
+msgid "Thanks for installing CardPointe Payment Gateway. <a href=\"%s\">Enter your CardPointe credentials</a> to start accepting payments."
+msgstr ""
+
+#. translators: 1: environment, 2: settings URL
+#: includes/Admin/Notices.php:73
+msgid "CardPointe is enabled but the %1$s credentials are incomplete. <a href=\"%2$s\">Complete the settings</a> to accept payments."
+msgstr ""
+
+#. translators: 1: environment, 2: settings URL
+#: includes/Admin/Notices.php:74
+msgid "sandbox"
+msgstr ""
+
+#. translators: 1: environment, 2: settings URL
+#: includes/Admin/Notices.php:74
+msgid "production"
+msgstr ""
+
+#: includes/Admin/Notices.php:84
+msgid "CardPointe is in production mode but checkout is not served over HTTPS. The payment methods will be hidden until HTTPS is enabled."
+msgstr ""
+
+#: includes/Admin/Notices.php:91
+msgid "CardPointe sandbox mode is on: customers cannot make real payments."
+msgstr ""
+
+#: includes/Admin/Notices.php:98
+msgid "The CardPointe eCheck gateway is enabled but your merchant ID is not configured for ACH. Contact CardPointe support to enable ACH, or disable the eCheck gateway."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:62
+msgid "CardPointe"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:105
+msgid "Voided"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:107
+msgid "Captured (%s)"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:107
+#: includes/Admin/OrderActions.php:127
+msgid "Captured"
+msgstr ""
+
+#. translators: %s: settlement status
+#: includes/Admin/OrderActions.php:109
+msgid "Authorized, not captured"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:111
+msgid "Payment method vaulted, not charged"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:113
+msgid "Pending / unknown"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:113
+msgid "No transaction"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:118
+#: includes/Blocks/EcheckBlocksMethod.php:47
+#: includes/Settings/FormFields.php:178
+#: templates/checkout/echeck-fields.php:21
+msgid "Savings"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:118
+#: includes/Blocks/EcheckBlocksMethod.php:46
+#: includes/Settings/FormFields.php:177
+#: templates/checkout/echeck-fields.php:20
+msgid "Checking"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:120
+#: includes/Gateway/Receipt.php:60
+#: includes/Integrations/Subscriptions.php:228
+msgid "Card"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:124
+msgid "Retref"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:125
+msgid "Auth code"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:126
+msgid "Authorized"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:128
+msgid "Method"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:129
+msgid "AVS"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:130
+#: includes/Frontend/TokenizerConfig.php:68
+msgid "CVV"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:131
+msgid "Profile"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:132
+msgid "Gateway order"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:139
+#: templates/admin/order-meta-box.php:57
+msgid "Void"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:139
+msgid "Refund"
+msgstr ""
+
+#. translators: %s: date
+#: includes/Admin/OrderActions.php:151
+msgid "Authorizations usually expire after 7 days (around %s). Capture before then."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:195
+msgid "CardPointe: capture authorization"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:196
+msgid "CardPointe: void authorization"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:210
+#: includes/Gateway/TransactionManager.php:101
+msgid "CardPointe capture failed:"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:224
+#: includes/Admin/OrderActions.php:268
+msgid "Order cancelled after CardPointe void."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:227
+#: includes/Gateway/TransactionManager.php:167
+msgid "CardPointe void failed:"
+msgstr ""
+
+#. translators: %s: amount
+#: includes/Admin/OrderActions.php:249
+msgid "Captured %s."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:270
+msgid "Transaction voided."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:288
+msgid "An approved transaction was found and applied to the order."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:289
+msgid "No approved transaction was found for the pending attempt."
+msgstr ""
+
+#. translators: 1: settlement status, 2: voidable, 3: refundable
+#: includes/Admin/OrderActions.php:298
+msgid "Status: %1$s. Voidable: %2$s. Refundable: %3$s."
+msgstr ""
+
+#. translators: 1: settlement status, 2: voidable, 3: refundable
+#: includes/Admin/OrderActions.php:299
+#: includes/Gateway/TransactionManager.php:287
+msgid "unknown"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:316
+#: includes/Admin/SettingsUi.php:36
+msgid "You are not allowed to do that."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:321
+#: includes/Gateway/AbstractGateway.php:312
+msgid "Order not found."
+msgstr ""
+
+#: includes/Admin/OrderActions.php:360
+msgid "CardPointe automatic capture failed:"
+msgstr ""
+
+#: includes/Admin/OrderActions.php:386
+msgid "CardPointe automatic void failed:"
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:55
+msgid "Please fill in the site name, merchant ID, API username and API password first."
+msgstr ""
+
+#. translators: %s: site name
+#: includes/Admin/SettingsUi.php:72
+msgid "CardPointe reports this merchant ID is boarded to site \"%s\". Use that as the site name if requests fail."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:77
+msgid "The merchant account is not enabled for processing."
+msgstr ""
+
+#: includes/Api/ApiException.php:91
+msgid "We could not confirm your payment because the payment service did not respond in time. You have not been charged. Please try again."
+msgstr ""
+
+#: includes/Api/ApiException.php:93
+msgid "The payment service rejected the store credentials. Please contact the store owner."
+msgstr ""
+
+#: includes/Api/ApiException.php:95
+msgid "The payment service is busy. Please wait a moment and try again."
+msgstr ""
+
+#: includes/Api/ApiException.php:97
+msgid "We were unable to reach the payment service. Please try again or use a different payment method."
+msgstr ""
+
+#: includes/Api/Client.php:272
+msgid "The CardPointe API rejected the username or password."
+msgstr ""
+
+#. translators: %d: seconds
+#: includes/Api/Client.php:281
+msgid "The CardPointe API rate limit was reached. Retry after %d seconds."
+msgstr ""
+
+#. translators: 1: HTTP status, 2: message
+#: includes/Api/Client.php:304
+msgid "CardPointe API error (HTTP %1$d): %2$s"
+msgstr ""
+
+#: includes/Api/Client.php:314
+msgid "The CardPointe API returned an unreadable response."
+msgstr ""
+
+#: includes/Api/Response.php:168
+msgid "Unknown gateway response"
+msgstr ""
+
+#: includes/Blocks/AbstractBlocksMethod.php:115
+#: includes/Gateway/AbstractGateway.php:238
+msgid "SANDBOX MODE: no real payments are processed."
+msgstr ""
+
+#: includes/Blocks/EcheckBlocksMethod.php:61
+#: templates/checkout/echeck-fields.php:32
+msgid "Account type"
+msgstr ""
+
+#: includes/Blocks/EcheckBlocksMethod.php:62
+#: includes/Frontend/TokenizerConfig.php:48
+#: templates/checkout/echeck-fields.php:42
+msgid "Routing number / Account number"
+msgstr ""
+
+#: includes/Blocks/EcheckBlocksMethod.php:63
+#: templates/checkout/echeck-fields.php:43
+msgid "Type your routing number, a slash, then your account number, e.g. 123456789/000123456."
+msgstr ""
+
+#. translators: 1: required PHP version, 2: current PHP version
+#: includes/Compatibility.php:26
+msgid "CardPointe Payment Gateway requires PHP %1$s or newer. This server runs PHP %2$s."
+msgstr ""
+
+#: includes/Compatibility.php:33
+msgid "CardPointe Payment Gateway requires WooCommerce to be installed and active."
+msgstr ""
+
+#. translators: 1: required WooCommerce version, 2: current WooCommerce version
+#: includes/Compatibility.php:39
+msgid "CardPointe Payment Gateway requires WooCommerce %1$s or newer. You are running WooCommerce %2$s."
+msgstr ""
+
+#: includes/Compatibility.php:46
+msgid "CardPointe Payment Gateway requires an HTTP transport with SSL support (cURL with OpenSSL) to talk to the CardPointe API."
+msgstr ""
+
+#: includes/Frontend/Assets.php:85
+#: includes/Gateway/PaymentSource.php:82
+msgid "Please enter your card details."
+msgstr ""
+
+#: includes/Frontend/Assets.php:86
+#: includes/Gateway/PaymentSource.php:83
+msgid "Please enter your bank routing and account numbers."
+msgstr ""
+
+#: includes/Frontend/Assets.php:87
+msgid "The card details are not valid. Please check them and try again."
+msgstr ""
+
+#: includes/Frontend/Assets.php:88
+msgid "Enter your routing number, a slash, then your account number (for example 123456789/000123456)."
+msgstr ""
+
+#: includes/Frontend/Assets.php:89
+msgid "%s cards are not accepted."
+msgstr ""
+
+#: includes/Frontend/Assets.php:90
+#: includes/Gateway/PaymentSource.php:100
+msgid "Please choose your bank account type."
+msgstr ""
+
+#: includes/Frontend/Assets.php:91
+#: includes/Gateway/PaymentSource.php:104
+msgid "Please authorize the bank account debit to continue."
+msgstr ""
+
+#: includes/Frontend/Assets.php:92
+msgid "The secure payment form did not respond. Please re-enter your details."
+msgstr ""
+
+#: includes/Frontend/Assets.php:93
+#: templates/checkout/card-fields.php:32
+#: templates/checkout/echeck-fields.php:52
+msgid "Loading secure payment form…"
+msgstr ""
+
+#: includes/Frontend/Assets.php:94
+msgid "Card type: %s"
+msgstr ""
+
+#: includes/Frontend/Assets.php:97
+msgid "Invalid account number."
+msgstr ""
+
+#: includes/Frontend/Assets.php:98
+msgid "Invalid security code."
+msgstr ""
+
+#: includes/Frontend/Assets.php:99
+msgid "Invalid expiration date."
+msgstr ""
+
+#: includes/Frontend/Assets.php:100
+msgid "Card number is required."
+msgstr ""
+
+#: includes/Frontend/Assets.php:101
+msgid "Security code is required."
+msgstr ""
+
+#: includes/Frontend/Assets.php:102
+msgid "Expiration date is required."
+msgstr ""
+
+#: includes/Frontend/Assets.php:130
+msgid "Testing connection…"
+msgstr ""
+
+#: includes/Frontend/Assets.php:131
+msgid "Connected."
+msgstr ""
+
+#: includes/Frontend/Assets.php:132
+msgid "Connection failed."
+msgstr ""
+
+#: includes/Frontend/Assets.php:133
+msgid "Yes"
+msgstr ""
+
+#: includes/Frontend/Assets.php:134
+msgid "No"
+msgstr ""
+
+#: includes/Frontend/Assets.php:136
+msgid "Host"
+msgstr ""
+
+#: includes/Frontend/Assets.php:137
+msgid "Site"
+msgstr ""
+
+#: includes/Frontend/Assets.php:138
+msgid "Merchant enabled"
+msgstr ""
+
+#: includes/Frontend/Assets.php:139
+msgid "ACH / eCheck"
+msgstr ""
+
+#: includes/Frontend/Assets.php:140
+msgid "CVV verification"
+msgstr ""
+
+#: includes/Frontend/Assets.php:141
+msgid "AVS verification"
+msgstr ""
+
+#: includes/Frontend/Assets.php:142
+msgid "Account updater"
+msgstr ""
+
+#: includes/Frontend/Assets.php:143
+msgid "Processor"
+msgstr ""
+
+#: includes/Frontend/Assets.php:161
+msgid "Void this transaction? The customer will not be charged."
+msgstr ""
+
+#: includes/Frontend/Assets.php:162
+msgid "Capture %s now?"
+msgstr ""
+
+#: includes/Frontend/Assets.php:163
+msgid "Working…"
+msgstr ""
+
+#: includes/Frontend/Assets.php:164
+msgid "The request failed. Please try again."
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:49
+msgid "Bank routing and account number"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:67
+#: includes/Frontend/TokenizerConfig.php:71
+msgid "Card number"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:72
+msgid "Expiration date"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:73
+msgid "Security code"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:74
+msgid "Credit card number"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:75
+msgid "Expiration month"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:76
+msgid "Expiration year"
+msgstr ""
+
+#: includes/Frontend/TokenizerConfig.php:77
+msgid "Card security code"
+msgstr ""
+
+#: includes/Gateway/AbstractGateway.php:286
+msgid "The order could not be found."
+msgstr ""
+
+#: includes/Gateway/AbstractGateway.php:356
+#: includes/Settings/FormFields.php:254
+msgid "Sandbox mode"
+msgstr ""
+
+#: includes/Gateway/AbstractGateway.php:357
+msgid "Production mode"
+msgstr ""
+
+#. translators: 1: plugin version, 2: link
+#: includes/Gateway/AbstractGateway.php:364
+msgid "Version %1$s by %2$s"
+msgstr ""
+
+#: includes/Gateway/AbstractGateway.php:420
+msgid "Test connection"
+msgstr ""
+
+#: includes/Gateway/AbstractGateway.php:424
+msgid "Checks the credentials of the environment selected above using the values currently in the form (unsaved changes included)."
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:27
+msgid "CardPointe - Credit Card"
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:28
+msgid "Accept credit and debit cards through CardPointe. Card data is entered in a hosted iframe and tokenized by CardSecure, so it never touches your server."
+msgstr ""
+
+#: includes/Gateway/CardTypes.php:30
+msgid "Visa"
+msgstr ""
+
+#: includes/Gateway/CardTypes.php:31
+msgid "Mastercard"
+msgstr ""
+
+#: includes/Gateway/CardTypes.php:32
+msgid "American Express"
+msgstr ""
+
+#: includes/Gateway/CardTypes.php:33
+msgid "Discover"
+msgstr ""
+
+#: includes/Gateway/CardTypes.php:34
+msgid "Diners Club"
+msgstr ""
+
+#: includes/Gateway/CardTypes.php:35
+msgid "JCB"
+msgstr ""
+
+#: includes/Gateway/EcheckGateway.php:27
+msgid "CardPointe - eCheck (ACH)"
+msgstr ""
+
+#: includes/Gateway/EcheckGateway.php:28
+msgid "Accept eCheck payments through the ACH network using CardPointe. Bank details are tokenized in a hosted iframe. Requires ACH to be enabled on your CardPointe merchant account."
+msgstr ""
+
+#: includes/Gateway/EcheckGateway.php:127
+msgid "Use a new bank account"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:281
+msgid "Address matches, ZIP does not"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:282
+msgid "Address matches, postal code not verified"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:283
+msgid "Address and postal code match (international)"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:284
+msgid "AVS not allowed for this card type"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:285
+msgid "Address and postal code match (UK)"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:286
+msgid "Not supported by issuer (international)"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:287
+msgid "Address not verified (international)"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:288
+msgid "Address and postal code match"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:289
+msgid "No match on address or ZIP"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:290
+msgid "Postal code matches, address not verified"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:291
+msgid "Retry, system unavailable"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:292
+msgid "Service not supported by issuer"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:293
+msgid "Address information unavailable"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:294
+msgid "9-digit ZIP matches, address does not"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:295
+msgid "Address and 9-digit ZIP match"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:296
+msgid "Address and 5-digit ZIP match"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:297
+msgid "5-digit ZIP matches, address does not"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:300
+#: includes/Gateway/OrderMeta.php:318
+msgid "Not checked"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:310
+msgid "Match"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:311
+msgid "No match"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:312
+msgid "Not processed"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:313
+msgid "CVV not present"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:314
+msgid "Issuer not certified"
+msgstr ""
+
+#: includes/Gateway/OrderMeta.php:315
+msgid "No response"
+msgstr ""
+
+#. translators: %s: payment method description
+#: includes/Gateway/PaymentProcessor.php:177
+msgid "CardPointe: no charge required. Payment method verified and vaulted (%s)."
+msgstr ""
+
+#. translators: %s: payment method description
+#: includes/Gateway/PaymentProcessor.php:218
+msgid "CardPointe: payment method vaulted for pre-order (%s). It will be charged when the pre-order is released."
+msgstr ""
+
+#. translators: %s: payment method description
+#: includes/Gateway/PaymentProcessor.php:263
+msgid "CardPointe payment method updated (%s)."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:300
+msgid "No vaulted payment method is available for this order."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:359
+msgid "CardPointe did not respond in time and no approved transaction was found for this order."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:372
+msgid "We could not confirm your payment. You have not been charged. Please try again."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:400
+msgid "CardPointe timed out but the transaction was found approved via inquireByOrderid."
+msgstr ""
+
+#. translators: 1: amount, 2: payment method description, 3: retref, 4: auth code, 5: AVS text, 6: CVV text
+#: includes/Gateway/PaymentProcessor.php:437
+msgid "%1$s via %2$s. Retref: %3$s. Auth code: %4$s. AVS: %5$s. CVV: %6$s."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:447
+msgid "[Sandbox]"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:452
+msgid "CardPointe eCheck accepted, awaiting funds:"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:454
+msgid "CardPointe payment approved:"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:458
+msgid "CardPointe authorization approved (not yet captured):"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:458
+msgid "Capture from the CardPointe panel or by changing the status to Processing."
+msgstr ""
+
+#. translators: %s: gateway error text
+#: includes/Gateway/PaymentProcessor.php:475
+msgid "CardPointe declined the payment: %s"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:501
+msgid "CardPointe payment failed:"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:513
+msgid "the transaction was declined"
+msgstr ""
+
+#. translators: %s: decline reason
+#: includes/Gateway/PaymentProcessor.php:516
+msgid "Your payment was not approved (%s). Please check your details or try another payment method."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:620
+msgid "CardPointe: the payment method could not be added to the customer profile; the token will be used instead."
+msgstr ""
+
+#. translators: %s: card brand
+#: includes/Gateway/PaymentProcessor.php:681
+msgid "%s cards are not accepted. Please use a different card."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:720
+msgid "savings account"
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:720
+msgid "checking account"
+msgstr ""
+
+#. translators: 1: account type, 2: last four digits
+#: includes/Gateway/PaymentProcessor.php:722
+#: includes/Gateway/PaymentProcessor.php:726
+#: includes/Integrations/Subscriptions.php:231
+msgid "%1$s ending in %2$s"
+msgstr ""
+
+#. translators: 1: account type, 2: last four digits
+#: includes/Gateway/PaymentProcessor.php:724
+msgid "card"
+msgstr ""
+
+#: includes/Gateway/PaymentSource.php:91
+msgid "Please enter a valid card expiration date."
+msgstr ""
+
+#: includes/Gateway/PaymentSource.php:125
+msgid "The selected saved payment method is not available. Please choose another one."
+msgstr ""
+
+#: includes/Gateway/PaymentSource.php:130
+msgid "The selected saved payment method belongs to a different environment. Please add it again."
+msgstr ""
+
+#: includes/Gateway/Receipt.php:59
+#: includes/Integrations/Subscriptions.php:226
+#: includes/Tokens/TokenManager.php:193
+msgid "Savings account"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:59
+#: includes/Integrations/Subscriptions.php:226
+#: includes/Tokens/TokenManager.php:194
+msgid "Checking account"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:63
+msgid "Merchant"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:64
+msgid "Address"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:65
+msgid "Phone"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:66
+msgid "Date"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:67
+#: includes/Integrations/Privacy.php:149
+msgid "Payment method"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:68
+msgid "Name"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:69
+msgid "Amount"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:70
+msgid "Authorization code"
+msgstr ""
+
+#: includes/Gateway/Receipt.php:71
+msgid "Reference"
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:59
+msgid "This order has already been captured."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:62
+msgid "This authorization was voided and cannot be captured."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:67
+msgid "Enter an amount greater than zero."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:77
+msgid "The capture amount cannot exceed the authorized amount."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:110
+msgid "CardPointe capture declined:"
+msgstr ""
+
+#. translators: 1: amount, 2: retref
+#: includes/Gateway/TransactionManager.php:130
+msgid "CardPointe captured %1$s (retref %2$s)."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:161
+msgid "This transaction has already been voided."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:173
+msgid "CardPointe void declined:"
+msgstr ""
+
+#. translators: 1: amount, 2: retref
+#: includes/Gateway/TransactionManager.php:195
+msgid "CardPointe voided %1$s (retref %2$s)."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:227
+msgid "Refund amount must be greater than zero."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:257
+msgid "This order is authorized but not captured. Capture the reduced amount from the CardPointe panel instead, or void the full authorization."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:272
+msgid "This transaction is captured but not yet settled, so a partial refund is not possible yet. Try again after settlement (usually the next business day), or refund the full amount to void it."
+msgstr ""
+
+#. translators: %s: settlement status
+#: includes/Gateway/TransactionManager.php:286
+msgid "CardPointe reports this transaction is not refundable right now (status: %s). Please try again later or refund from the CardPointe portal."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:312
+msgid "CardPointe refund failed:"
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:318
+msgid "CardPointe refund declined:"
+msgstr ""
+
+#. translators: 1: amount, 2: refund retref, 3: reason
+#: includes/Gateway/TransactionManager.php:335
+msgid "CardPointe refunded %1$s (refund retref %2$s). %3$s"
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:338
+msgid "Reason:"
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:414
+msgid "CardPointe: pending transaction reconciled and found approved."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:425
+msgid "CardPointe: no approved transaction found for the pending order ID."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:439
+msgid "This order was not paid with CardPointe."
+msgstr ""
+
+#: includes/Gateway/TransactionManager.php:443
+msgid "No CardPointe transaction reference is stored for this order."
+msgstr ""
+
+#. translators: %s: environment
+#: includes/Gateway/TransactionManager.php:449
+msgid "This order was processed in the %s environment, which is not the active one. Switch environments to manage it."
+msgstr ""
+
+#: includes/Integrations/PreOrders.php:48
+msgid "CardPointe pre-order charge failed: no vaulted payment method is stored on the order."
+msgstr ""
+
+#: includes/Integrations/PreOrders.php:55
+msgid "CardPointe pre-order charge failed: the payment method was vaulted in a different environment."
+msgstr ""
+
+#: includes/Integrations/PreOrders.php:79
+msgid "CardPointe pre-order charge failed:"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:43
+msgid "When you pay with CardPointe, your card or bank account details are entered in a secure form hosted by CardPointe (Fiserv) and are never stored on this site. We store a payment reference, the last four digits of your account, the card brand, and, if you choose to save a payment method, a vault reference that lets us charge it later. See the CardPointe privacy policy for how they process your data."
+msgstr ""
+
+#: includes/Integrations/Privacy.php:44
+msgid "CardPointe Payment Gateway"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:55
+msgid "Retain CardPointe payment data"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:56
+msgid "Vault references and receipts on orders older than this are removed when a customer requests erasure."
+msgstr ""
+
+#: includes/Integrations/Privacy.php:59
+msgid "N/A"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:76
+#: includes/Integrations/Privacy.php:90
+msgid "CardPointe payment data"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:147
+msgid "Order"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:148
+msgid "CardPointe reference"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:150
+msgid "Vault profile"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:154
+msgid "CardPointe payments"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:169
+msgid "CardPointe profile (%s)"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:177
+msgid "CardPointe vault"
+msgstr ""
+
+#: includes/Integrations/Privacy.php:230
+msgid "Some CardPointe payment references were retained because the orders are within the retention period."
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:67
+msgid "CardPointe renewal failed: no vaulted payment method is stored for this subscription."
+msgstr ""
+
+#. translators: %s: environment
+#: includes/Integrations/Subscriptions.php:77
+msgid "CardPointe renewal failed: the payment method was vaulted in the %s environment, which is not active."
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:106
+msgid "CardPointe renewal failed:"
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:159
+msgid "CardPointe profile ID"
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:163
+msgid "CardPointe account ID"
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:167
+msgid "CardSecure token"
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:171
+msgid "Token expiry (YYYYMM)"
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:197
+msgid "Enter a CardPointe profile ID or a CardSecure token."
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:200
+msgid "The CardPointe profile ID must be numeric (up to 20 digits)."
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:203
+msgid "The CardSecure token must be 15 to 19 digits."
+msgstr ""
+
+#: includes/Integrations/Subscriptions.php:206
+msgid "Enter the token expiry as YYYYMM when using a CardSecure token."
+msgstr ""
+
+#: includes/Plugin.php:140
+msgid "Settings"
+msgstr ""
+
+#: includes/Plugin.php:141
+msgid "Paradox Solutions"
+msgstr ""
+
+#: includes/Settings/FormFields.php:27
+#: includes/Settings/FormFields.php:145
+msgid "Enable/Disable"
+msgstr ""
+
+#: includes/Settings/FormFields.php:28
+msgid "Enable CardPointe credit card payments"
+msgstr ""
+
+#: includes/Settings/FormFields.php:33
+#: includes/Settings/FormFields.php:151
+msgid "Title"
+msgstr ""
+
+#: includes/Settings/FormFields.php:35
+msgid "Payment method name shown to customers at checkout."
+msgstr ""
+
+#: includes/Settings/FormFields.php:36
+msgid "Credit Card"
+msgstr ""
+
+#: includes/Settings/FormFields.php:40
+#: includes/Settings/FormFields.php:157
+msgid "Description"
+msgstr ""
+
+#: includes/Settings/FormFields.php:42
+msgid "Short text shown under the payment method name at checkout."
+msgstr ""
+
+#: includes/Settings/FormFields.php:43
+msgid "Pay securely with your credit or debit card."
+msgstr ""
+
+#: includes/Settings/FormFields.php:52
+msgid "Transactions"
+msgstr ""
+
+#: includes/Settings/FormFields.php:57
+msgid "Transaction type"
+msgstr ""
+
+#: includes/Settings/FormFields.php:60
+msgid "\"Charge\" captures funds immediately. \"Authorize only\" places a hold; capture later from the order screen or by changing the order status to Processing or Completed. Authorizations typically expire after 7 days."
+msgstr ""
+
+#: includes/Settings/FormFields.php:63
+msgid "Charge (authorize and capture)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:64
+msgid "Authorize only"
+msgstr ""
+
+#: includes/Settings/FormFields.php:68
+msgid "Capture on status change"
+msgstr ""
+
+#: includes/Settings/FormFields.php:69
+msgid "Capture authorized orders when their status changes to Processing or Completed, and void them when changed to Cancelled"
+msgstr ""
+
+#: includes/Settings/FormFields.php:74
+msgid "Accepted card types"
+msgstr ""
+
+#: includes/Settings/FormFields.php:77
+msgid "Cards of other brands are rejected before any charge is attempted."
+msgstr ""
+
+#: includes/Settings/FormFields.php:83
+msgid "Card brand detection"
+msgstr ""
+
+#: includes/Settings/FormFields.php:84
+msgid "Look up the card brand with the CardPointe BIN service before charging (recommended)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:86
+msgid "When disabled, the brand is inferred from the token prefix only."
+msgstr ""
+
+#: includes/Settings/FormFields.php:91
+msgid "Saved cards"
+msgstr ""
+
+#: includes/Settings/FormFields.php:92
+msgid "Allow customers to save cards for faster checkout"
+msgstr ""
+
+#: includes/Settings/FormFields.php:94
+msgid "Card data is stored in the CardSecure vault as a CardPointe profile, never on this site."
+msgstr ""
+
+#: includes/Settings/FormFields.php:99
+msgid "Level 2 data"
+msgstr ""
+
+#: includes/Settings/FormFields.php:100
+msgid "Send tax amount and invoice number with each transaction (can lower interchange for corporate cards)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:110
+#: includes/Settings/FormFields.php:223
+msgid "Advanced"
+msgstr ""
+
+#: includes/Settings/FormFields.php:115
+msgid "Card form CSS"
+msgstr ""
+
+#: includes/Settings/FormFields.php:118
+msgid "CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. Only properties allowed by CardPointe are applied."
+msgstr ""
+
+#: includes/Settings/FormFields.php:122
+msgid "Uninstall"
+msgstr ""
+
+#: includes/Settings/FormFields.php:123
+msgid "Remove plugin settings and saved payment methods when the plugin is deleted"
+msgstr ""
+
+#: includes/Settings/FormFields.php:125
+msgid "Order data is never removed."
+msgstr ""
+
+#: includes/Settings/FormFields.php:146
+msgid "Enable CardPointe eCheck (ACH) payments"
+msgstr ""
+
+#: includes/Settings/FormFields.php:153
+msgid "Bank Account (eCheck)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:159
+msgid "Pay directly from your checking or savings account."
+msgstr ""
+
+#: includes/Settings/FormFields.php:163
+#: includes/Settings/FormFields.php:249
+msgid "CardPointe account"
+msgstr ""
+
+#. translators: %s: settings URL
+#: includes/Settings/FormFields.php:167
+msgid "API credentials, sandbox mode and logging are configured on the <a href=\"%s\">Credit Card gateway settings page</a>. eCheck uses the same account and requires ACH to be enabled on your merchant ID."
+msgstr ""
+
+#: includes/Settings/FormFields.php:172
+msgid "Account types"
+msgstr ""
+
+#: includes/Settings/FormFields.php:182
+msgid "Order status after acceptance"
+msgstr ""
+
+#: includes/Settings/FormFields.php:185
+msgid "ACH payments are accepted immediately but can be returned days later. Choose On hold if you prefer to wait for funds before fulfilling."
+msgstr ""
+
+#: includes/Settings/FormFields.php:188
+msgid "Processing (payment complete)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:189
+msgid "On hold (wait for funds to clear)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:193
+msgid "ACH processor"
+msgstr ""
+
+#: includes/Settings/FormFields.php:196
+msgid "Controls which SEC code field is sent. Fiserv ACH uses achEntryCode; ProfitStars uses ecomind. \"Both\" is safe for most accounts."
+msgstr ""
+
+#: includes/Settings/FormFields.php:199
+msgid "Send both fields (default)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:200
+msgid "Fiserv ACH (achEntryCode only)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:201
+msgid "ProfitStars (ecomind only)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:205
+msgid "Authorization text"
+msgstr ""
+
+#: includes/Settings/FormFields.php:208
+msgid "Shown with a required checkbox at checkout. Placeholders: {amount}, {company}, {site}."
+msgstr ""
+
+#: includes/Settings/FormFields.php:209
+msgid "I authorize {company} to electronically debit my bank account for {amount}, and, if necessary, to credit my account to correct erroneous debits."
+msgstr ""
+
+#: includes/Settings/FormFields.php:212
+msgid "Saved bank accounts"
+msgstr ""
+
+#: includes/Settings/FormFields.php:213
+msgid "Allow customers to save bank accounts for faster checkout"
+msgstr ""
+
+#: includes/Settings/FormFields.php:227
+msgid "Bank account form CSS"
+msgstr ""
+
+#: includes/Settings/FormFields.php:230
+msgid "CSS applied inside the hosted bank account form. Element ID: #ccnumfield."
+msgstr ""
+
+#: includes/Settings/FormFields.php:251
+msgid "Credentials are shared by the Credit Card and eCheck payment methods. Keep separate production and sandbox sets so you can switch with one checkbox."
+msgstr ""
+
+#: includes/Settings/FormFields.php:255
+msgid "Enable sandbox (UAT) mode and use the sandbox credentials"
+msgstr ""
+
+#: includes/Settings/FormFields.php:257
+msgid "In sandbox mode no real money moves. Use test card 4111 1111 1111 1111 with any future expiry and CVV."
+msgstr ""
+
+#: includes/Settings/FormFields.php:261
+msgid "Connection"
+msgstr ""
+
+#: includes/Settings/FormFields.php:267
+#: templates/admin/order-meta-box.php:16
+msgid "Production"
+msgstr ""
+
+#: includes/Settings/FormFields.php:267
+#: templates/admin/order-meta-box.php:16
+msgid "Sandbox"
+msgstr ""
+
+#. translators: %s: environment label
+#: includes/Settings/FormFields.php:271
+msgid "%s site name"
+msgstr ""
+
+#: includes/Settings/FormFields.php:274
+msgid "The subdomain of your CardPointe API URL, e.g. \"fts\" for https://fts.cardconnect.com."
+msgstr ""
+
+#: includes/Settings/FormFields.php:275
+msgid "Usually \"fts\"; resolves to https://fts-uat.cardconnect.com."
+msgstr ""
+
+#. translators: %s: environment label
+#: includes/Settings/FormFields.php:282
+msgid "%s merchant ID"
+msgstr ""
+
+#. translators: %s: environment label
+#: includes/Settings/FormFields.php:293
+msgid "%s API username"
+msgstr ""
+
+#. translators: %s: environment label
+#: includes/Settings/FormFields.php:301
+msgid "%s API password"
+msgstr ""
+
+#. translators: %s: constant name
+#: includes/Settings/FormFields.php:310
+msgid "Defined in wp-config.php via %s; the value stored here is ignored."
+msgstr ""
+
+#: includes/Settings/FormFields.php:319
+msgid "Logging"
+msgstr ""
+
+#: includes/Settings/FormFields.php:320
+msgid "Log API requests and responses to the WooCommerce log (card numbers, CVV and passwords are never written)"
+msgstr ""
+
+#. translators: %s: log viewer URL
+#: includes/Settings/FormFields.php:324
+msgid "View the log under <a href=\"%s\">WooCommerce &rarr; Status &rarr; Logs</a>."
+msgstr ""
+
+#: includes/Settings/FormFields.php:339
+msgid "Gateway receipts"
+msgstr ""
+
+#: includes/Settings/FormFields.php:341
+msgid "CardPointe can return receipt details (merchant DBA, address, authorization code) with each transaction."
+msgstr ""
+
+#: includes/Settings/FormFields.php:344
+msgid "Request receipts"
+msgstr ""
+
+#: includes/Settings/FormFields.php:345
+msgid "Request gateway receipt data and store it with the order"
+msgstr ""
+
+#: includes/Settings/FormFields.php:350
+msgid "Show on order pages"
+msgstr ""
+
+#: includes/Settings/FormFields.php:351
+msgid "Display the receipt on the order received page and in My Account order details"
+msgstr ""
+
+#: includes/Settings/FormFields.php:356
+msgid "Include in emails"
+msgstr ""
+
+#: includes/Settings/FormFields.php:357
+msgid "Append the receipt to customer order emails"
+msgstr ""
+
+#. translators: %s: gateway message
+#: includes/Tokens/ProfileService.php:113
+msgid "The payment method could not be saved (%s)."
+msgstr ""
+
+#. translators: %s: gateway message
+#: includes/Tokens/ProfileService.php:114
+msgid "unknown error"
+msgstr ""
+
+#: includes/Tokens/TokenManager.php:211
+msgid "Please log in to save a payment method."
+msgstr ""
+
+#: includes/Tokens/TokenManager.php:216
+msgid "Please enter a new payment method."
+msgstr ""
+
+#: includes/Tokens/TokenManager.php:238
+msgid "The payment method was verified but could not be saved. Please try again."
+msgstr ""
+
+#: templates/admin/order-meta-box.php:32
+msgid "Voids / refunds"
+msgstr ""
+
+#: templates/admin/order-meta-box.php:41
+msgid "A payment attempt did not complete. Use \"Refresh status\" to check CardPointe for an approved transaction."
+msgstr ""
+
+#: templates/admin/order-meta-box.php:51
+msgid "Capture amount"
+msgstr ""
+
+#: templates/admin/order-meta-box.php:53
+msgid "Capture"
+msgstr ""
+
+#: templates/admin/order-meta-box.php:60
+msgid "Refresh status"
+msgstr ""
+
+#: templates/checkout/card-fields.php:31
+msgid "Secure card entry form"
+msgstr ""
+
+#: templates/checkout/echeck-fields.php:51
+msgid "Secure bank account entry form"
+msgstr ""
+
+#: templates/receipt.php:20
+msgid "PAYMENT RECEIPT"
+msgstr ""
+
+#: templates/receipt.php:34
+msgid "Payment receipt"
+msgstr ""
+
