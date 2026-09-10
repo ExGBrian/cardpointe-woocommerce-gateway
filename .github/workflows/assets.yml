@@ -1,0 +1,27 @@
+name: Update WordPress.org assets
+
+# Banner, icon and screenshot changes do not need a new plugin version, so they
+# publish on their own whenever the asset directory changes on main.
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.wordpress-org/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  assets:
+    name: Publish banner, icon and screenshots
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: 10up/action-wordpress-plugin-asset-update@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: paradox-cardpointe-gateway
+          ASSETS_DIR: .wordpress-org

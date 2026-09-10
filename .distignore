@@ -1,0 +1,16 @@
+# Everything listed here is excluded from the package published to WordPress.org.
+# Development tooling and repository scaffolding must not ship to users.
+/.git
+/.github
+/.wordpress-org
+/node_modules
+/vendor
+/.distignore
+/.gitattributes
+/.gitignore
+/.DS_Store
+/composer.json
+/composer.lock
+/phpcs.xml.dist
+/README.md
+/RELEASING.md
