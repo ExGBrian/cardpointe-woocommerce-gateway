@@ -40,6 +40,19 @@ See `readme.txt` for the full WordPress.org style documentation and FAQ.
 - Templates in `templates/` can be overridden from a theme under `paradox-cardpointe-gateway/`.
 - Regenerate translations with `wp i18n make-pot . languages/paradox-cardpointe-gateway.pot`.
 
+## Releasing
+
+Publishing to the WordPress.org plugin directory is automated from tags. See
+[RELEASING.md](RELEASING.md) for the checklist and the required repository secrets.
+
+```sh
+git tag v1.0.1 && git push origin v1.0.1
+```
+
+Continuous integration runs PHP syntax checks on 7.4, 8.1 and 8.3, PHP_CodeSniffer
+against the WordPress standards, and the official Plugin Check tool that the review
+team uses.
+
 ## License
 
 GPL-3.0-or-later. See `LICENSE`.

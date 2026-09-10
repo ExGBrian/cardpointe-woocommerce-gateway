@@ -1,0 +1,24 @@
+{
+	"name": "paradoxsolutions/cardpointe-woocommerce-gateway",
+	"description": "CardPointe payment gateway for WooCommerce, using the CardPointe Hosted iFrame Tokenizer.",
+	"type": "wordpress-plugin",
+	"license": "GPL-3.0-or-later",
+	"homepage": "https://paradoxsolutions.io",
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"wp-coding-standards/wpcs": "^3.1",
+		"phpcompatibility/phpcompatibility-wp": "^2.1"
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"fix": "phpcbf"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}
