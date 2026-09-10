@@ -306,12 +306,12 @@ msgid "CardPointe Payment Gateway requires an HTTP transport with SSL support (c
 msgstr ""
 
 #: includes/Frontend/Assets.php:85
-#: includes/Gateway/PaymentSource.php:82
+#: includes/Gateway/PaymentSource.php:83
 msgid "Please enter your card details."
 msgstr ""
 
 #: includes/Frontend/Assets.php:86
-#: includes/Gateway/PaymentSource.php:83
+#: includes/Gateway/PaymentSource.php:84
 msgid "Please enter your bank routing and account numbers."
 msgstr ""
 
@@ -328,12 +328,12 @@ msgid "%s cards are not accepted."
 msgstr ""
 
 #: includes/Frontend/Assets.php:90
-#: includes/Gateway/PaymentSource.php:100
+#: includes/Gateway/PaymentSource.php:110
 msgid "Please choose your bank account type."
 msgstr ""
 
 #: includes/Frontend/Assets.php:91
-#: includes/Gateway/PaymentSource.php:104
+#: includes/Gateway/PaymentSource.php:114
 msgid "Please authorize the bank account debit to continue."
 msgstr ""
 
@@ -746,15 +746,15 @@ msgstr ""
 msgid "card"
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:91
+#: includes/Gateway/PaymentSource.php:101
 msgid "Please enter a valid card expiration date."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:125
+#: includes/Gateway/PaymentSource.php:135
 msgid "The selected saved payment method is not available. Please choose another one."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:130
+#: includes/Gateway/PaymentSource.php:140
 msgid "The selected saved payment method belongs to a different environment. Please add it again."
 msgstr ""
 
