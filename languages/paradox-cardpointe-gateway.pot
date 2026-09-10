@@ -1131,7 +1131,7 @@ msgid "Card form CSS"
 msgstr ""
 
 #: includes/Settings/FormFields.php:118
-msgid "CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. Only properties allowed by CardPointe are applied."
+msgid "CSS applied inside the hosted card form. Element IDs: #ccnumfield, #ccexpiryfieldmonth, #ccexpiryfieldyear, #cccvvfield, #cccardlabel, #ccexpirylabel, #cccvvlabel. CardPointe validates this strictly and drops the whole stylesheet if any part is rejected, so avoid quoted font names such as \"Segoe UI\", vendor tokens starting with a hyphen, comma-separated selector groups and shorthands like box-shadow. If the form loads with serif labels and unstyled inputs, your CSS was rejected."
 msgstr ""
 
 #: includes/Settings/FormFields.php:122
