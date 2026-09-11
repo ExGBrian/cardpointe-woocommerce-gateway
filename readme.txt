@@ -1,5 +1,5 @@
 === CardPointe Payment Gateway for WooCommerce ===
-Contributors: paradoxsolutions
+Contributors: exgbrian
 Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
