@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -100,10 +100,20 @@ CardPointe developer documentation: https://developer.cardpointe.com/
 
 == Changelog ==
 
+= 1.0.1 =
+* Fixed the hosted tokenizer iframe sometimes stalling the first time the payment form was shown, when reloading the page would display it correctly.
+* The iframe is no longer torn down and rebuilt each time WooCommerce refreshes the checkout, which restarted the request to CardPointe.
+* The iframe is now marked as eagerly loaded, so optimisation plugins that add lazy loading cannot defer it indefinitely.
+* Added a connection hint for the tokenizer host on checkout pages so the first load does not wait on a DNS lookup and TLS handshake.
+* If the form still does not appear, it is now retried automatically once and then offers a "Reload the payment form" link instead of waiting forever.
+
 = 1.0.0 =
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.0.1 =
+Fixes the secure payment form occasionally failing to appear until the checkout page was reloaded.
 
 = 1.0.0 =
 Initial release.
