@@ -23,27 +23,27 @@ final class Compatibility {
 		if ( version_compare( PHP_VERSION, PARADOX_CARDPOINTE_MIN_PHP, '<' ) ) {
 			return sprintf(
 				/* translators: 1: required PHP version, 2: current PHP version */
-				__( 'CardPointe Payment Gateway requires PHP %1$s or newer. This server runs PHP %2$s.', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe Payment Gateway requires PHP %1$s or newer. This server runs PHP %2$s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				PARADOX_CARDPOINTE_MIN_PHP,
 				PHP_VERSION
 			);
 		}
 
 		if ( ! class_exists( 'WooCommerce' ) || ! defined( 'WC_VERSION' ) ) {
-			return __( 'CardPointe Payment Gateway requires WooCommerce to be installed and active.', 'paradox-cardpointe-gateway' );
+			return __( 'CardPointe Payment Gateway requires WooCommerce to be installed and active.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 
 		if ( version_compare( WC_VERSION, PARADOX_CARDPOINTE_MIN_WC, '<' ) ) {
 			return sprintf(
 				/* translators: 1: required WooCommerce version, 2: current WooCommerce version */
-				__( 'CardPointe Payment Gateway requires WooCommerce %1$s or newer. You are running WooCommerce %2$s.', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe Payment Gateway requires WooCommerce %1$s or newer. You are running WooCommerce %2$s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				PARADOX_CARDPOINTE_MIN_WC,
 				WC_VERSION
 			);
 		}
 
 		if ( ! wp_http_supports( array( 'ssl' ) ) ) {
-			return __( 'CardPointe Payment Gateway requires an HTTP transport with SSL support (cURL with OpenSSL) to talk to the CardPointe API.', 'paradox-cardpointe-gateway' );
+			return __( 'CardPointe Payment Gateway requires an HTTP transport with SSL support (cURL with OpenSSL) to talk to the CardPointe API.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 
 		return null;

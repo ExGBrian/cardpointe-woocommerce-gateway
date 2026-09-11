@@ -88,13 +88,13 @@ class ApiException extends \Exception {
 	public function customer_message(): string {
 		switch ( $this->type ) {
 			case self::TIMEOUT:
-				return __( 'We could not confirm your payment because the payment service did not respond in time. You have not been charged. Please try again.', 'paradox-cardpointe-gateway' );
+				return __( 'We could not confirm your payment because the payment service did not respond in time. You have not been charged. Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' );
 			case self::INVALID_CREDENTIALS:
-				return __( 'The payment service rejected the store credentials. Please contact the store owner.', 'paradox-cardpointe-gateway' );
+				return __( 'The payment service rejected the store credentials. Please contact the store owner.', 'paradox-cardpointe-gateway-for-woocommerce' );
 			case self::RATE_LIMITED:
-				return __( 'The payment service is busy. Please wait a moment and try again.', 'paradox-cardpointe-gateway' );
+				return __( 'The payment service is busy. Please wait a moment and try again.', 'paradox-cardpointe-gateway-for-woocommerce' );
 			default:
-				return __( 'We were unable to reach the payment service. Please try again or use a different payment method.', 'paradox-cardpointe-gateway' );
+				return __( 'We were unable to reach the payment service. Please try again or use a different payment method.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 	}
 }

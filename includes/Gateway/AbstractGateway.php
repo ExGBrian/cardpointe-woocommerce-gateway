@@ -235,7 +235,7 @@ abstract class AbstractGateway extends \WC_Payment_Gateway {
 	 * Text shown at checkout in sandbox mode.
 	 */
 	protected function sandbox_notice(): string {
-		return __( 'SANDBOX MODE: no real payments are processed.', 'paradox-cardpointe-gateway' );
+		return __( 'SANDBOX MODE: no real payments are processed.', 'paradox-cardpointe-gateway-for-woocommerce' );
 	}
 
 	/**
@@ -283,7 +283,7 @@ abstract class AbstractGateway extends \WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
-			wc_add_notice( __( 'The order could not be found.', 'paradox-cardpointe-gateway' ), 'error' );
+			wc_add_notice( __( 'The order could not be found.', 'paradox-cardpointe-gateway-for-woocommerce' ), 'error' );
 			return array( 'result' => 'failure' );
 		}
 
@@ -309,7 +309,7 @@ abstract class AbstractGateway extends \WC_Payment_Gateway {
 	public function process_refund( $order_id, $amount = null, $reason = '' ) {
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
-			return new \WP_Error( 'paradox_cardpointe_order', __( 'Order not found.', 'paradox-cardpointe-gateway' ) );
+			return new \WP_Error( 'paradox_cardpointe_order', __( 'Order not found.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		$manager = new TransactionManager( $this );
 		return $manager->refund( $order, (float) $amount, (string) $reason );
@@ -353,15 +353,15 @@ abstract class AbstractGateway extends \WC_Payment_Gateway {
 	public function admin_options() {
 		$credentials = $this->credentials();
 		$badge       = $credentials->sandbox
-			? '<span class="paradox-cardpointe-badge paradox-cardpointe-badge-sandbox">' . esc_html__( 'Sandbox mode', 'paradox-cardpointe-gateway' ) . '</span>'
-			: '<span class="paradox-cardpointe-badge paradox-cardpointe-badge-live">' . esc_html__( 'Production mode', 'paradox-cardpointe-gateway' ) . '</span>';
+			? '<span class="paradox-cardpointe-badge paradox-cardpointe-badge-sandbox">' . esc_html__( 'Sandbox mode', 'paradox-cardpointe-gateway-for-woocommerce' ) . '</span>'
+			: '<span class="paradox-cardpointe-badge paradox-cardpointe-badge-live">' . esc_html__( 'Production mode', 'paradox-cardpointe-gateway-for-woocommerce' ) . '</span>';
 
 		echo '<div class="paradox-cardpointe-settings-header">';
 		echo '<h2>' . esc_html( $this->get_method_title() ) . ' ' . wp_kses_post( $badge ) . '</h2>';
 		echo '<p>' . wp_kses_post( $this->get_method_description() ) . '</p>';
 		echo '<p class="description">' . sprintf(
 			/* translators: 1: plugin version, 2: link */
-			esc_html__( 'Version %1$s by %2$s', 'paradox-cardpointe-gateway' ),
+			esc_html__( 'Version %1$s by %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			esc_html( PARADOX_CARDPOINTE_VERSION ),
 			'<a href="https://paradoxsolutions.io" target="_blank" rel="noopener noreferrer">Paradox Solutions</a>'
 		) . '</p>';
@@ -417,11 +417,11 @@ abstract class AbstractGateway extends \WC_Payment_Gateway {
 			<th scope="row" class="titledesc"><?php echo esc_html( $data['title'] ?? '' ); ?></th>
 			<td class="forminp">
 				<button type="button" class="button button-secondary" id="paradox-cardpointe-test-connection" data-nonce="<?php echo esc_attr( wp_create_nonce( 'paradox_cardpointe_admin' ) ); ?>">
-					<?php esc_html_e( 'Test connection', 'paradox-cardpointe-gateway' ); ?>
+					<?php esc_html_e( 'Test connection', 'paradox-cardpointe-gateway-for-woocommerce' ); ?>
 				</button>
 				<span class="spinner" style="float:none;margin-top:0;"></span>
 				<div id="paradox-cardpointe-test-connection-result" class="paradox-cardpointe-test-result" aria-live="polite"></div>
-				<p class="description"><?php esc_html_e( 'Checks the credentials of the environment selected above using the values currently in the form (unsaved changes included).', 'paradox-cardpointe-gateway' ); ?></p>
+				<p class="description"><?php esc_html_e( 'Checks the credentials of the environment selected above using the values currently in the form (unsaved changes included).', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
 			</td>
 		</tr>
 		<?php

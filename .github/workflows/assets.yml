@@ -23,5 +23,5 @@ jobs:
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-          SLUG: paradox-cardpointe-gateway
+          SLUG: paradox-cardpointe-gateway-for-woocommerce
           ASSETS_DIR: .wordpress-org

@@ -78,7 +78,7 @@ abstract class AbstractBlocksMethod extends AbstractPaymentMethodType {
 				true
 			);
 			if ( function_exists( 'wp_set_script_translations' ) ) {
-				wp_set_script_translations( $handle, 'paradox-cardpointe-gateway', PARADOX_CARDPOINTE_PATH . 'languages' );
+				wp_set_script_translations( $handle, 'paradox-cardpointe-gateway-for-woocommerce', PARADOX_CARDPOINTE_PATH . 'languages' );
 			}
 		}
 		return array( $handle );
@@ -112,7 +112,7 @@ abstract class AbstractBlocksMethod extends AbstractPaymentMethodType {
 			'showSavedCards'  => $logged_in && $gateway->supports( 'tokenization' ),
 			'showSaveOption'  => $logged_in && $gateway->supports( 'tokenization' ) && ! $gateway->is_forced_save_context(),
 			'isSandbox'       => $gateway->is_sandbox(),
-			'sandboxNotice'   => __( 'SANDBOX MODE: no real payments are processed.', 'paradox-cardpointe-gateway' ),
+			'sandboxNotice'   => __( 'SANDBOX MODE: no real payments are processed.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'i18n'            => Assets::i18n(),
 		);
 		return array_merge( $data, $this->extra_data( $gateway ) );

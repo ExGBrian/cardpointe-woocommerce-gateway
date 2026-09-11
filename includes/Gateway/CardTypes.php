@@ -27,12 +27,12 @@ final class CardTypes {
 	 */
 	public static function options(): array {
 		return array(
-			'visa'       => __( 'Visa', 'paradox-cardpointe-gateway' ),
-			'mastercard' => __( 'Mastercard', 'paradox-cardpointe-gateway' ),
-			'amex'       => __( 'American Express', 'paradox-cardpointe-gateway' ),
-			'discover'   => __( 'Discover', 'paradox-cardpointe-gateway' ),
-			'diners'     => __( 'Diners Club', 'paradox-cardpointe-gateway' ),
-			'jcb'        => __( 'JCB', 'paradox-cardpointe-gateway' ),
+			'visa'       => __( 'Visa', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'mastercard' => __( 'Mastercard', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'amex'       => __( 'American Express', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'discover'   => __( 'Discover', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'diners'     => __( 'Diners Club', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'jcb'        => __( 'JCB', 'paradox-cardpointe-gateway-for-woocommerce' ),
 		);
 	}
 

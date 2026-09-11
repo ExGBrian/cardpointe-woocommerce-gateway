@@ -99,7 +99,7 @@ final class Plugin {
 	 * Loads translations.
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( 'paradox-cardpointe-gateway', false, dirname( PARADOX_CARDPOINTE_BASENAME ) . '/languages' );
+		load_plugin_textdomain( 'paradox-cardpointe-gateway-for-woocommerce', false, dirname( PARADOX_CARDPOINTE_BASENAME ) . '/languages' );
 	}
 
 	/**
@@ -137,8 +137,8 @@ final class Plugin {
 	 * @return array
 	 */
 	public function plugin_action_links( $links ) {
-		$settings = '<a href="' . esc_url( self::settings_url() ) . '">' . esc_html__( 'Settings', 'paradox-cardpointe-gateway' ) . '</a>';
-		$docs     = '<a href="https://paradoxsolutions.io" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Paradox Solutions', 'paradox-cardpointe-gateway' ) . '</a>';
+		$settings = '<a href="' . esc_url( self::settings_url() ) . '">' . esc_html__( 'Settings', 'paradox-cardpointe-gateway-for-woocommerce' ) . '</a>';
+		$docs     = '<a href="https://paradoxsolutions.io" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Paradox Solutions', 'paradox-cardpointe-gateway-for-woocommerce' ) . '</a>';
 		array_unshift( $links, $settings, $docs );
 		return $links;
 	}
@@ -237,13 +237,13 @@ final class Plugin {
 	}
 
 	/**
-	 * Loads a plugin template, allowing theme overrides in {theme}/paradox-cardpointe-gateway/.
+	 * Loads a plugin template, allowing theme overrides in {theme}/paradox-cardpointe-gateway-for-woocommerce/.
 	 *
 	 * @param string $template Relative template path, e.g. checkout/card-fields.php.
 	 * @param array  $args     Variables exposed to the template.
 	 */
 	public static function template( string $template, array $args = array() ) {
-		wc_get_template( $template, $args, 'paradox-cardpointe-gateway/', PARADOX_CARDPOINTE_PATH . 'templates/' );
+		wc_get_template( $template, $args, 'paradox-cardpointe-gateway-for-woocommerce/', PARADOX_CARDPOINTE_PATH . 'templates/' );
 	}
 
 	/**
@@ -253,6 +253,6 @@ final class Plugin {
 	 * @param array  $args     Variables exposed to the template.
 	 */
 	public static function template_html( string $template, array $args = array() ): string {
-		return wc_get_template_html( $template, $args, 'paradox-cardpointe-gateway/', PARADOX_CARDPOINTE_PATH . 'templates/' );
+		return wc_get_template_html( $template, $args, 'paradox-cardpointe-gateway-for-woocommerce/', PARADOX_CARDPOINTE_PATH . 'templates/' );
 	}
 }

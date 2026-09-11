@@ -190,8 +190,8 @@ final class TokenManager {
 			return $item;
 		}
 		$type = 'ESAV' === $token->get_meta( self::META_ACCTTYPE, true )
-			? __( 'Savings account', 'paradox-cardpointe-gateway' )
-			: __( 'Checking account', 'paradox-cardpointe-gateway' );
+			? __( 'Savings account', 'paradox-cardpointe-gateway-for-woocommerce' )
+			: __( 'Checking account', 'paradox-cardpointe-gateway-for-woocommerce' );
 		$item['method']['last4'] = $token->get_last4();
 		$item['method']['brand'] = $type;
 		return $item;
@@ -208,12 +208,12 @@ final class TokenManager {
 	public function add_payment_method( AbstractGateway $gateway ): array {
 		$user_id = get_current_user_id();
 		if ( ! $user_id ) {
-			throw new \Exception( __( 'Please log in to save a payment method.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'Please log in to save a payment method.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$source = PaymentSource::from_request( $gateway );
 		if ( $source->is_saved() ) {
-			throw new \Exception( __( 'Please enter a new payment method.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'Please enter a new payment method.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$processor = new PaymentProcessor( $gateway );
@@ -235,7 +235,7 @@ final class TokenManager {
 			$source->wc_token = self::save_source( $user_id, $gateway->id, $source, $gateway->credentials() );
 		}
 		if ( ! $source->wc_token ) {
-			throw new \Exception( __( 'The payment method was verified but could not be saved. Please try again.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'The payment method was verified but could not be saved. Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		return array(

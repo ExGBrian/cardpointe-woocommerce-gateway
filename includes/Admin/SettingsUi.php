@@ -33,7 +33,7 @@ final class SettingsUi {
 		check_ajax_referer( 'paradox_cardpointe_admin', 'nonce' );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'paradox-cardpointe-gateway' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'paradox-cardpointe-gateway-for-woocommerce' ) ), 403 );
 		}
 
 		$env      = isset( $_POST['environment'] ) && 'production' === $_POST['environment'] ? 'production' : 'sandbox';
@@ -52,7 +52,7 @@ final class SettingsUi {
 
 		$credentials = Credentials::from_values( $site, $merchant, $username, $password, 'sandbox' === $env );
 		if ( ! $credentials->is_complete() ) {
-			wp_send_json_error( array( 'message' => __( 'Please fill in the site name, merchant ID, API username and API password first.', 'paradox-cardpointe-gateway' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Please fill in the site name, merchant ID, API username and API password first.', 'paradox-cardpointe-gateway-for-woocommerce' ) ) );
 		}
 
 		try {
@@ -69,12 +69,12 @@ final class SettingsUi {
 		if ( '' !== $site_out && strtolower( $site_out ) !== strtolower( $credentials->site ) && strtolower( $site_out ) !== strtolower( $credentials->site . '-uat' ) ) {
 			$warnings[] = sprintf(
 				/* translators: %s: site name */
-				__( 'CardPointe reports this merchant ID is boarded to site "%s". Use that as the site name if requests fail.', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe reports this merchant ID is boarded to site "%s". Use that as the site name if requests fail.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				$site_out
 			);
 		}
 		if ( isset( $info['enabled'] ) && ! filter_var( $info['enabled'], FILTER_VALIDATE_BOOLEAN ) && 'Y' !== strtoupper( (string) $info['enabled'] ) ) {
-			$warnings[] = __( 'The merchant account is not enabled for processing.', 'paradox-cardpointe-gateway' );
+			$warnings[] = __( 'The merchant account is not enabled for processing.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 
 		wp_send_json_success(

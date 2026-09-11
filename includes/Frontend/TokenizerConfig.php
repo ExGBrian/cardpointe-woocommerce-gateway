@@ -45,8 +45,8 @@ final class TokenizerConfig {
 				'invalidinputevent'     => 'true',
 				'sendcssloadedevent'    => 'true',
 				'sendcardtypingevent'   => 'true',
-				'placeholder'           => __( 'Routing number / Account number', 'paradox-cardpointe-gateway' ),
-				'cardtitle'             => __( 'Bank routing and account number', 'paradox-cardpointe-gateway' ),
+				'placeholder'           => __( 'Routing number / Account number', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'cardtitle'             => __( 'Bank routing and account number', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			);
 		} else {
 			$params = array(
@@ -64,17 +64,17 @@ final class TokenizerConfig {
 				'inactivityto'           => '500',
 				'sendcssloadedevent'     => 'true',
 				'sendcardtypingevent'    => 'true',
-				'placeholder'            => __( 'Card number', 'paradox-cardpointe-gateway' ),
-				'placeholdercvv'         => __( 'CVV', 'paradox-cardpointe-gateway' ),
+				'placeholder'            => __( 'Card number', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'placeholdercvv'         => __( 'CVV', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				'placeholdermonth'       => 'MM',
 				'placeholderyear'        => 'YYYY',
-				'cardlabel'              => __( 'Card number', 'paradox-cardpointe-gateway' ),
-				'expirylabel'            => __( 'Expiration date', 'paradox-cardpointe-gateway' ),
-				'cvvlabel'               => __( 'Security code', 'paradox-cardpointe-gateway' ),
-				'cardtitle'              => __( 'Credit card number', 'paradox-cardpointe-gateway' ),
-				'expirymonthtitle'       => __( 'Expiration month', 'paradox-cardpointe-gateway' ),
-				'expiryyeartitle'        => __( 'Expiration year', 'paradox-cardpointe-gateway' ),
-				'cvvtitle'               => __( 'Card security code', 'paradox-cardpointe-gateway' ),
+				'cardlabel'              => __( 'Card number', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'expirylabel'            => __( 'Expiration date', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'cvvlabel'               => __( 'Security code', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'cardtitle'              => __( 'Credit card number', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'expirymonthtitle'       => __( 'Expiration month', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'expiryyeartitle'        => __( 'Expiration year', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'cvvtitle'               => __( 'Card security code', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			);
 		}
 

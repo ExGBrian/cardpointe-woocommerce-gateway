@@ -278,26 +278,26 @@ final class OrderMeta {
 	 */
 	public static function avs_text( string $code ): string {
 		$map = array(
-			'A' => __( 'Address matches, ZIP does not', 'paradox-cardpointe-gateway' ),
-			'B' => __( 'Address matches, postal code not verified', 'paradox-cardpointe-gateway' ),
-			'D' => __( 'Address and postal code match (international)', 'paradox-cardpointe-gateway' ),
-			'E' => __( 'AVS not allowed for this card type', 'paradox-cardpointe-gateway' ),
-			'F' => __( 'Address and postal code match (UK)', 'paradox-cardpointe-gateway' ),
-			'G' => __( 'Not supported by issuer (international)', 'paradox-cardpointe-gateway' ),
-			'I' => __( 'Address not verified (international)', 'paradox-cardpointe-gateway' ),
-			'M' => __( 'Address and postal code match', 'paradox-cardpointe-gateway' ),
-			'N' => __( 'No match on address or ZIP', 'paradox-cardpointe-gateway' ),
-			'P' => __( 'Postal code matches, address not verified', 'paradox-cardpointe-gateway' ),
-			'R' => __( 'Retry, system unavailable', 'paradox-cardpointe-gateway' ),
-			'S' => __( 'Service not supported by issuer', 'paradox-cardpointe-gateway' ),
-			'U' => __( 'Address information unavailable', 'paradox-cardpointe-gateway' ),
-			'W' => __( '9-digit ZIP matches, address does not', 'paradox-cardpointe-gateway' ),
-			'X' => __( 'Address and 9-digit ZIP match', 'paradox-cardpointe-gateway' ),
-			'Y' => __( 'Address and 5-digit ZIP match', 'paradox-cardpointe-gateway' ),
-			'Z' => __( '5-digit ZIP matches, address does not', 'paradox-cardpointe-gateway' ),
+			'A' => __( 'Address matches, ZIP does not', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'B' => __( 'Address matches, postal code not verified', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'D' => __( 'Address and postal code match (international)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'E' => __( 'AVS not allowed for this card type', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'F' => __( 'Address and postal code match (UK)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'G' => __( 'Not supported by issuer (international)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'I' => __( 'Address not verified (international)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'M' => __( 'Address and postal code match', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'N' => __( 'No match on address or ZIP', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'P' => __( 'Postal code matches, address not verified', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'R' => __( 'Retry, system unavailable', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'S' => __( 'Service not supported by issuer', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'U' => __( 'Address information unavailable', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'W' => __( '9-digit ZIP matches, address does not', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'X' => __( 'Address and 9-digit ZIP match', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'Y' => __( 'Address and 5-digit ZIP match', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'Z' => __( '5-digit ZIP matches, address does not', 'paradox-cardpointe-gateway-for-woocommerce' ),
 		);
 		$code = strtoupper( $code );
-		return $map[ $code ] ?? ( '' === $code ? __( 'Not checked', 'paradox-cardpointe-gateway' ) : $code );
+		return $map[ $code ] ?? ( '' === $code ? __( 'Not checked', 'paradox-cardpointe-gateway-for-woocommerce' ) : $code );
 	}
 
 	/**
@@ -307,14 +307,14 @@ final class OrderMeta {
 	 */
 	public static function cvv_text( string $code ): string {
 		$map = array(
-			'M' => __( 'Match', 'paradox-cardpointe-gateway' ),
-			'N' => __( 'No match', 'paradox-cardpointe-gateway' ),
-			'P' => __( 'Not processed', 'paradox-cardpointe-gateway' ),
-			'S' => __( 'CVV not present', 'paradox-cardpointe-gateway' ),
-			'U' => __( 'Issuer not certified', 'paradox-cardpointe-gateway' ),
-			'X' => __( 'No response', 'paradox-cardpointe-gateway' ),
+			'M' => __( 'Match', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'N' => __( 'No match', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'P' => __( 'Not processed', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'S' => __( 'CVV not present', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'U' => __( 'Issuer not certified', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'X' => __( 'No response', 'paradox-cardpointe-gateway-for-woocommerce' ),
 		);
 		$code = strtoupper( $code );
-		return $map[ $code ] ?? ( '' === $code ? __( 'Not checked', 'paradox-cardpointe-gateway' ) : $code );
+		return $map[ $code ] ?? ( '' === $code ? __( 'Not checked', 'paradox-cardpointe-gateway-for-woocommerce' ) : $code );
 	}
 }

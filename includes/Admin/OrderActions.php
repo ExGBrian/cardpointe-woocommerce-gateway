@@ -59,7 +59,7 @@ final class OrderActions {
 		}
 		add_meta_box(
 			'paradox-cardpointe',
-			__( 'CardPointe', 'paradox-cardpointe-gateway' ),
+			__( 'CardPointe', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			array( $this, 'render_meta_box' ),
 			$screen_id,
 			'side',
@@ -102,41 +102,41 @@ final class OrderActions {
 		$currency   = array( 'currency' => $order->get_currency() );
 
 		if ( $voided ) {
-			$state = __( 'Voided', 'paradox-cardpointe-gateway' );
+			$state = __( 'Voided', 'paradox-cardpointe-gateway-for-woocommerce' );
 		} elseif ( $captured ) {
-			$state = '' !== $setlstat ? sprintf( /* translators: %s: settlement status */ __( 'Captured (%s)', 'paradox-cardpointe-gateway' ), $setlstat ) : __( 'Captured', 'paradox-cardpointe-gateway' );
+			$state = '' !== $setlstat ? sprintf( /* translators: %s: settlement status */ __( 'Captured (%s)', 'paradox-cardpointe-gateway-for-woocommerce' ), $setlstat ) : __( 'Captured', 'paradox-cardpointe-gateway-for-woocommerce' );
 		} elseif ( '' !== $retref ) {
-			$state = __( 'Authorized, not captured', 'paradox-cardpointe-gateway' );
+			$state = __( 'Authorized, not captured', 'paradox-cardpointe-gateway-for-woocommerce' );
 		} elseif ( OrderMeta::has_stored_payment_method( $order ) ) {
-			$state = __( 'Payment method vaulted, not charged', 'paradox-cardpointe-gateway' );
+			$state = __( 'Payment method vaulted, not charged', 'paradox-cardpointe-gateway-for-woocommerce' );
 		} else {
-			$state = $pending ? __( 'Pending / unknown', 'paradox-cardpointe-gateway' ) : __( 'No transaction', 'paradox-cardpointe-gateway' );
+			$state = $pending ? __( 'Pending / unknown', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'No transaction', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 
 		$method = '';
 		if ( 'echeck' === $stored['type'] ) {
-			$method = ( 'ESAV' === $stored['accttype'] ? __( 'Savings', 'paradox-cardpointe-gateway' ) : __( 'Checking', 'paradox-cardpointe-gateway' ) ) . ( '' !== $stored['last4'] ? ' ****' . $stored['last4'] : '' );
+			$method = ( 'ESAV' === $stored['accttype'] ? __( 'Savings', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'Checking', 'paradox-cardpointe-gateway-for-woocommerce' ) ) . ( '' !== $stored['last4'] ? ' ****' . $stored['last4'] : '' );
 		} elseif ( '' !== $stored['last4'] || '' !== $stored['brand'] ) {
-			$method = ( '' !== $stored['brand'] ? CardTypes::label( $stored['brand'] ) : __( 'Card', 'paradox-cardpointe-gateway' ) ) . ( '' !== $stored['last4'] ? ' ****' . $stored['last4'] : '' );
+			$method = ( '' !== $stored['brand'] ? CardTypes::label( $stored['brand'] ) : __( 'Card', 'paradox-cardpointe-gateway-for-woocommerce' ) ) . ( '' !== $stored['last4'] ? ' ****' . $stored['last4'] : '' );
 		}
 
 		$rows = array(
-			__( 'Retref', 'paradox-cardpointe-gateway' )       => $retref,
-			__( 'Auth code', 'paradox-cardpointe-gateway' )    => (string) OrderMeta::get( $order, OrderMeta::AUTHCODE ),
-			__( 'Authorized', 'paradox-cardpointe-gateway' )   => $authorized > 0 ? wp_strip_all_tags( wc_price( $authorized, $currency ) ) : '',
-			__( 'Captured', 'paradox-cardpointe-gateway' )     => $captured ? wp_strip_all_tags( wc_price( (float) OrderMeta::get( $order, OrderMeta::CAPTURED_AMOUNT, $authorized ), $currency ) ) : '',
-			__( 'Method', 'paradox-cardpointe-gateway' )       => $method,
-			__( 'AVS', 'paradox-cardpointe-gateway' )          => '' !== $retref ? OrderMeta::avs_text( (string) OrderMeta::get( $order, OrderMeta::AVSRESP ) ) : '',
-			__( 'CVV', 'paradox-cardpointe-gateway' )          => '' !== $retref && 'card' === $stored['type'] ? OrderMeta::cvv_text( (string) OrderMeta::get( $order, OrderMeta::CVVRESP ) ) : '',
-			__( 'Profile', 'paradox-cardpointe-gateway' )      => '' !== $stored['profile_id'] ? $stored['profile_id'] . ( '' !== $stored['acct_id'] ? '/' . $stored['acct_id'] : '' ) : '',
-			__( 'Gateway order', 'paradox-cardpointe-gateway' ) => (string) OrderMeta::get( $order, OrderMeta::ORDERID ),
+			__( 'Retref', 'paradox-cardpointe-gateway-for-woocommerce' )       => $retref,
+			__( 'Auth code', 'paradox-cardpointe-gateway-for-woocommerce' )    => (string) OrderMeta::get( $order, OrderMeta::AUTHCODE ),
+			__( 'Authorized', 'paradox-cardpointe-gateway-for-woocommerce' )   => $authorized > 0 ? wp_strip_all_tags( wc_price( $authorized, $currency ) ) : '',
+			__( 'Captured', 'paradox-cardpointe-gateway-for-woocommerce' )     => $captured ? wp_strip_all_tags( wc_price( (float) OrderMeta::get( $order, OrderMeta::CAPTURED_AMOUNT, $authorized ), $currency ) ) : '',
+			__( 'Method', 'paradox-cardpointe-gateway-for-woocommerce' )       => $method,
+			__( 'AVS', 'paradox-cardpointe-gateway-for-woocommerce' )          => '' !== $retref ? OrderMeta::avs_text( (string) OrderMeta::get( $order, OrderMeta::AVSRESP ) ) : '',
+			__( 'CVV', 'paradox-cardpointe-gateway-for-woocommerce' )          => '' !== $retref && 'card' === $stored['type'] ? OrderMeta::cvv_text( (string) OrderMeta::get( $order, OrderMeta::CVVRESP ) ) : '',
+			__( 'Profile', 'paradox-cardpointe-gateway-for-woocommerce' )      => '' !== $stored['profile_id'] ? $stored['profile_id'] . ( '' !== $stored['acct_id'] ? '/' . $stored['acct_id'] : '' ) : '',
+			__( 'Gateway order', 'paradox-cardpointe-gateway-for-woocommerce' ) => (string) OrderMeta::get( $order, OrderMeta::ORDERID ),
 		);
 
 		$refunds = array();
 		foreach ( OrderMeta::refunds( $order ) as $record ) {
 			$refunds[] = sprintf(
 				'%s %s (%s) %s',
-				'void' === ( $record['type'] ?? '' ) ? __( 'Void', 'paradox-cardpointe-gateway' ) : __( 'Refund', 'paradox-cardpointe-gateway' ),
+				'void' === ( $record['type'] ?? '' ) ? __( 'Void', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'Refund', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				wp_strip_all_tags( wc_price( (float) ( $record['amount'] ?? 0 ), $currency ) ),
 				(string) ( $record['retref'] ?? '' ),
 				isset( $record['date'] ) ? wp_date( get_option( 'date_format' ), strtotime( $record['date'] ) ) : ''
@@ -148,7 +148,7 @@ final class OrderActions {
 		if ( '' !== $retref && ! $captured && ! $voided && $authorized_at > 0 ) {
 			$expires_note = sprintf(
 				/* translators: %s: date */
-				__( 'Authorizations usually expire after 7 days (around %s). Capture before then.', 'paradox-cardpointe-gateway' ),
+				__( 'Authorizations usually expire after 7 days (around %s). Capture before then.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				wp_date( get_option( 'date_format' ), $authorized_at + 7 * DAY_IN_SECONDS )
 			);
 		}
@@ -192,8 +192,8 @@ final class OrderActions {
 			return $actions;
 		}
 		if ( ! OrderMeta::is_captured( $order ) ) {
-			$actions['paradox_cardpointe_capture'] = __( 'CardPointe: capture authorization', 'paradox-cardpointe-gateway' );
-			$actions['paradox_cardpointe_void']    = __( 'CardPointe: void authorization', 'paradox-cardpointe-gateway' );
+			$actions['paradox_cardpointe_capture'] = __( 'CardPointe: capture authorization', 'paradox-cardpointe-gateway-for-woocommerce' );
+			$actions['paradox_cardpointe_void']    = __( 'CardPointe: void authorization', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 		return $actions;
 	}
@@ -207,7 +207,7 @@ final class OrderActions {
 		try {
 			( new TransactionManager( Plugin::gateway_for_order( $order ) ) )->capture( $order );
 		} catch ( \Exception $e ) {
-			$order->add_order_note( __( 'CardPointe capture failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe capture failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 		}
 	}
@@ -221,10 +221,10 @@ final class OrderActions {
 		try {
 			( new TransactionManager( Plugin::gateway_for_order( $order ) ) )->void( $order );
 			if ( ! $order->has_status( array( 'cancelled', 'refunded' ) ) ) {
-				$order->update_status( 'cancelled', __( 'Order cancelled after CardPointe void.', 'paradox-cardpointe-gateway' ) );
+				$order->update_status( 'cancelled', __( 'Order cancelled after CardPointe void.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			}
 		} catch ( \Exception $e ) {
-			$order->add_order_note( __( 'CardPointe void failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe void failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 		}
 	}
@@ -246,7 +246,7 @@ final class OrderActions {
 				array(
 					'message' => sprintf(
 						/* translators: %s: amount */
-						__( 'Captured %s.', 'paradox-cardpointe-gateway' ),
+						__( 'Captured %s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 						wp_strip_all_tags( wc_price( (float) $response->string( 'amount', $amount ), array( 'currency' => $order->get_currency() ) ) )
 					),
 				)
@@ -265,9 +265,9 @@ final class OrderActions {
 			$manager = new TransactionManager( Plugin::gateway_for_order( $order ) );
 			$manager->void( $order );
 			if ( ! OrderMeta::is_captured( $order ) && ! $order->has_status( array( 'cancelled', 'refunded' ) ) ) {
-				$order->update_status( 'cancelled', __( 'Order cancelled after CardPointe void.', 'paradox-cardpointe-gateway' ) );
+				$order->update_status( 'cancelled', __( 'Order cancelled after CardPointe void.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			}
-			wp_send_json_success( array( 'message' => __( 'Transaction voided.', 'paradox-cardpointe-gateway' ) ) );
+			wp_send_json_success( array( 'message' => __( 'Transaction voided.', 'paradox-cardpointe-gateway-for-woocommerce' ) ) );
 		} catch ( \Exception $e ) {
 			wp_send_json_error( array( 'message' => $e->getMessage() ) );
 		}
@@ -285,8 +285,8 @@ final class OrderActions {
 				wp_send_json_success(
 					array(
 						'message' => $found
-							? __( 'An approved transaction was found and applied to the order.', 'paradox-cardpointe-gateway' )
-							: __( 'No approved transaction was found for the pending attempt.', 'paradox-cardpointe-gateway' ),
+							? __( 'An approved transaction was found and applied to the order.', 'paradox-cardpointe-gateway-for-woocommerce' )
+							: __( 'No approved transaction was found for the pending attempt.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					)
 				);
 			}
@@ -295,8 +295,8 @@ final class OrderActions {
 				array(
 					'message' => sprintf(
 						/* translators: 1: settlement status, 2: voidable, 3: refundable */
-						__( 'Status: %1$s. Voidable: %2$s. Refundable: %3$s.', 'paradox-cardpointe-gateway' ),
-						$response->setlstat() ?: __( 'unknown', 'paradox-cardpointe-gateway' ),
+						__( 'Status: %1$s. Voidable: %2$s. Refundable: %3$s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						$response->setlstat() ?: __( 'unknown', 'paradox-cardpointe-gateway-for-woocommerce' ),
 						$response->string( 'voidable', '-' ),
 						$response->string( 'refundable', '-' )
 					),
@@ -313,12 +313,12 @@ final class OrderActions {
 	private function ajax_order(): \WC_Order {
 		check_ajax_referer( 'paradox_cardpointe_order_action', 'nonce' );
 		if ( ! current_user_can( 'edit_shop_orders' ) ) {
-			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'paradox-cardpointe-gateway' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to do that.', 'paradox-cardpointe-gateway-for-woocommerce' ) ), 403 );
 		}
 		$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
 		$order    = $order_id ? wc_get_order( $order_id ) : null;
 		if ( ! $order instanceof \WC_Order || ! Plugin::is_our_gateway( $order->get_payment_method() ) ) {
-			wp_send_json_error( array( 'message' => __( 'Order not found.', 'paradox-cardpointe-gateway' ) ), 404 );
+			wp_send_json_error( array( 'message' => __( 'Order not found.', 'paradox-cardpointe-gateway-for-woocommerce' ) ), 404 );
 		}
 		return $order;
 	}
@@ -357,7 +357,7 @@ final class OrderActions {
 		try {
 			( new TransactionManager( $gateway ) )->capture( $order );
 		} catch ( \Exception $e ) {
-			$order->add_order_note( __( 'CardPointe automatic capture failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe automatic capture failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 		}
 	}
@@ -383,7 +383,7 @@ final class OrderActions {
 		try {
 			( new TransactionManager( $gateway ) )->void( $order );
 		} catch ( \Exception $e ) {
-			$order->add_order_note( __( 'CardPointe automatic void failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe automatic void failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 		}
 	}

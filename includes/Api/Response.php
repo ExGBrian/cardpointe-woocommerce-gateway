@@ -165,7 +165,7 @@ final class Response {
 			$text .= ' (' . $hint . ')';
 		}
 		if ( '' === $text ) {
-			$text = __( 'Unknown gateway response', 'paradox-cardpointe-gateway' );
+			$text = __( 'Unknown gateway response', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 		return $text;
 	}

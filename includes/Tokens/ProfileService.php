@@ -110,8 +110,8 @@ final class ProfileService {
 			throw new PaymentException(
 				sprintf(
 					/* translators: %s: gateway message */
-					__( 'The payment method could not be saved (%s).', 'paradox-cardpointe-gateway' ),
-					$response->string( 'resptext', __( 'unknown error', 'paradox-cardpointe-gateway' ) )
+					__( 'The payment method could not be saved (%s).', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					$response->string( 'resptext', __( 'unknown error', 'paradox-cardpointe-gateway-for-woocommerce' ) )
 				)
 			);
 		}

@@ -2,7 +2,7 @@
 /**
  * eCheck (ACH) fields (hosted iframe mount point).
  *
- * Override by copying to yourtheme/paradox-cardpointe-gateway/checkout/echeck-fields.php.
+ * Override by copying to yourtheme/paradox-cardpointe-gateway-for-woocommerce/checkout/echeck-fields.php.
  *
  * @var \ParadoxSolutions\CardPointe\Gateway\EcheckGateway $gateway
  * @var string   $field_prefix
@@ -17,8 +17,8 @@
 defined( 'ABSPATH' ) || exit;
 
 $labels = array(
-	'ECHK' => __( 'Checking', 'paradox-cardpointe-gateway' ),
-	'ESAV' => __( 'Savings', 'paradox-cardpointe-gateway' ),
+	'ECHK' => __( 'Checking', 'paradox-cardpointe-gateway-for-woocommerce' ),
+	'ESAV' => __( 'Savings', 'paradox-cardpointe-gateway-for-woocommerce' ),
 );
 ?>
 <fieldset id="wc-<?php echo esc_attr( $field_prefix ); ?>-echeck-form"
@@ -29,7 +29,7 @@ $labels = array(
 	<div class="paradox-cardpointe-errors woocommerce-error" role="alert" aria-live="assertive" hidden></div>
 
 	<p class="form-row form-row-wide paradox-cardpointe-accttype">
-		<span class="paradox-cardpointe-label"><?php esc_html_e( 'Account type', 'paradox-cardpointe-gateway' ); ?> <span class="required">*</span></span>
+		<span class="paradox-cardpointe-label"><?php esc_html_e( 'Account type', 'paradox-cardpointe-gateway-for-woocommerce' ); ?> <span class="required">*</span></span>
 		<?php foreach ( $account_types as $index => $type ) : ?>
 			<label class="paradox-cardpointe-radio">
 				<input type="radio" name="<?php echo esc_attr( $field_prefix ); ?>_accttype" value="<?php echo esc_attr( $type ); ?>" <?php checked( 0 === $index ); ?> />
@@ -39,8 +39,8 @@ $labels = array(
 	</p>
 
 	<p class="form-row form-row-wide paradox-cardpointe-help">
-		<span class="paradox-cardpointe-label"><?php esc_html_e( 'Routing number / Account number', 'paradox-cardpointe-gateway' ); ?> <span class="required">*</span></span>
-		<small><?php esc_html_e( 'Type your routing number, a slash, then your account number, e.g. 123456789/000123456.', 'paradox-cardpointe-gateway' ); ?></small>
+		<span class="paradox-cardpointe-label"><?php esc_html_e( 'Routing number / Account number', 'paradox-cardpointe-gateway-for-woocommerce' ); ?> <span class="required">*</span></span>
+		<small><?php esc_html_e( 'Type your routing number, a slash, then your account number, e.g. 123456789/000123456.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></small>
 	</p>
 
 	<div class="paradox-cardpointe-frame-wrap" style="min-height:<?php echo (int) $iframe_height; ?>px;">
@@ -48,8 +48,8 @@ $labels = array(
 			data-src="<?php echo esc_url( $tokenizer_url ); ?>"
 			data-origin="<?php echo esc_attr( $gateway->tokenizer_origin() ); ?>"
 			data-height="<?php echo (int) $iframe_height; ?>"
-			data-title="<?php esc_attr_e( 'Secure bank account entry form', 'paradox-cardpointe-gateway' ); ?>"></div>
-		<p class="paradox-cardpointe-loading"><?php esc_html_e( 'Loading secure payment form…', 'paradox-cardpointe-gateway' ); ?></p>
+			data-title="<?php esc_attr_e( 'Secure bank account entry form', 'paradox-cardpointe-gateway-for-woocommerce' ); ?>"></div>
+		<p class="paradox-cardpointe-loading"><?php esc_html_e( 'Loading secure payment form…', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
 	</div>
 
 	<p class="paradox-cardpointe-status" aria-live="polite"></p>
