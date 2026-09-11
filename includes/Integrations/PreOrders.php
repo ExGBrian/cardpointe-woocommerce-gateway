@@ -45,14 +45,14 @@ final class PreOrders {
 		}
 
 		if ( ! OrderMeta::has_stored_payment_method( $order ) ) {
-			$order->update_status( 'failed', __( 'CardPointe pre-order charge failed: no vaulted payment method is stored on the order.', 'paradox-cardpointe-gateway' ) );
+			$order->update_status( 'failed', __( 'CardPointe pre-order charge failed: no vaulted payment method is stored on the order.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			return;
 		}
 
 		$stored      = OrderMeta::stored_payment_method( $order );
 		$credentials = Credentials::active();
 		if ( '' !== $stored['environment'] && $stored['environment'] !== $credentials->environment() ) {
-			$order->update_status( 'failed', __( 'CardPointe pre-order charge failed: the payment method was vaulted in a different environment.', 'paradox-cardpointe-gateway' ) );
+			$order->update_status( 'failed', __( 'CardPointe pre-order charge failed: the payment method was vaulted in a different environment.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			return;
 		}
 
@@ -76,7 +76,7 @@ final class PreOrders {
 		} catch ( PaymentException $e ) {
 			Plugin::instance()->logger()->warning( 'Pre-order release charge failed', array( 'order_id' => $order->get_id(), 'error' => $e->getMessage() ) );
 		} catch ( \Exception $e ) {
-			$order->update_status( 'failed', __( 'CardPointe pre-order charge failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->update_status( 'failed', __( 'CardPointe pre-order charge failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 		}
 	}
 }

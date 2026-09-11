@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Paradox CardPointe Gateway">
+<ruleset name="Paradox CardPointe Gateway for WooCommerce">
 	<description>WordPress coding standards, matched to the versions this plugin supports.</description>
 
 	<file>.</file>
@@ -22,7 +22,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="paradox-cardpointe-gateway"/>
+				<element value="paradox-cardpointe-gateway-for-woocommerce"/>
 			</property>
 		</properties>
 	</rule>

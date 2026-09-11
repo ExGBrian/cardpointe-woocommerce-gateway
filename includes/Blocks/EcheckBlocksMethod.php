@@ -43,8 +43,8 @@ final class EcheckBlocksMethod extends AbstractBlocksMethod {
 			return array();
 		}
 		$labels = array(
-			'ECHK' => __( 'Checking', 'paradox-cardpointe-gateway' ),
-			'ESAV' => __( 'Savings', 'paradox-cardpointe-gateway' ),
+			'ECHK' => __( 'Checking', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'ESAV' => __( 'Savings', 'paradox-cardpointe-gateway-for-woocommerce' ),
 		);
 		$types  = array();
 		foreach ( $gateway->account_types() as $type ) {
@@ -58,9 +58,9 @@ final class EcheckBlocksMethod extends AbstractBlocksMethod {
 			'accountTypes'        => $types,
 			'consentTemplate'     => (string) $gateway->get_option( 'consent_text' ),
 			'consentCompany'      => get_bloginfo( 'name' ),
-			'accountTypeLabel'    => __( 'Account type', 'paradox-cardpointe-gateway' ),
-			'routingLabel'        => __( 'Routing number / Account number', 'paradox-cardpointe-gateway' ),
-			'routingHelp'         => __( 'Type your routing number, a slash, then your account number, e.g. 123456789/000123456.', 'paradox-cardpointe-gateway' ),
+			'accountTypeLabel'    => __( 'Account type', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'routingLabel'        => __( 'Routing number / Account number', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'routingHelp'         => __( 'Type your routing number, a slash, then your account number, e.g. 123456789/000123456.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 		);
 	}
 }

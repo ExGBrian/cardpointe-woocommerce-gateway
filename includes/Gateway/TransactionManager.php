@@ -56,15 +56,15 @@ final class TransactionManager {
 		$retref = $this->guard( $order );
 
 		if ( OrderMeta::is_captured( $order ) ) {
-			throw new \Exception( __( 'This order has already been captured.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'This order has already been captured.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		if ( OrderMeta::is_voided( $order ) ) {
-			throw new \Exception( __( 'This authorization was voided and cannot be captured.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'This authorization was voided and cannot be captured.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$authorized = (float) OrderMeta::get( $order, OrderMeta::AMOUNT_AUTHORIZED, $order->get_total() );
 		if ( null !== $amount && $amount <= 0 ) {
-			throw new \Exception( __( 'Enter an amount greater than zero.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'Enter an amount greater than zero.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		/**
 		 * Filters whether captures above the authorized amount are allowed (requires MID entitlement).
@@ -74,7 +74,7 @@ final class TransactionManager {
 		 */
 		$allow_over = apply_filters( 'paradox_cardpointe_allow_over_capture', false, $order );
 		if ( null !== $amount && ! $allow_over && $amount > $authorized + 0.005 ) {
-			throw new \Exception( __( 'The capture amount cannot exceed the authorized amount.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'The capture amount cannot exceed the authorized amount.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$extra = array();
@@ -98,7 +98,7 @@ final class TransactionManager {
 		try {
 			$response = $this->client->capture( $retref, $formatted, $extra );
 		} catch ( ApiException $e ) {
-			$order->add_order_note( __( 'CardPointe capture failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe capture failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 			throw new \Exception( $e->getMessage() );
 		}
@@ -107,7 +107,7 @@ final class TransactionManager {
 		$approved = $response->is_approved() || in_array( $setlstat, array( 'Queued for Capture', 'Settled' ), true );
 
 		if ( ! $approved ) {
-			$order->add_order_note( __( 'CardPointe capture declined:', 'paradox-cardpointe-gateway' ) . ' ' . $response->error_text() . ( '' !== $setlstat ? ' [' . $setlstat . ']' : '' ) );
+			$order->add_order_note( __( 'CardPointe capture declined:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $response->error_text() . ( '' !== $setlstat ? ' [' . $setlstat . ']' : '' ) );
 			$order->save();
 			throw new \Exception( $response->error_text() );
 		}
@@ -127,7 +127,7 @@ final class TransactionManager {
 		$order->add_order_note(
 			sprintf(
 				/* translators: 1: amount, 2: retref */
-				__( 'CardPointe captured %1$s (retref %2$s).', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe captured %1$s (retref %2$s).', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				wp_strip_all_tags( wc_price( (float) $captured_amount, array( 'currency' => $order->get_currency() ) ) ),
 				$retref
 			)
@@ -158,19 +158,19 @@ final class TransactionManager {
 		$retref = $this->guard( $order );
 
 		if ( OrderMeta::is_voided( $order ) ) {
-			throw new \Exception( __( 'This transaction has already been voided.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'This transaction has already been voided.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		try {
 			$response = $this->client->void( $retref, null !== $amount ? RequestBuilder::amount( $amount ) : null );
 		} catch ( ApiException $e ) {
-			$order->add_order_note( __( 'CardPointe void failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe void failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 			throw new \Exception( $e->getMessage() );
 		}
 
 		if ( ! $response->is_approved() && 'REVERS' !== strtoupper( $response->string( 'authcode' ) ) ) {
-			$order->add_order_note( __( 'CardPointe void declined:', 'paradox-cardpointe-gateway' ) . ' ' . $response->error_text() );
+			$order->add_order_note( __( 'CardPointe void declined:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $response->error_text() );
 			$order->save();
 			throw new \Exception( $response->error_text() );
 		}
@@ -192,7 +192,7 @@ final class TransactionManager {
 		$order->add_order_note(
 			sprintf(
 				/* translators: 1: amount, 2: retref */
-				__( 'CardPointe voided %1$s (retref %2$s).', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe voided %1$s (retref %2$s).', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				wp_strip_all_tags( wc_price( (float) $voided_amount, array( 'currency' => $order->get_currency() ) ) ),
 				$retref
 			)
@@ -224,7 +224,7 @@ final class TransactionManager {
 		}
 
 		if ( $amount <= 0 ) {
-			return new \WP_Error( 'paradox_cardpointe_refund', __( 'Refund amount must be greater than zero.', 'paradox-cardpointe-gateway' ) );
+			return new \WP_Error( 'paradox_cardpointe_refund', __( 'Refund amount must be greater than zero.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$captured        = OrderMeta::is_captured( $order );
@@ -254,7 +254,7 @@ final class TransactionManager {
 			}
 			return new \WP_Error(
 				'paradox_cardpointe_refund',
-				__( 'This order is authorized but not captured. Capture the reduced amount from the CardPointe panel instead, or void the full authorization.', 'paradox-cardpointe-gateway' )
+				__( 'This order is authorized but not captured. Capture the reduced amount from the CardPointe panel instead, or void the full authorization.', 'paradox-cardpointe-gateway-for-woocommerce' )
 			);
 		}
 
@@ -269,7 +269,7 @@ final class TransactionManager {
 			if ( true !== $refundable ) {
 				return new \WP_Error(
 					'paradox_cardpointe_refund',
-					__( 'This transaction is captured but not yet settled, so a partial refund is not possible yet. Try again after settlement (usually the next business day), or refund the full amount to void it.', 'paradox-cardpointe-gateway' )
+					__( 'This transaction is captured but not yet settled, so a partial refund is not possible yet. Try again after settlement (usually the next business day), or refund the full amount to void it.', 'paradox-cardpointe-gateway-for-woocommerce' )
 				);
 			}
 		}
@@ -283,8 +283,8 @@ final class TransactionManager {
 				'paradox_cardpointe_refund',
 				sprintf(
 					/* translators: %s: settlement status */
-					__( 'CardPointe reports this transaction is not refundable right now (status: %s). Please try again later or refund from the CardPointe portal.', 'paradox-cardpointe-gateway' ),
-					'' !== $setlstat ? $setlstat : __( 'unknown', 'paradox-cardpointe-gateway' )
+					__( 'CardPointe reports this transaction is not refundable right now (status: %s). Please try again later or refund from the CardPointe portal.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'' !== $setlstat ? $setlstat : __( 'unknown', 'paradox-cardpointe-gateway-for-woocommerce' )
 				)
 			);
 		}
@@ -309,13 +309,13 @@ final class TransactionManager {
 		try {
 			$response = $this->client->refund( $args['retref'], $args['amount'], $args['orderid'] );
 		} catch ( ApiException $e ) {
-			$order->add_order_note( __( 'CardPointe refund failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$order->add_order_note( __( 'CardPointe refund failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 			$order->save();
 			return new \WP_Error( 'paradox_cardpointe_refund', $e->getMessage() );
 		}
 
 		if ( ! $response->is_approved() ) {
-			$order->add_order_note( __( 'CardPointe refund declined:', 'paradox-cardpointe-gateway' ) . ' ' . $response->error_text() );
+			$order->add_order_note( __( 'CardPointe refund declined:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $response->error_text() );
 			$order->save();
 			return new \WP_Error( 'paradox_cardpointe_refund', $response->error_text() );
 		}
@@ -332,10 +332,10 @@ final class TransactionManager {
 		$order->add_order_note(
 			sprintf(
 				/* translators: 1: amount, 2: refund retref, 3: reason */
-				__( 'CardPointe refunded %1$s (refund retref %2$s). %3$s', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe refunded %1$s (refund retref %2$s). %3$s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				wp_strip_all_tags( wc_price( $amount, array( 'currency' => $order->get_currency() ) ) ),
 				$response->string( 'retref' ),
-				'' !== $reason ? __( 'Reason:', 'paradox-cardpointe-gateway' ) . ' ' . $reason : ''
+				'' !== $reason ? __( 'Reason:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $reason : ''
 			)
 		);
 		$order->save();
@@ -411,7 +411,7 @@ final class TransactionManager {
 				$capture = 'Queued for Capture' === $txn->setlstat() || 'Settled' === $txn->setlstat() || ( $gateway && $gateway->should_capture() );
 				OrderMeta::apply_auth_response( $order, $txn, $source, $this->credentials, $capture );
 				OrderMeta::set( $order, OrderMeta::ORDERID, $orderid );
-				$order->add_order_note( __( 'CardPointe: pending transaction reconciled and found approved.', 'paradox-cardpointe-gateway' ) );
+				$order->add_order_note( __( 'CardPointe: pending transaction reconciled and found approved.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 				if ( $capture ) {
 					$order->payment_complete( $txn->string( 'retref' ) );
 				} else {
@@ -422,7 +422,7 @@ final class TransactionManager {
 			}
 		}
 		OrderMeta::delete( $order, OrderMeta::PENDING_ORDERID );
-		$order->add_order_note( __( 'CardPointe: no approved transaction found for the pending order ID.', 'paradox-cardpointe-gateway' ) );
+		$order->add_order_note( __( 'CardPointe: no approved transaction found for the pending order ID.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		$order->save();
 		return null;
 	}
@@ -436,17 +436,17 @@ final class TransactionManager {
 	 */
 	private function guard( \WC_Order $order ): string {
 		if ( ! Plugin::is_our_gateway( $order->get_payment_method() ) ) {
-			throw new \Exception( __( 'This order was not paid with CardPointe.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'This order was not paid with CardPointe.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		$retref = OrderMeta::retref( $order );
 		if ( '' === $retref ) {
-			throw new \Exception( __( 'No CardPointe transaction reference is stored for this order.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'No CardPointe transaction reference is stored for this order.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		if ( ! OrderMeta::matches_environment( $order, $this->credentials ) ) {
 			throw new \Exception(
 				sprintf(
 					/* translators: %s: environment */
-					__( 'This order was processed in the %s environment, which is not the active one. Switch environments to manage it.', 'paradox-cardpointe-gateway' ),
+					__( 'This order was processed in the %s environment, which is not the active one. Switch environments to manage it.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					(string) OrderMeta::get( $order, OrderMeta::ENVIRONMENT )
 				)
 			);

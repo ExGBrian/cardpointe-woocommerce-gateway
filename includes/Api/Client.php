@@ -269,7 +269,7 @@ final class Client {
 		);
 
 		if ( 401 === $status || 403 === $status ) {
-			throw new ApiException( ApiException::INVALID_CREDENTIALS, __( 'The CardPointe API rejected the username or password.', 'paradox-cardpointe-gateway' ), $status, $decoded );
+			throw new ApiException( ApiException::INVALID_CREDENTIALS, __( 'The CardPointe API rejected the username or password.', 'paradox-cardpointe-gateway-for-woocommerce' ), $status, $decoded );
 		}
 
 		if ( 429 === $status ) {
@@ -278,7 +278,7 @@ final class Client {
 				ApiException::RATE_LIMITED,
 				sprintf(
 					/* translators: %d: seconds */
-					__( 'The CardPointe API rate limit was reached. Retry after %d seconds.', 'paradox-cardpointe-gateway' ),
+					__( 'The CardPointe API rate limit was reached. Retry after %d seconds.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					max( 1, $retry_after )
 				),
 				$status,
@@ -301,7 +301,7 @@ final class Client {
 				ApiException::HTTP_ERROR,
 				sprintf(
 					/* translators: 1: HTTP status, 2: message */
-					__( 'CardPointe API error (HTTP %1$d): %2$s', 'paradox-cardpointe-gateway' ),
+					__( 'CardPointe API error (HTTP %1$d): %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					$status,
 					$message
 				),
@@ -311,7 +311,7 @@ final class Client {
 		}
 
 		if ( ! is_array( $decoded ) ) {
-			throw new ApiException( ApiException::INVALID_RESPONSE, __( 'The CardPointe API returned an unreadable response.', 'paradox-cardpointe-gateway' ), $status, $raw_body );
+			throw new ApiException( ApiException::INVALID_RESPONSE, __( 'The CardPointe API returned an unreadable response.', 'paradox-cardpointe-gateway-for-woocommerce' ), $status, $raw_body );
 		}
 
 		return Response::from_decoded( $decoded, $status );

@@ -48,7 +48,7 @@ final class Notices {
 				'info',
 				sprintf(
 					/* translators: %s: settings URL */
-					__( 'Thanks for installing CardPointe Payment Gateway. <a href="%s">Enter your CardPointe credentials</a> to start accepting payments.', 'paradox-cardpointe-gateway' ),
+					__( 'Thanks for installing CardPointe Payment Gateway. <a href="%s">Enter your CardPointe credentials</a> to start accepting payments.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					esc_url( $settings_url )
 				)
 			);
@@ -70,8 +70,8 @@ final class Notices {
 				'error',
 				sprintf(
 					/* translators: 1: environment, 2: settings URL */
-					__( 'CardPointe is enabled but the %1$s credentials are incomplete. <a href="%2$s">Complete the settings</a> to accept payments.', 'paradox-cardpointe-gateway' ),
-					$credentials->sandbox ? __( 'sandbox', 'paradox-cardpointe-gateway' ) : __( 'production', 'paradox-cardpointe-gateway' ),
+					__( 'CardPointe is enabled but the %1$s credentials are incomplete. <a href="%2$s">Complete the settings</a> to accept payments.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					$credentials->sandbox ? __( 'sandbox', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'production', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					esc_url( $settings_url )
 				)
 			);
@@ -81,21 +81,21 @@ final class Notices {
 		if ( ! $credentials->sandbox && ! wc_checkout_is_https() ) {
 			$this->notice(
 				'warning',
-				__( 'CardPointe is in production mode but checkout is not served over HTTPS. The payment methods will be hidden until HTTPS is enabled.', 'paradox-cardpointe-gateway' )
+				__( 'CardPointe is in production mode but checkout is not served over HTTPS. The payment methods will be hidden until HTTPS is enabled.', 'paradox-cardpointe-gateway-for-woocommerce' )
 			);
 		}
 
 		if ( $credentials->sandbox && 'woocommerce_page_wc-settings' === $screen_id ) {
 			$this->notice(
 				'info',
-				__( 'CardPointe sandbox mode is on: customers cannot make real payments.', 'paradox-cardpointe-gateway' )
+				__( 'CardPointe sandbox mode is on: customers cannot make real payments.', 'paradox-cardpointe-gateway-for-woocommerce' )
 			);
 		}
 
 		if ( $echeck_enabled && false === MerchantInfo::supports_echeck( $credentials ) ) {
 			$this->notice(
 				'warning',
-				__( 'The CardPointe eCheck gateway is enabled but your merchant ID is not configured for ACH. Contact CardPointe support to enable ACH, or disable the eCheck gateway.', 'paradox-cardpointe-gateway' )
+				__( 'The CardPointe eCheck gateway is enabled but your merchant ID is not configured for ACH. Contact CardPointe support to enable ACH, or disable the eCheck gateway.', 'paradox-cardpointe-gateway-for-woocommerce' )
 			);
 		}
 	}

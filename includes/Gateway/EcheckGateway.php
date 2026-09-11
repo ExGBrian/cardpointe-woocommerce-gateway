@@ -24,8 +24,8 @@ class EcheckGateway extends AbstractGateway {
 	 */
 	public function __construct() {
 		$this->id                 = Plugin::ECHECK_GATEWAY_ID;
-		$this->method_title       = __( 'CardPointe - eCheck (ACH)', 'paradox-cardpointe-gateway' );
-		$this->method_description = __( 'Accept eCheck payments through the ACH network using CardPointe. Bank details are tokenized in a hosted iframe. Requires ACH to be enabled on your CardPointe merchant account.', 'paradox-cardpointe-gateway' );
+		$this->method_title       = __( 'CardPointe - eCheck (ACH)', 'paradox-cardpointe-gateway-for-woocommerce' );
+		$this->method_description = __( 'Accept eCheck payments through the ACH network using CardPointe. Bank details are tokenized in a hosted iframe. Requires ACH to be enabled on your CardPointe merchant account.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		$this->icon               = '';
 
 		parent::__construct();
@@ -124,7 +124,7 @@ class EcheckGateway extends AbstractGateway {
 	 */
 	public function new_method_label( $label, $gateway ) {
 		if ( $gateway instanceof self ) {
-			return __( 'Use a new bank account', 'paradox-cardpointe-gateway' );
+			return __( 'Use a new bank account', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 		return $label;
 	}

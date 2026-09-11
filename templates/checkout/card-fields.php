@@ -2,7 +2,7 @@
 /**
  * Credit card fields (hosted iframe mount point).
  *
- * Override by copying to yourtheme/paradox-cardpointe-gateway/checkout/card-fields.php.
+ * Override by copying to yourtheme/paradox-cardpointe-gateway-for-woocommerce/checkout/card-fields.php.
  *
  * @var \ParadoxSolutions\CardPointe\Gateway\CardGateway $gateway
  * @var string   $field_prefix
@@ -28,8 +28,8 @@ defined( 'ABSPATH' ) || exit;
 			data-src="<?php echo esc_url( $tokenizer_url ); ?>"
 			data-origin="<?php echo esc_attr( $gateway->tokenizer_origin() ); ?>"
 			data-height="<?php echo (int) $iframe_height; ?>"
-			data-title="<?php esc_attr_e( 'Secure card entry form', 'paradox-cardpointe-gateway' ); ?>"></div>
-		<p class="paradox-cardpointe-loading"><?php esc_html_e( 'Loading secure payment form…', 'paradox-cardpointe-gateway' ); ?></p>
+			data-title="<?php esc_attr_e( 'Secure card entry form', 'paradox-cardpointe-gateway-for-woocommerce' ); ?>"></div>
+		<p class="paradox-cardpointe-loading"><?php esc_html_e( 'Loading secure payment form…', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
 	</div>
 
 	<p class="paradox-cardpointe-status" aria-live="polite"></p>

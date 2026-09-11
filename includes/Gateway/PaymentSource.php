@@ -80,8 +80,8 @@ final class PaymentSource {
 		if ( ! preg_match( '/^\d{15,19}$/', $source->token ) ) {
 			throw new \Exception(
 				'card' === $source->type
-					? __( 'Please enter your card details.', 'paradox-cardpointe-gateway' )
-					: __( 'Please enter your bank routing and account numbers.', 'paradox-cardpointe-gateway' )
+					? __( 'Please enter your card details.', 'paradox-cardpointe-gateway-for-woocommerce' )
+					: __( 'Please enter your bank routing and account numbers.', 'paradox-cardpointe-gateway-for-woocommerce' )
 			);
 		}
 
@@ -98,7 +98,7 @@ final class PaymentSource {
 						'digit_count'   => strlen( $raw_expiry ),
 					)
 				);
-				throw new \Exception( __( 'Please enter a valid card expiration date.', 'paradox-cardpointe-gateway' ) );
+				throw new \Exception( __( 'Please enter a valid card expiration date.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			}
 			$hint          = isset( $_POST[ $id . '_brand_hint' ] ) ? sanitize_key( wp_unslash( $_POST[ $id . '_brand_hint' ] ) ) : '';
 			$source->brand = in_array( $hint, CardTypes::ALL, true ) ? $hint : '';
@@ -107,11 +107,11 @@ final class PaymentSource {
 			$allowed          = $gateway instanceof EcheckGateway ? $gateway->account_types() : array( 'ECHK', 'ESAV' );
 			$source->accttype = in_array( $accttype, $allowed, true ) ? $accttype : '';
 			if ( '' === $source->accttype ) {
-				throw new \Exception( __( 'Please choose your bank account type.', 'paradox-cardpointe-gateway' ) );
+				throw new \Exception( __( 'Please choose your bank account type.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			}
 			$source->consent = self::posted_bool( $id . '_consent' );
 			if ( ! $source->consent ) {
-				throw new \Exception( __( 'Please authorize the bank account debit to continue.', 'paradox-cardpointe-gateway' ) );
+				throw new \Exception( __( 'Please authorize the bank account debit to continue.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			}
 		}
 
@@ -132,12 +132,12 @@ final class PaymentSource {
 		$user  = get_current_user_id();
 
 		if ( ! $token || $token->get_gateway_id() !== $gateway->id || ! $user || (int) $token->get_user_id() !== $user ) {
-			throw new \Exception( __( 'The selected saved payment method is not available. Please choose another one.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'The selected saved payment method is not available. Please choose another one.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$env = (string) $token->get_meta( 'paradox_cardpointe_environment', true );
 		if ( '' !== $env && $env !== $gateway->credentials()->environment() ) {
-			throw new \Exception( __( 'The selected saved payment method belongs to a different environment. Please add it again.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'The selected saved payment method belongs to a different environment. Please add it again.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		return self::from_wc_token( $token, $gateway->payment_type() );

@@ -56,19 +56,19 @@ final class Receipt {
 
 		$stored = OrderMeta::stored_payment_method( $order );
 		$method = 'echeck' === $stored['type']
-			? ( 'ESAV' === $stored['accttype'] ? __( 'Savings account', 'paradox-cardpointe-gateway' ) : __( 'Checking account', 'paradox-cardpointe-gateway' ) )
-			: ( '' !== $stored['brand'] ? CardTypes::label( $stored['brand'] ) : __( 'Card', 'paradox-cardpointe-gateway' ) );
+			? ( 'ESAV' === $stored['accttype'] ? __( 'Savings account', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'Checking account', 'paradox-cardpointe-gateway-for-woocommerce' ) )
+			: ( '' !== $stored['brand'] ? CardTypes::label( $stored['brand'] ) : __( 'Card', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 
 		$rows = array(
-			'dba'      => array( __( 'Merchant', 'paradox-cardpointe-gateway' ), (string) ( $receipt['dba'] ?? '' ) ),
-			'address'  => array( __( 'Address', 'paradox-cardpointe-gateway' ), trim( (string) ( $receipt['address1'] ?? '' ) . ' ' . (string) ( $receipt['address2'] ?? '' ) ) ),
-			'phone'    => array( __( 'Phone', 'paradox-cardpointe-gateway' ), (string) ( $receipt['phone'] ?? '' ) ),
-			'date'     => array( __( 'Date', 'paradox-cardpointe-gateway' ), $date ),
-			'method'   => array( __( 'Payment method', 'paradox-cardpointe-gateway' ), trim( $method . ' ' . ( '' !== $stored['last4'] ? '****' . $stored['last4'] : '' ) ) ),
-			'name'     => array( __( 'Name', 'paradox-cardpointe-gateway' ), (string) ( $receipt['nameOnCard'] ?? '' ) ),
-			'amount'   => array( __( 'Amount', 'paradox-cardpointe-gateway' ), wp_strip_all_tags( wc_price( (float) OrderMeta::get( $order, OrderMeta::CAPTURED_AMOUNT, OrderMeta::get( $order, OrderMeta::AMOUNT_AUTHORIZED, $order->get_total() ) ), array( 'currency' => $order->get_currency() ) ) ) ),
-			'authcode' => array( __( 'Authorization code', 'paradox-cardpointe-gateway' ), (string) OrderMeta::get( $order, OrderMeta::AUTHCODE ) ),
-			'retref'   => array( __( 'Reference', 'paradox-cardpointe-gateway' ), OrderMeta::retref( $order ) ),
+			'dba'      => array( __( 'Merchant', 'paradox-cardpointe-gateway-for-woocommerce' ), (string) ( $receipt['dba'] ?? '' ) ),
+			'address'  => array( __( 'Address', 'paradox-cardpointe-gateway-for-woocommerce' ), trim( (string) ( $receipt['address1'] ?? '' ) . ' ' . (string) ( $receipt['address2'] ?? '' ) ) ),
+			'phone'    => array( __( 'Phone', 'paradox-cardpointe-gateway-for-woocommerce' ), (string) ( $receipt['phone'] ?? '' ) ),
+			'date'     => array( __( 'Date', 'paradox-cardpointe-gateway-for-woocommerce' ), $date ),
+			'method'   => array( __( 'Payment method', 'paradox-cardpointe-gateway-for-woocommerce' ), trim( $method . ' ' . ( '' !== $stored['last4'] ? '****' . $stored['last4'] : '' ) ) ),
+			'name'     => array( __( 'Name', 'paradox-cardpointe-gateway-for-woocommerce' ), (string) ( $receipt['nameOnCard'] ?? '' ) ),
+			'amount'   => array( __( 'Amount', 'paradox-cardpointe-gateway-for-woocommerce' ), wp_strip_all_tags( wc_price( (float) OrderMeta::get( $order, OrderMeta::CAPTURED_AMOUNT, OrderMeta::get( $order, OrderMeta::AMOUNT_AUTHORIZED, $order->get_total() ) ), array( 'currency' => $order->get_currency() ) ) ) ),
+			'authcode' => array( __( 'Authorization code', 'paradox-cardpointe-gateway-for-woocommerce' ), (string) OrderMeta::get( $order, OrderMeta::AUTHCODE ) ),
+			'retref'   => array( __( 'Reference', 'paradox-cardpointe-gateway-for-woocommerce' ), OrderMeta::retref( $order ) ),
 		);
 		$rows = array_filter(
 			$rows,

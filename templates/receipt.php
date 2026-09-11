@@ -2,7 +2,7 @@
 /**
  * Gateway receipt.
  *
- * Override by copying to yourtheme/paradox-cardpointe-gateway/receipt.php.
+ * Override by copying to yourtheme/paradox-cardpointe-gateway-for-woocommerce/receipt.php.
  *
  * @var \WC_Order $order
  * @var array     $receipt Raw receipt from CardPointe.
@@ -17,7 +17,7 @@
 defined( 'ABSPATH' ) || exit;
 
 if ( $plain ) {
-	echo "\n" . esc_html( __( 'PAYMENT RECEIPT', 'paradox-cardpointe-gateway' ) ) . "\n";
+	echo "\n" . esc_html( __( 'PAYMENT RECEIPT', 'paradox-cardpointe-gateway-for-woocommerce' ) ) . "\n";
 	if ( '' !== $header ) {
 		echo esc_html( $header ) . "\n";
 	}
@@ -31,7 +31,7 @@ if ( $plain ) {
 }
 ?>
 <section class="paradox-cardpointe-receipt woocommerce-order-details">
-	<h2 class="woocommerce-column__title"><?php esc_html_e( 'Payment receipt', 'paradox-cardpointe-gateway' ); ?></h2>
+	<h2 class="woocommerce-column__title"><?php esc_html_e( 'Payment receipt', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></h2>
 	<?php if ( '' !== $header ) : ?>
 		<p class="paradox-cardpointe-receipt-header"><?php echo esc_html( $header ); ?></p>
 	<?php endif; ?>

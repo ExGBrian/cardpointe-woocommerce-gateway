@@ -174,7 +174,7 @@ final class PaymentProcessor {
 		$order->add_order_note(
 			sprintf(
 				/* translators: %s: payment method description */
-				__( 'CardPointe: no charge required. Payment method verified and vaulted (%s).', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe: no charge required. Payment method verified and vaulted (%s).', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				$this->describe_source( $source )
 			)
 		);
@@ -215,7 +215,7 @@ final class PaymentProcessor {
 		$order->add_order_note(
 			sprintf(
 				/* translators: %s: payment method description */
-				__( 'CardPointe: payment method vaulted for pre-order (%s). It will be charged when the pre-order is released.', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe: payment method vaulted for pre-order (%s). It will be charged when the pre-order is released.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				$this->describe_source( $source )
 			)
 		);
@@ -260,7 +260,7 @@ final class PaymentProcessor {
 		$subscription->add_order_note(
 			sprintf(
 				/* translators: %s: payment method description */
-				__( 'CardPointe payment method updated (%s).', 'paradox-cardpointe-gateway' ),
+				__( 'CardPointe payment method updated (%s).', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				$this->describe_source( $source )
 			)
 		);
@@ -297,7 +297,7 @@ final class PaymentProcessor {
 		);
 
 		if ( ! $source->has_profile() && '' === $source->token ) {
-			throw new PaymentException( __( 'No vaulted payment method is available for this order.', 'paradox-cardpointe-gateway' ) );
+			throw new PaymentException( __( 'No vaulted payment method is available for this order.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$body = RequestBuilder::auth_for_order(
@@ -356,7 +356,7 @@ final class PaymentProcessor {
 				if ( $recovered ) {
 					return $recovered;
 				}
-				$this->fail( $order, __( 'CardPointe did not respond in time and no approved transaction was found for this order.', 'paradox-cardpointe-gateway' ), $context );
+				$this->fail( $order, __( 'CardPointe did not respond in time and no approved transaction was found for this order.', 'paradox-cardpointe-gateway-for-woocommerce' ), $context );
 				throw new PaymentException( $e->customer_message() );
 			}
 			$this->fail( $order, $e->getMessage(), $context );
@@ -369,7 +369,7 @@ final class PaymentProcessor {
 				return $recovered;
 			}
 			$this->fail( $order, sprintf( 'CardPointe asked to retry (%s) and no approved transaction was found.', $response->error_text() ), $context );
-			throw new PaymentException( __( 'We could not confirm your payment. You have not been charged. Please try again.', 'paradox-cardpointe-gateway' ) );
+			throw new PaymentException( __( 'We could not confirm your payment. You have not been charged. Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		if ( ! $response->is_approved() ) {
@@ -397,7 +397,7 @@ final class PaymentProcessor {
 			foreach ( $inquiry->transactions() as $txn ) {
 				if ( $txn->is_approved() && '' !== $txn->string( 'retref' ) ) {
 					$this->logger->warning( 'Recovered approved transaction after timeout', array( 'order_id' => $order->get_id(), 'retref' => $txn->string( 'retref' ) ) );
-					$order->add_order_note( __( 'CardPointe timed out but the transaction was found approved via inquireByOrderid.', 'paradox-cardpointe-gateway' ) );
+					$order->add_order_note( __( 'CardPointe timed out but the transaction was found approved via inquireByOrderid.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 					OrderMeta::set( $order, OrderMeta::ORDERID, $orderid );
 					return $txn;
 				}
@@ -434,7 +434,7 @@ final class PaymentProcessor {
 		$amount = wc_price( (float) $response->string( 'amount', (string) $order->get_total() ), array( 'currency' => $order->get_currency() ) );
 		$detail = sprintf(
 			/* translators: 1: amount, 2: payment method description, 3: retref, 4: auth code, 5: AVS text, 6: CVV text */
-			__( '%1$s via %2$s. Retref: %3$s. Auth code: %4$s. AVS: %5$s. CVV: %6$s.', 'paradox-cardpointe-gateway' ),
+			__( '%1$s via %2$s. Retref: %3$s. Auth code: %4$s. AVS: %5$s. CVV: %6$s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			wp_strip_all_tags( $amount ),
 			$this->describe_source( $source ),
 			$response->string( 'retref' ),
@@ -444,18 +444,18 @@ final class PaymentProcessor {
 		);
 
 		if ( $this->credentials->sandbox ) {
-			$detail .= ' ' . __( '[Sandbox]', 'paradox-cardpointe-gateway' );
+			$detail .= ' ' . __( '[Sandbox]', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 
 		if ( $captured ) {
 			if ( $this->gateway instanceof EcheckGateway && 'on-hold' === $this->gateway->approved_status() ) {
-				$order->update_status( 'on-hold', __( 'CardPointe eCheck accepted, awaiting funds:', 'paradox-cardpointe-gateway' ) . ' ' . $detail );
+				$order->update_status( 'on-hold', __( 'CardPointe eCheck accepted, awaiting funds:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $detail );
 			} else {
-				$order->add_order_note( __( 'CardPointe payment approved:', 'paradox-cardpointe-gateway' ) . ' ' . $detail );
+				$order->add_order_note( __( 'CardPointe payment approved:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $detail );
 				$order->payment_complete( $response->string( 'retref' ) );
 			}
 		} else {
-			$order->update_status( 'on-hold', __( 'CardPointe authorization approved (not yet captured):', 'paradox-cardpointe-gateway' ) . ' ' . $detail . ' ' . __( 'Capture from the CardPointe panel or by changing the status to Processing.', 'paradox-cardpointe-gateway' ) );
+			$order->update_status( 'on-hold', __( 'CardPointe authorization approved (not yet captured):', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $detail . ' ' . __( 'Capture from the CardPointe panel or by changing the status to Processing.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$order->save();
@@ -472,7 +472,7 @@ final class PaymentProcessor {
 	public function record_decline( \WC_Order $order, Response $response, string $context ) {
 		$note = sprintf(
 			/* translators: %s: gateway error text */
-			__( 'CardPointe declined the payment: %s', 'paradox-cardpointe-gateway' ),
+			__( 'CardPointe declined the payment: %s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			$response->error_text()
 		);
 		OrderMeta::delete( $order, OrderMeta::PENDING_ORDERID );
@@ -498,7 +498,7 @@ final class PaymentProcessor {
 	 */
 	private function fail( \WC_Order $order, string $reason, string $context ) {
 		OrderMeta::delete( $order, OrderMeta::PENDING_ORDERID );
-		$order->update_status( 'failed', __( 'CardPointe payment failed:', 'paradox-cardpointe-gateway' ) . ' ' . $reason );
+		$order->update_status( 'failed', __( 'CardPointe payment failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $reason );
 		$this->logger->error( 'Payment failed', array( 'order_id' => $order->get_id(), 'context' => $context, 'reason' => $reason ) );
 		do_action( 'paradox_cardpointe_payment_failed', $order, null, $context );
 	}
@@ -510,10 +510,10 @@ final class PaymentProcessor {
 	 */
 	private function decline_message( Response $response ): string {
 		$text = $response->string( 'resptext' );
-		$text = '' !== $text ? $text : __( 'the transaction was declined', 'paradox-cardpointe-gateway' );
+		$text = '' !== $text ? $text : __( 'the transaction was declined', 'paradox-cardpointe-gateway-for-woocommerce' );
 		return sprintf(
 			/* translators: %s: decline reason */
-			__( 'Your payment was not approved (%s). Please check your details or try another payment method.', 'paradox-cardpointe-gateway' ),
+			__( 'Your payment was not approved (%s). Please check your details or try another payment method.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			$text
 		);
 	}
@@ -617,7 +617,7 @@ final class PaymentProcessor {
 		} catch ( \Exception $e ) {
 			// The payment already succeeded; a vaulting problem must not fail the order.
 			$this->logger->error( 'Could not add account to profile after payment', array( 'order_id' => $order->get_id(), 'error' => $e->getMessage() ) );
-			$order->add_order_note( __( 'CardPointe: the payment method could not be added to the customer profile; the token will be used instead.', 'paradox-cardpointe-gateway' ) );
+			$order->add_order_note( __( 'CardPointe: the payment method could not be added to the customer profile; the token will be used instead.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$source->profile_id = $profile_id;
@@ -678,7 +678,7 @@ final class PaymentProcessor {
 			throw new PaymentException(
 				sprintf(
 					/* translators: %s: card brand */
-					__( '%s cards are not accepted. Please use a different card.', 'paradox-cardpointe-gateway' ),
+					__( '%s cards are not accepted. Please use a different card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					CardTypes::label( (string) $brand )
 				)
 			);
@@ -717,13 +717,13 @@ final class PaymentProcessor {
 	 */
 	public function describe_source( PaymentSource $source ): string {
 		if ( 'echeck' === $source->type ) {
-			$type = 'ESAV' === $source->accttype ? __( 'savings account', 'paradox-cardpointe-gateway' ) : __( 'checking account', 'paradox-cardpointe-gateway' );
+			$type = 'ESAV' === $source->accttype ? __( 'savings account', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'checking account', 'paradox-cardpointe-gateway-for-woocommerce' );
 			/* translators: 1: account type, 2: last four digits */
-			return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway' ), $type, $source->last4() );
+			return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ), $type, $source->last4() );
 		}
-		$brand = '' !== $source->brand ? CardTypes::label( $source->brand ) : __( 'card', 'paradox-cardpointe-gateway' );
+		$brand = '' !== $source->brand ? CardTypes::label( $source->brand ) : __( 'card', 'paradox-cardpointe-gateway-for-woocommerce' );
 		/* translators: 1: card brand, 2: last four digits */
-		return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway' ), $brand, $source->last4() );
+		return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ), $brand, $source->last4() );
 	}
 
 	/**

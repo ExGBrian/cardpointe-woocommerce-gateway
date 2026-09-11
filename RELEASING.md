@@ -11,7 +11,7 @@ tag. Work down this list in order.
    - `SVN_USERNAME`, your WordPress.org account name
    - `SVN_PASSWORD`, that account's password
 3. Confirm the `SLUG` in `.github/workflows/deploy.yml` matches the slug the review
-   team assigned. It is currently `paradox-cardpointe-gateway`.
+   team assigned. It is currently `paradox-cardpointe-gateway-for-woocommerce`.
 4. Add the banner and icon images described in `.wordpress-org/README.md`.
 
 ## Before every release
@@ -31,7 +31,7 @@ tag. Work down this list in order.
 ## Cutting the release
 
 1. Bump the version in **both** places, they must match:
-   - `Version:` in `paradox-cardpointe-gateway.php`
+   - `Version:` in `paradox-cardpointe-gateway-for-woocommerce.php`
    - `Stable tag:` in `readme.txt`
 2. Add a `== Changelog ==` entry for the new version in `readme.txt`. The deploy
    workflow refuses to publish without one.

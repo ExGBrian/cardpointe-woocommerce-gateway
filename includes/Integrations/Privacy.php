@@ -40,8 +40,8 @@ final class Privacy {
 		if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
 			return;
 		}
-		$content = '<p>' . __( 'When you pay with CardPointe, your card or bank account details are entered in a secure form hosted by CardPointe (Fiserv) and are never stored on this site. We store a payment reference, the last four digits of your account, the card brand, and, if you choose to save a payment method, a vault reference that lets us charge it later. See the CardPointe privacy policy for how they process your data.', 'paradox-cardpointe-gateway' ) . '</p>';
-		wp_add_privacy_policy_content( __( 'CardPointe Payment Gateway', 'paradox-cardpointe-gateway' ), wp_kses_post( wpautop( $content ) ) );
+		$content = '<p>' . __( 'When you pay with CardPointe, your card or bank account details are entered in a secure form hosted by CardPointe (Fiserv) and are never stored on this site. We store a payment reference, the last four digits of your account, the card brand, and, if you choose to save a payment method, a vault reference that lets us charge it later. See the CardPointe privacy policy for how they process your data.', 'paradox-cardpointe-gateway-for-woocommerce' ) . '</p>';
+		wp_add_privacy_policy_content( __( 'CardPointe Payment Gateway', 'paradox-cardpointe-gateway-for-woocommerce' ), wp_kses_post( wpautop( $content ) ) );
 	}
 
 	/**
@@ -52,11 +52,11 @@ final class Privacy {
 	 */
 	public function retention_setting( $settings ) {
 		$insert = array(
-			'title'       => __( 'Retain CardPointe payment data', 'paradox-cardpointe-gateway' ),
-			'desc_tip'    => __( 'Vault references and receipts on orders older than this are removed when a customer requests erasure.', 'paradox-cardpointe-gateway' ),
+			'title'       => __( 'Retain CardPointe payment data', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'desc_tip'    => __( 'Vault references and receipts on orders older than this are removed when a customer requests erasure.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'id'          => self::RETENTION_OPTION,
 			'type'        => 'relative_date_selector',
-			'placeholder' => __( 'N/A', 'paradox-cardpointe-gateway' ),
+			'placeholder' => __( 'N/A', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'default'     => '',
 			'autoload'    => false,
 		);
@@ -73,7 +73,7 @@ final class Privacy {
 	 */
 	public function register_exporter( $exporters ) {
 		$exporters['paradox-cardpointe'] = array(
-			'exporter_friendly_name' => __( 'CardPointe payment data', 'paradox-cardpointe-gateway' ),
+			'exporter_friendly_name' => __( 'CardPointe payment data', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'callback'               => array( $this, 'export' ),
 		);
 		return $exporters;
@@ -87,7 +87,7 @@ final class Privacy {
 	 */
 	public function register_eraser( $erasers ) {
 		$erasers['paradox-cardpointe'] = array(
-			'eraser_friendly_name' => __( 'CardPointe payment data', 'paradox-cardpointe-gateway' ),
+			'eraser_friendly_name' => __( 'CardPointe payment data', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'callback'             => array( $this, 'erase' ),
 		);
 		return $erasers;
@@ -144,14 +144,14 @@ final class Privacy {
 		foreach ( $orders as $order ) {
 			$stored = OrderMeta::stored_payment_method( $order );
 			$data   = array(
-				array( 'name' => __( 'Order', 'paradox-cardpointe-gateway' ), 'value' => $order->get_order_number() ),
-				array( 'name' => __( 'CardPointe reference', 'paradox-cardpointe-gateway' ), 'value' => OrderMeta::retref( $order ) ),
-				array( 'name' => __( 'Payment method', 'paradox-cardpointe-gateway' ), 'value' => trim( $stored['type'] . ' ' . $stored['brand'] . ' ****' . $stored['last4'] ) ),
-				array( 'name' => __( 'Vault profile', 'paradox-cardpointe-gateway' ), 'value' => '' !== $stored['profile_id'] ? $stored['profile_id'] . '/' . $stored['acct_id'] : '' ),
+				array( 'name' => __( 'Order', 'paradox-cardpointe-gateway-for-woocommerce' ), 'value' => $order->get_order_number() ),
+				array( 'name' => __( 'CardPointe reference', 'paradox-cardpointe-gateway-for-woocommerce' ), 'value' => OrderMeta::retref( $order ) ),
+				array( 'name' => __( 'Payment method', 'paradox-cardpointe-gateway-for-woocommerce' ), 'value' => trim( $stored['type'] . ' ' . $stored['brand'] . ' ****' . $stored['last4'] ) ),
+				array( 'name' => __( 'Vault profile', 'paradox-cardpointe-gateway-for-woocommerce' ), 'value' => '' !== $stored['profile_id'] ? $stored['profile_id'] . '/' . $stored['acct_id'] : '' ),
 			);
 			$export[] = array(
 				'group_id'    => 'paradox_cardpointe_orders',
-				'group_label' => __( 'CardPointe payments', 'paradox-cardpointe-gateway' ),
+				'group_label' => __( 'CardPointe payments', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				'item_id'     => 'order-' . $order->get_id(),
 				'data'        => $data,
 			);
@@ -166,7 +166,7 @@ final class Privacy {
 					$profile_id  = ProfileService::get_user_profile_id( $user->ID, $credentials );
 					if ( '' !== $profile_id ) {
 						$data[] = array(
-							'name'  => sprintf( /* translators: %s: environment */ __( 'CardPointe profile (%s)', 'paradox-cardpointe-gateway' ), $credentials->environment() ),
+							'name'  => sprintf( /* translators: %s: environment */ __( 'CardPointe profile (%s)', 'paradox-cardpointe-gateway-for-woocommerce' ), $credentials->environment() ),
 							'value' => $profile_id,
 						);
 					}
@@ -174,7 +174,7 @@ final class Privacy {
 				if ( $data ) {
 					$export[] = array(
 						'group_id'    => 'paradox_cardpointe_profile',
-						'group_label' => __( 'CardPointe vault', 'paradox-cardpointe-gateway' ),
+						'group_label' => __( 'CardPointe vault', 'paradox-cardpointe-gateway-for-woocommerce' ),
 						'item_id'     => 'user-' . $user->ID,
 						'data'        => $data,
 					);
@@ -227,7 +227,7 @@ final class Privacy {
 		}
 
 		if ( $retained ) {
-			$messages[] = __( 'Some CardPointe payment references were retained because the orders are within the retention period.', 'paradox-cardpointe-gateway' );
+			$messages[] = __( 'Some CardPointe payment references were retained because the orders are within the retention period.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 
 		return array(

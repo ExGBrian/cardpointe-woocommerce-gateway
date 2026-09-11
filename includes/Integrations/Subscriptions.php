@@ -64,7 +64,7 @@ final class Subscriptions {
 		}
 
 		if ( '' === $stored['profile_id'] && '' === $stored['token'] ) {
-			$renewal_order->update_status( 'failed', __( 'CardPointe renewal failed: no vaulted payment method is stored for this subscription.', 'paradox-cardpointe-gateway' ) );
+			$renewal_order->update_status( 'failed', __( 'CardPointe renewal failed: no vaulted payment method is stored for this subscription.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 			return;
 		}
 
@@ -74,7 +74,7 @@ final class Subscriptions {
 				'failed',
 				sprintf(
 					/* translators: %s: environment */
-					__( 'CardPointe renewal failed: the payment method was vaulted in the %s environment, which is not active.', 'paradox-cardpointe-gateway' ),
+					__( 'CardPointe renewal failed: the payment method was vaulted in the %s environment, which is not active.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					$stored['environment']
 				)
 			);
@@ -103,7 +103,7 @@ final class Subscriptions {
 			// The order is already marked failed with a note; Subscriptions reacts to the status.
 			Plugin::instance()->logger()->warning( 'Renewal charge failed', array( 'order_id' => $renewal_order->get_id(), 'error' => $e->getMessage() ) );
 		} catch ( \Exception $e ) {
-			$renewal_order->update_status( 'failed', __( 'CardPointe renewal failed:', 'paradox-cardpointe-gateway' ) . ' ' . $e->getMessage() );
+			$renewal_order->update_status( 'failed', __( 'CardPointe renewal failed:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . $e->getMessage() );
 		}
 	}
 
@@ -156,19 +156,19 @@ final class Subscriptions {
 				'post_meta' => array(
 					OrderMeta::key( OrderMeta::PROFILE_ID )   => array(
 						'value' => (string) OrderMeta::get( $subscription, OrderMeta::PROFILE_ID ),
-						'label' => __( 'CardPointe profile ID', 'paradox-cardpointe-gateway' ),
+						'label' => __( 'CardPointe profile ID', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					),
 					OrderMeta::key( OrderMeta::ACCT_ID )      => array(
 						'value' => (string) OrderMeta::get( $subscription, OrderMeta::ACCT_ID ),
-						'label' => __( 'CardPointe account ID', 'paradox-cardpointe-gateway' ),
+						'label' => __( 'CardPointe account ID', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					),
 					OrderMeta::key( OrderMeta::TOKEN )        => array(
 						'value' => (string) OrderMeta::get( $subscription, OrderMeta::TOKEN ),
-						'label' => __( 'CardSecure token', 'paradox-cardpointe-gateway' ),
+						'label' => __( 'CardSecure token', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					),
 					OrderMeta::key( OrderMeta::TOKEN_EXPIRY ) => array(
 						'value' => (string) OrderMeta::get( $subscription, OrderMeta::TOKEN_EXPIRY ),
-						'label' => __( 'Token expiry (YYYYMM)', 'paradox-cardpointe-gateway' ),
+						'label' => __( 'Token expiry (YYYYMM)', 'paradox-cardpointe-gateway-for-woocommerce' ),
 					),
 				),
 			);
@@ -194,16 +194,16 @@ final class Subscriptions {
 		$expiry     = trim( (string) ( $meta[ OrderMeta::key( OrderMeta::TOKEN_EXPIRY ) ]['value'] ?? '' ) );
 
 		if ( '' === $profile_id && '' === $token ) {
-			throw new \Exception( __( 'Enter a CardPointe profile ID or a CardSecure token.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'Enter a CardPointe profile ID or a CardSecure token.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		if ( '' !== $profile_id && ! preg_match( '/^\d{1,20}$/', $profile_id ) ) {
-			throw new \Exception( __( 'The CardPointe profile ID must be numeric (up to 20 digits).', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'The CardPointe profile ID must be numeric (up to 20 digits).', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		if ( '' !== $token && ! preg_match( '/^\d{15,19}$/', $token ) ) {
-			throw new \Exception( __( 'The CardSecure token must be 15 to 19 digits.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'The CardSecure token must be 15 to 19 digits.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		if ( '' !== $token && Plugin::CARD_GATEWAY_ID === $payment_method_id && ! preg_match( '/^\d{6}$/', $expiry ) ) {
-			throw new \Exception( __( 'Enter the token expiry as YYYYMM when using a CardSecure token.', 'paradox-cardpointe-gateway' ) );
+			throw new \Exception( __( 'Enter the token expiry as YYYYMM when using a CardSecure token.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 	}
 
@@ -223,11 +223,11 @@ final class Subscriptions {
 			return $label;
 		}
 		if ( 'echeck' === $stored['type'] ) {
-			$name = 'ESAV' === $stored['accttype'] ? __( 'Savings account', 'paradox-cardpointe-gateway' ) : __( 'Checking account', 'paradox-cardpointe-gateway' );
+			$name = 'ESAV' === $stored['accttype'] ? __( 'Savings account', 'paradox-cardpointe-gateway-for-woocommerce' ) : __( 'Checking account', 'paradox-cardpointe-gateway-for-woocommerce' );
 		} else {
-			$name = '' !== $stored['brand'] ? CardTypes::label( $stored['brand'] ) : __( 'Card', 'paradox-cardpointe-gateway' );
+			$name = '' !== $stored['brand'] ? CardTypes::label( $stored['brand'] ) : __( 'Card', 'paradox-cardpointe-gateway-for-woocommerce' );
 		}
 		/* translators: 1: method name, 2: last four digits */
-		return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway' ), $name, $stored['last4'] );
+		return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ), $name, $stored['last4'] );
 	}
 }

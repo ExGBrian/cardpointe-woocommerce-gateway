@@ -24,8 +24,8 @@ class CardGateway extends AbstractGateway {
 	 */
 	public function __construct() {
 		$this->id                 = Plugin::CARD_GATEWAY_ID;
-		$this->method_title       = __( 'CardPointe - Credit Card', 'paradox-cardpointe-gateway' );
-		$this->method_description = __( 'Accept credit and debit cards through CardPointe. Card data is entered in a hosted iframe and tokenized by CardSecure, so it never touches your server.', 'paradox-cardpointe-gateway' );
+		$this->method_title       = __( 'CardPointe - Credit Card', 'paradox-cardpointe-gateway-for-woocommerce' );
+		$this->method_description = __( 'Accept credit and debit cards through CardPointe. Card data is entered in a hosted iframe and tokenized by CardSecure, so it never touches your server.', 'paradox-cardpointe-gateway-for-woocommerce' );
 		$this->icon               = '';
 
 		parent::__construct();
