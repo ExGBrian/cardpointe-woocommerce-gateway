@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: CardPointe Payment Gateway for WooCommerce 1.0.0\n"
+"Project-Id-Version: Paradox CardPointe Gateway 1.0.0\n"
 "Report-Msgid-Bugs-To: https://paradoxsolutions.io\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

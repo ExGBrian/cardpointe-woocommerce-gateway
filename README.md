@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="docs/banner.jpg" width="560" alt="CardPointe Payment Gateway for WooCommerce - secure checkout integration">
+  <img src="docs/banner.jpg" width="560" alt="Paradox CardPointe Gateway - secure checkout integration">
 </p>
 
-# CardPointe Payment Gateway for WooCommerce
+# Paradox CardPointe Gateway
 
 WooCommerce payment gateway for [CardPointe](https://cardpointe.com) (Fiserv / CardConnect) by [Paradox Solutions](https://paradoxsolutions.io).
 
@@ -30,7 +30,7 @@ Card and bank account details are entered in CardPointe's Hosted iFrame Tokenize
 ## Installation
 
 1. Download this repository as a ZIP (or clone it into `wp-content/plugins/paradox-cardpointe-gateway`).
-2. Activate **CardPointe Payment Gateway for WooCommerce** under Plugins.
+2. Activate **Paradox CardPointe Gateway** under Plugins.
 3. Go to WooCommerce → Settings → Payments → **CardPointe - Credit Card**, enter your credentials, and click **Test connection**.
 4. Enable the gateway. Turn off sandbox mode when you are ready to go live (production requires HTTPS at checkout).
 5. Optionally enable **CardPointe - eCheck (ACH)** if your merchant ID supports ACH.
