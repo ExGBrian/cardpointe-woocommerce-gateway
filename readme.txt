@@ -1,5 +1,5 @@
 === CardPointe Payment Gateway for WooCommerce ===
-Contributors: paradoxsolutions
+Contributors: exgbrian
 Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
@@ -77,6 +77,26 @@ CardPointe can only void unsettled transactions in full. Partial refunds work af
 = Can I set the API password outside the database? =
 
 Yes. Define `PARADOX_CARDPOINTE_PRODUCTION_API_PASSWORD` and/or `PARADOX_CARDPOINTE_SANDBOX_API_PASSWORD` in wp-config.php.
+
+== External services ==
+
+This plugin connects your store to the CardPointe payment gateway, operated by Fiserv (CardConnect), in order to process payments. Using the plugin requires a CardPointe merchant account. Nothing is sent until you enter API credentials and enable a payment method.
+
+Both endpoints below use the site name you configure in the plugin settings: `{site}.cardconnect.com` in production, or `{site}-uat.cardconnect.com` in sandbox mode.
+
+**1. Hosted iFrame Tokenizer** (`https://{site}.cardconnect.com/itoke/ajax-tokenizer.html`)
+
+Loaded in an iframe on the checkout page, in the customer's browser, whenever a customer views a checkout with one of this plugin's payment methods available. The customer types the card number, expiry date and security code, or the bank routing and account number, directly into that iframe. Those details go from the customer's browser to Fiserv, which returns a token. They never pass through, and are never stored on, your server.
+
+**2. CardPointe Gateway REST API** (`https://{site}.cardconnect.com/cardconnect/rest/`)
+
+Called from your server when: a payment is authorized, captured, voided or refunded; a saved payment method is created, looked up or deleted; a card brand is verified against the BIN service; a transaction's settlement status is checked; or you click "Test connection" on the settings screen.
+
+These requests contain the token returned by the tokenizer, the payment amount and currency, your merchant ID, an order reference, and the billing name, company, address, phone number and email address from the order.
+
+Fiserv terms of use: https://www.fiserv.com/en/about-fiserv/terms-of-use.html
+Fiserv privacy notice: https://www.fiserv.com/en/about-fiserv/privacy-notice.html
+CardPointe developer documentation: https://developer.cardpointe.com/
 
 == Changelog ==
 
