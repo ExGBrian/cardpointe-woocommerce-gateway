@@ -15,6 +15,22 @@
 		return String( text || '' ).replace( '%s', value );
 	}
 
+	// How often to look for a payment box that has become visible without any event
+	// telling us so (multi-step checkouts such as CheckoutWC reveal their payment step
+	// client-side and fire nothing WooCommerce-shaped).
+	var WATCH_INTERVAL_MS = 500;
+
+	// A visible frame still not ready after this long is remounted once automatically,
+	// then offered to the shopper as a manual reload.
+	var STUCK_AFTER_MS = 3500;
+
+	/**
+	 * Whether an element is actually laid out, regardless of which ancestor hides it.
+	 */
+	function isVisible( el ) {
+		return !! ( el && ( el.offsetWidth || el.offsetHeight || el.getClientRects().length ) );
+	}
+
 	/**
 	 * Returns the form element that contains a payment box.
 	 */
@@ -58,14 +74,24 @@
 				'class': 'paradox-cardpointe-retry',
 				text: i18n.retryLoad
 			} ).on( 'click', function () {
-				var instance = instances[ gateway ];
 				$( this ).remove();
 				showError( $fieldset, '' );
-				if ( instance ) {
-					instance.reload();
-				}
+				remount( $fieldset );
 			} )
 		);
+	}
+
+	/**
+	 * Throws away any existing instance for a fieldset and mounts a fresh one.
+	 */
+	function remount( $fieldset ) {
+		var gateway = $fieldset.data( 'gateway' );
+		if ( instances[ gateway ] ) {
+			instances[ gateway ].destroy();
+			delete instances[ gateway ];
+		}
+		$fieldset.find( '.paradox-cardpointe-frame' ).removeData( 'visibleSince' );
+		mountFieldset( $fieldset.get( 0 ) );
 	}
 
 	/**
@@ -104,6 +130,7 @@
 			onReady: function () {
 				$fieldset.find( '.paradox-cardpointe-retry' ).remove();
 				$fieldset.find( '.paradox-cardpointe-loading' ).hide();
+				$frame.removeAttr( 'data-attempts' ).removeData( 'visibleSince' );
 			},
 			onTimeout: function () {
 				showRetry( $fieldset, gateway );
@@ -159,18 +186,79 @@
 	function mountVisible() {
 		$( '.paradox-cardpointe-form' ).each( function () {
 			var $fieldset = $( this );
-			var $box = $fieldset.closest( '.payment_box, .woocommerce-PaymentBox, form#add_payment_method, form#order_review' );
 			// Only mount for the selected gateway (or when there is no gateway selector, e.g. add payment method).
 			var gateway = $fieldset.data( 'gateway' );
 			var $radio = $( '#payment_method_' + gateway );
 			if ( $radio.length && ! $radio.is( ':checked' ) ) {
 				return;
 			}
-			if ( $box.length && $box.is( ':hidden' ) && $radio.length ) {
+			// Mounting into a container with no layout wastes the load and, under display:none,
+			// some browsers never start it. Wait for the frame itself to be laid out, whichever
+			// ancestor is doing the hiding; the watchers below bring us back when it appears.
+			if ( ! isVisible( $fieldset.find( '.paradox-cardpointe-frame' ).get( 0 ) ) ) {
 				return;
 			}
 			mountFieldset( this );
 		} );
+	}
+
+	/**
+	 * Recovers frames that are visible but have not become ready: once automatically,
+	 * then by offering the shopper a reload control.
+	 */
+	function stuckCheck() {
+		$( '.paradox-cardpointe-form' ).each( function () {
+			var $fieldset = $( this );
+			var $frame = $fieldset.find( '.paradox-cardpointe-frame' );
+			if ( ! $frame.length || $frame.attr( 'data-ready' ) === '1' ) {
+				return;
+			}
+			if ( ! isVisible( $frame.get( 0 ) ) ) {
+				$frame.removeData( 'visibleSince' );
+				return;
+			}
+			var since = $frame.data( 'visibleSince' );
+			if ( ! since ) {
+				$frame.data( 'visibleSince', Date.now() );
+				return;
+			}
+			if ( Date.now() - since < STUCK_AFTER_MS ) {
+				return;
+			}
+			var attempts = parseInt( $frame.attr( 'data-attempts' ) || '0', 10 );
+			if ( attempts < 1 ) {
+				$frame.attr( 'data-attempts', String( attempts + 1 ) );
+				remount( $fieldset );
+				return;
+			}
+			showRetry( $fieldset, $fieldset.data( 'gateway' ) );
+		} );
+	}
+
+	/**
+	 * Watches for the payment box appearing through any route WooCommerce does not announce.
+	 */
+	function startWatchers() {
+		// Multi-step checkouts route on the URL fragment (CheckoutWC: #cfw-payment-method).
+		$( window ).on( 'hashchange', scheduleMount );
+
+		// A step being revealed is a style, class or hidden-attribute change somewhere above
+		// our fieldset, or the step's markup being inserted. Our own mutations re-enter here
+		// too, but the debounce absorbs them and an already-mounted frame is a no-op.
+		if ( window.MutationObserver ) {
+			new window.MutationObserver( scheduleMount ).observe( document.body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: [ 'style', 'class', 'hidden', 'aria-hidden' ]
+			} );
+		}
+
+		// Backstop for anything that escapes the observer, and the driver for stuckCheck.
+		window.setInterval( function () {
+			mountVisible();
+			stuckCheck();
+		}, WATCH_INTERVAL_MS );
 	}
 
 	/**
@@ -289,5 +377,6 @@
 		$( document.body ).on( 'checkout_error', reloadAll );
 
 		mountVisible();
+		startWatchers();
 	} );
 } )( jQuery, window, document );

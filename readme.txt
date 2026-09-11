@@ -102,6 +102,7 @@ CardPointe developer documentation: https://developer.cardpointe.com/
 
 = 1.0.1 =
 * Fixed the hosted tokenizer iframe sometimes stalling the first time the payment form was shown, when reloading the page would display it correctly.
+* Fixed the payment form never loading on multi-step checkouts such as CheckoutWC, where the payment step is revealed client-side after the page has loaded. The form now mounts the moment its container becomes visible.
 * The iframe is no longer torn down and rebuilt each time WooCommerce refreshes the checkout, which restarted the request to CardPointe.
 * The iframe is now marked as eagerly loaded, so optimisation plugins that add lazy loading cannot defer it indefinitely.
 * Added a connection hint for the tokenizer host on checkout pages so the first load does not wait on a DNS lookup and TLS handshake.
