@@ -1,4 +1,4 @@
-=== CardPointe Payment Gateway for WooCommerce ===
+=== Paradox CardPointe Gateway ===
 Contributors: exgbrian
 Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
@@ -12,7 +12,7 @@ Accept credit cards and eChecks through CardPointe. Tokenized checkout, refunds,
 
 == Description ==
 
-CardPointe Payment Gateway for WooCommerce, by [Paradox Solutions](https://paradoxsolutions.io), connects your store to the CardPointe (Fiserv / CardConnect) gateway.
+Paradox CardPointe Gateway, by [Paradox Solutions](https://paradoxsolutions.io), connects your WooCommerce store to the CardPointe (Fiserv / CardConnect) gateway.
 
 **Easy install.** Upload the plugin, enter your API credentials, flip sandbox mode off when you are ready, and start taking payments.
 
