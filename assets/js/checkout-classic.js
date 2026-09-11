@@ -45,6 +45,30 @@
 	}
 
 	/**
+	 * Offers a manual reload once the iframe has failed to load in time.
+	 */
+	function showRetry( $fieldset, gateway ) {
+		var $loading = $fieldset.find( '.paradox-cardpointe-loading' );
+		if ( ! $loading.length || $loading.find( '.paradox-cardpointe-retry' ).length ) {
+			return;
+		}
+		$loading.append(
+			$( '<button>', {
+				type: 'button',
+				'class': 'paradox-cardpointe-retry',
+				text: i18n.retryLoad
+			} ).on( 'click', function () {
+				var instance = instances[ gateway ];
+				$( this ).remove();
+				showError( $fieldset, '' );
+				if ( instance ) {
+					instance.reload();
+				}
+			} )
+		);
+	}
+
+	/**
 	 * Mounts the tokenizer for a fieldset when not already mounted.
 	 */
 	function mountFieldset( fieldset ) {
@@ -58,14 +82,18 @@
 		var container = $frame.get( 0 );
 		var existing = instances[ gateway ];
 
-		// WooCommerce replaces the payment box on updated_checkout; re-mount when our iframe is gone.
-		if ( existing && existing.iframe && document.body.contains( existing.iframe ) ) {
+		// WooCommerce replaces the payment box on updated_checkout. Re-mount only when the
+		// iframe is really gone or a different container has appeared: tearing a frame down
+		// while it is still loading and starting a new one is what makes the first paint
+		// look hung, because each rebuild restarts the round trip to CardPointe.
+		if ( existing && existing.container === container && existing.iframe && document.body.contains( existing.iframe ) ) {
 			return;
 		}
 		if ( existing ) {
 			existing.destroy();
 		}
 
+		$fieldset.find( '.paradox-cardpointe-retry' ).remove();
 		$fieldset.find( '.paradox-cardpointe-loading' ).show();
 
 		instances[ gateway ] = window.ParadoxCardPointeTokenizer.mount( container, {
@@ -74,7 +102,11 @@
 			height: $frame.data( 'height' ),
 			title: $frame.data( 'title' ),
 			onReady: function () {
+				$fieldset.find( '.paradox-cardpointe-retry' ).remove();
 				$fieldset.find( '.paradox-cardpointe-loading' ).hide();
+			},
+			onTimeout: function () {
+				showRetry( $fieldset, gateway );
 			},
 			onToken: function ( token, expiry, brand ) {
 				$fieldset.find( '.paradox-cardpointe-token' ).val( token );
@@ -105,6 +137,23 @@
 				}
 			}
 		} );
+	}
+
+	var mountTimer = null;
+
+	/**
+	 * Coalesces mount requests. updated_checkout fires on the initial review refresh and
+	 * again on every address change, often several times in a burst; without this each one
+	 * would start another iframe load.
+	 */
+	function scheduleMount() {
+		if ( mountTimer ) {
+			window.clearTimeout( mountTimer );
+		}
+		mountTimer = window.setTimeout( function () {
+			mountTimer = null;
+			mountVisible();
+		}, 80 );
 	}
 
 	function mountVisible() {
@@ -232,13 +281,9 @@
 			return ok;
 		} );
 
-		$( document.body ).on( 'updated_checkout payment_method_selected', mountVisible );
-		$( document ).on( 'change', 'input[name="payment_method"]', function () {
-			window.setTimeout( mountVisible, 50 );
-		} );
-		$( document ).on( 'change', 'input.woocommerce-SavedPaymentMethods-tokenInput', function () {
-			window.setTimeout( mountVisible, 50 );
-		} );
+		$( document.body ).on( 'updated_checkout payment_method_selected', scheduleMount );
+		$( document ).on( 'change', 'input[name="payment_method"]', scheduleMount );
+		$( document ).on( 'change', 'input.woocommerce-SavedPaymentMethods-tokenInput', scheduleMount );
 
 		// A failed attempt consumes the CVV attached to the token; start over with a fresh iframe.
 		$( document.body ).on( 'checkout_error', reloadAll );

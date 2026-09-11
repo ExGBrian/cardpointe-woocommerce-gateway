@@ -24,6 +24,7 @@ final class Assets {
 	public function __construct() {
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin' ) );
+		add_filter( 'wp_resource_hints', array( $this, 'resource_hints' ), 10, 2 );
 	}
 
 	/**
@@ -80,6 +81,40 @@ final class Assets {
 	/**
 	 * Translatable strings for the scripts.
 	 */
+	/**
+	 * Warms the connection to the tokenizer host on checkout-like pages.
+	 *
+	 * The iframe is created by JavaScript after the document is parsed, so without a hint
+	 * the DNS lookup and TLS handshake to CardPointe only start at that point and are on
+	 * the critical path of the first paint of the payment form.
+	 *
+	 * @param array  $urls          URLs for this relation type.
+	 * @param string $relation_type Relation type being processed.
+	 * @return array
+	 */
+	public function resource_hints( $urls, $relation_type ): array {
+		if ( 'preconnect' !== $relation_type && 'dns-prefetch' !== $relation_type ) {
+			return $urls;
+		}
+		if ( ! is_checkout() && ! is_checkout_pay_page() && ! is_add_payment_method_page() ) {
+			return $urls;
+		}
+
+		$origins = array();
+		foreach ( Plugin::gateway_ids() as $gateway_id ) {
+			$gateway = Plugin::gateway( $gateway_id );
+			if ( ! $gateway || 'yes' !== $gateway->enabled ) {
+				continue;
+			}
+			$origin = $gateway->tokenizer_origin();
+			if ( '' !== $origin && ! in_array( $origin, $origins, true ) && ! in_array( $origin, $urls, true ) ) {
+				$origins[] = $origin;
+			}
+		}
+
+		return array_merge( $urls, $origins );
+	}
+
 	public static function i18n(): array {
 		return array(
 			'enterCard'        => __( 'Please enter your card details.', 'paradox-cardpointe-gateway-for-woocommerce' ),
@@ -91,6 +126,7 @@ final class Assets {
 			'consentRequired'  => __( 'Please authorize the bank account debit to continue.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'timeout'          => __( 'The secure payment form did not respond. Please re-enter your details.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'loading'          => __( 'Loading secure payment form…', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'retryLoad'        => __( 'Reload the payment form', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'detected'         => __( 'Card type: %s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'brands'           => CardTypes::options(),
 			'errorCodes'       => array(

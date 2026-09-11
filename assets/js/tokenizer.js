@@ -12,6 +12,14 @@
 
 	var VALIDATION_CODES = { '1001': 1, '1002': 1, '1003': 1, '1004': 1, '1005': 1, '1006': 1 };
 
+	// Reveal the frame even if cssLoaded never arrives, so it is never left invisible.
+	var REVEAL_TIMEOUT = 4000;
+
+	// No load event by this point means the navigation never happened rather than
+	// being merely slow. Re-point src once and tell the host UI, which can offer a
+	// manual reload.
+	var LOAD_TIMEOUT = 8000;
+
 	/**
 	 * Card brand from a CardSecure token (digits two and three mirror the PAN).
 	 *
@@ -49,32 +57,50 @@
 	 * Creates a tokenizer instance.
 	 *
 	 * @param {HTMLElement} container Element that receives the iframe.
-	 * @param {Object}      options   { src, origin, height, title, onToken, onError, onCleared, onTyping, onReady }
+	 * @param {Object}      options   { src, origin, height, title, onToken, onError, onCleared, onTyping, onReady, onTimeout }
 	 * @return {Object} Instance with reload(), destroy(), waitForToken(), getToken(), hasToken().
 	 */
 	function mount( container, options ) {
 		options = options || {};
 
-		var state = { token: '', expiry: '', ready: false, typing: false, destroyed: false };
+		var state = {
+			token: '',
+			expiry: '',
+			ready: false,
+			typing: false,
+			destroyed: false,
+			loaded: false,
+			retried: false
+		};
 		var iframe = document.createElement( 'iframe' );
 		var origin = options.origin || '';
 		var listeners = [];
+		var revealTimer = null;
+		var loadTimer = null;
 
 		iframe.setAttribute( 'title', options.title || 'Secure payment form' );
 		iframe.setAttribute( 'frameborder', '0' );
 		iframe.setAttribute( 'scrolling', 'no' );
 		iframe.setAttribute( 'allowtransparency', 'true' );
+		// Optimisation plugins rewrite every iframe on the page to loading="lazy".
+		// Inside a payment box that starts hidden that can defer the load indefinitely,
+		// so pin the behaviour this frame needs.
+		iframe.setAttribute( 'loading', 'eager' );
+		iframe.setAttribute( 'fetchpriority', 'high' );
 		iframe.className = 'paradox-cardpointe-iframe';
 		iframe.style.width = '100%';
 		iframe.style.height = ( parseInt( options.height, 10 ) || 250 ) + 'px';
 		iframe.style.border = '0';
 		iframe.style.visibility = 'hidden';
-		iframe.src = options.src;
 
 		// Remove any previous iframe in this container.
 		while ( container.firstChild ) {
 			container.removeChild( container.firstChild );
 		}
+
+		// Attach before assigning src. A detached iframe does not begin loading, and
+		// assigning src first can leave the frame sitting on about:blank once it is
+		// attached, which is indistinguishable from a hung load.
 		container.appendChild( iframe );
 
 		function call( name ) {
@@ -89,7 +115,27 @@
 			}
 		}
 
+		function clearRevealTimer() {
+			if ( revealTimer ) {
+				window.clearTimeout( revealTimer );
+				revealTimer = null;
+			}
+		}
+
+		function clearLoadTimer() {
+			if ( loadTimer ) {
+				window.clearTimeout( loadTimer );
+				loadTimer = null;
+			}
+		}
+
 		function reveal() {
+			if ( state.ready || state.destroyed ) {
+				return;
+			}
+			// Only the reveal timer is cleared here. The load watchdog has to survive so
+			// that a frame which is revealed but still blank is retried below.
+			clearRevealTimer();
 			state.ready = true;
 			iframe.style.visibility = 'visible';
 			container.setAttribute( 'data-ready', '1' );
@@ -98,10 +144,33 @@
 			listeners = [];
 		}
 
-		// Fallback: reveal even if the cssLoaded event never arrives.
-		var revealTimer = window.setTimeout( reveal, 4000 );
+		function onLoadTimeout() {
+			loadTimer = null;
+			if ( state.destroyed || state.loaded ) {
+				return;
+			}
+			call( 'onTimeout' );
+			if ( ! state.retried ) {
+				state.retried = true;
+				start();
+			}
+		}
+
+		function start() {
+			state.loaded = false;
+			clearRevealTimer();
+			clearLoadTimer();
+			revealTimer = window.setTimeout( reveal, REVEAL_TIMEOUT );
+			loadTimer = window.setTimeout( onLoadTimeout, LOAD_TIMEOUT );
+			iframe.src = options.src;
+		}
+
 		iframe.addEventListener( 'load', function () {
-			window.setTimeout( function () { if ( ! state.ready ) { reveal(); } }, 600 );
+			state.loaded = true;
+			clearLoadTimer();
+			// cssLoaded normally beats this; the short delay gives it a chance to arrive
+			// first so the form is not shown mid-style.
+			window.setTimeout( reveal, 600 );
 		} );
 
 		function onMessage( event ) {
@@ -127,8 +196,11 @@
 				return;
 			}
 
+			// Any message at all proves the document is live, whatever the load event did.
+			state.loaded = true;
+			clearLoadTimer();
+
 			if ( typeof data.cssLoaded !== 'undefined' ) {
-				window.clearTimeout( revealTimer );
 				reveal();
 				return;
 			}
@@ -164,21 +236,25 @@
 
 		window.addEventListener( 'message', onMessage, false );
 
+		start();
+
 		return {
 			iframe: iframe,
+			container: container,
 			getToken: function () { return state.token; },
 			getExpiry: function () { return state.expiry; },
 			hasToken: function () { return state.token !== ''; },
 			isTyping: function () { return state.typing; },
+			isReady: function () { return state.ready; },
 			clear: function () { state.token = ''; state.expiry = ''; },
 			reload: function () {
 				state.token = '';
 				state.expiry = '';
 				state.ready = false;
+				state.retried = false;
 				iframe.style.visibility = 'hidden';
 				container.removeAttribute( 'data-ready' );
-				revealTimer = window.setTimeout( reveal, 4000 );
-				iframe.src = options.src;
+				start();
 			},
 			/**
 			 * Resolves with the token once it arrives, or rejects after ms.
@@ -208,7 +284,8 @@
 			destroy: function () {
 				state.destroyed = true;
 				window.removeEventListener( 'message', onMessage, false );
-				window.clearTimeout( revealTimer );
+				clearRevealTimer();
+				clearLoadTimer();
 				if ( iframe.parentNode ) {
 					iframe.parentNode.removeChild( iframe );
 				}

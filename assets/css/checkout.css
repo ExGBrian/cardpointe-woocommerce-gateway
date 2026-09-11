@@ -26,6 +26,16 @@
 .paradox-cardpointe-frame[data-ready="1"] + .paradox-cardpointe-loading {
 	display: none;
 }
+.paradox-cardpointe-retry {
+	margin-left: 8px;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: inherit;
+	font: inherit;
+	text-decoration: underline;
+	cursor: pointer;
+}
 .paradox-cardpointe-errors {
 	margin: 0 0 12px;
 }
