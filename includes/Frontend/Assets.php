@@ -62,6 +62,7 @@ final class Assets {
 	public static function params(): array {
 		$card   = Plugin::gateway( Plugin::CARD_GATEWAY_ID );
 		$params = array(
+			'version'          => PARADOX_CARDPOINTE_VERSION,
 			'gateways'         => Plugin::gateway_ids(),
 			'allowedCardTypes' => $card ? $card->accepted_card_types() : CardTypes::ALL,
 			'iconUrls'         => array(),
