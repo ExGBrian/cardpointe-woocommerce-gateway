@@ -24,6 +24,34 @@
 	// then offered to the shopper as a manual reload.
 	var STUCK_AFTER_MS = 3500;
 
+	// Console tracing of every mount decision, switched on with ?paradox-cardpointe-debug=1
+	// or localStorage.paradoxCardpointeDebug = '1'. Off, it costs one test per call.
+	var DEBUG = /[?&]paradox-cardpointe-debug=1/.test( window.location.search ) || ( function () {
+		try {
+			return window.localStorage.getItem( 'paradoxCardpointeDebug' ) === '1';
+		} catch ( e ) {
+			return false;
+		}
+	} )();
+
+	function log() {
+		if ( DEBUG && window.console && window.console.log ) {
+			window.console.log.apply( window.console, [ '[CardPointe ' + ( params.version || '' ) + ']' ].concat( Array.prototype.slice.call( arguments ) ) );
+		}
+	}
+
+	/**
+	 * Records the last decision on the frame element so it can be read from the inspector
+	 * without a console: data-state on .paradox-cardpointe-frame.
+	 */
+	function setState( $fieldset, state ) {
+		var $frame = $fieldset.find( '.paradox-cardpointe-frame' );
+		if ( $frame.attr( 'data-state' ) !== state ) {
+			$frame.attr( 'data-state', state );
+			log( $fieldset.data( 'gateway' ), '->', state );
+		}
+	}
+
 	/**
 	 * Whether an element is actually laid out, regardless of which ancestor hides it.
 	 */
@@ -121,6 +149,7 @@
 
 		$fieldset.find( '.paradox-cardpointe-retry' ).remove();
 		$fieldset.find( '.paradox-cardpointe-loading' ).show();
+		setState( $fieldset, 'mounting' );
 
 		instances[ gateway ] = window.ParadoxCardPointeTokenizer.mount( container, {
 			src: $frame.data( 'src' ),
@@ -131,8 +160,10 @@
 				$fieldset.find( '.paradox-cardpointe-retry' ).remove();
 				$fieldset.find( '.paradox-cardpointe-loading' ).hide();
 				$frame.removeAttr( 'data-attempts' ).removeData( 'visibleSince' );
+				setState( $fieldset, 'ready' );
 			},
 			onTimeout: function () {
+				setState( $fieldset, 'load-timeout' );
 				showRetry( $fieldset, gateway );
 			},
 			onToken: function ( token, expiry, brand ) {
@@ -186,16 +217,20 @@
 	function mountVisible() {
 		$( '.paradox-cardpointe-form' ).each( function () {
 			var $fieldset = $( this );
-			// Only mount for the selected gateway (or when there is no gateway selector, e.g. add payment method).
-			var gateway = $fieldset.data( 'gateway' );
-			var $radio = $( '#payment_method_' + gateway );
-			if ( $radio.length && ! $radio.is( ':checked' ) ) {
-				return;
-			}
-			// Mounting into a container with no layout wastes the load and, under display:none,
-			// some browsers never start it. Wait for the frame itself to be laid out, whichever
-			// ancestor is doing the hiding; the watchers below bring us back when it appears.
+			// Proves in the inspector which build of this script is actually executing.
+			$fieldset.attr( 'data-script-version', params.version || '' );
+
+			// Whether this method is selected is read from layout rather than from the
+			// payment_method radio. WooCommerce and every checkout replacement hide the
+			// payment_box of unselected methods, and multi-step checkouts such as CheckoutWC
+			// manage selection with their own markup (cfw-active), so the radio is not a
+			// reliable signal. Mounting into a container with no layout would also waste the
+			// load and, under display:none, some browsers never start it. Wait for the frame
+			// itself to be laid out; the watchers below bring us back when it appears.
 			if ( ! isVisible( $fieldset.find( '.paradox-cardpointe-frame' ).get( 0 ) ) ) {
+				if ( $fieldset.find( '.paradox-cardpointe-frame' ).attr( 'data-ready' ) !== '1' ) {
+					setState( $fieldset, 'waiting-for-layout' );
+				}
 				return;
 			}
 			mountFieldset( this );
@@ -228,9 +263,11 @@
 			var attempts = parseInt( $frame.attr( 'data-attempts' ) || '0', 10 );
 			if ( attempts < 1 ) {
 				$frame.attr( 'data-attempts', String( attempts + 1 ) );
+				setState( $fieldset, 'stuck-remounting' );
 				remount( $fieldset );
 				return;
 			}
+			setState( $fieldset, 'needs-manual-reload' );
 			showRetry( $fieldset, $fieldset.data( 'gateway' ) );
 		} );
 	}
@@ -348,6 +385,7 @@
 
 	$( function () {
 		var gateways = params.gateways || [];
+		log( 'booted; gateways:', gateways.join( ', ' ), '; forms in DOM:', $( '.paradox-cardpointe-form' ).length );
 
 		// Checkout form submission per gateway.
 		$.each( gateways, function ( _, gateway ) {
