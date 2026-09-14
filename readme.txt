@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -33,6 +33,8 @@ Paradox CardPointe Gateway for WooCommerce, by [Paradox Solutions](https://parad
 **WooCommerce Pre-Orders.** Payment methods are verified and vaulted at checkout and charged automatically when the pre-order is released.
 
 **eCheck via ACH.** A separate "eCheck" payment method tokenizes routing and account numbers in the hosted iframe and processes them through the ACH network.
+
+**Apple Pay.** Shoppers using Safari on a device with Apple Pay set up can pay from the credit card box with one tap. The encrypted Apple Pay token is decrypted by CardSecure, never on your server. Available on the classic checkout, CheckoutWC and order-pay pages; the Cart & Checkout blocks are not yet supported for Apple Pay.
 
 **Save cards on file.** Customers can save cards and bank accounts for faster checkout. Details are stored in CardPointe profiles in the CardSecure vault, never on your site.
 
@@ -78,6 +80,15 @@ CardPointe can only void unsettled transactions in full. Partial refunds work af
 
 Yes. Define `PARADOX_CARDPOINTE_PRODUCTION_API_PASSWORD` and/or `PARADOX_CARDPOINTE_SANDBOX_API_PASSWORD` in wp-config.php.
 
+= How do I set up Apple Pay? =
+
+1. Email integrationdelivery@fiserv.com and ask for an Apple Pay Payment Processing Certificate CSR for your merchant ID (allow up to 5 business days). In the Apple Developer portal, create a merchant ID, create a Payment Processing Certificate from that CSR, and send the resulting .cer file back to your Fiserv representative. This is what lets CardSecure decrypt Apple Pay tokens.
+2. Under the same merchant ID, create a Merchant Identity Certificate from a CSR you generate yourself (RSA 2048). Convert the certificate and its private key to PEM and place them on the server outside the web root.
+3. Register your store's domain under the merchant ID and download the verification file.
+4. In WooCommerce > Settings > Payments > CardPointe - Credit Card, enable Apple Pay, enter the merchant identifier and the certificate and key paths, paste the verification file, and save. Then complete verification in the Apple portal. The Status row on that screen lists anything still missing.
+
+Apple Pay needs HTTPS even in sandbox mode. To test in the sandbox, use an Apple sandbox tester account with Apple's test cards.
+
 == External services ==
 
 This plugin connects your store to the CardPointe payment gateway, operated by Fiserv (CardConnect), in order to process payments. Using the plugin requires a CardPointe merchant account. Nothing is sent until you enter API credentials and enable a payment method.
@@ -98,7 +109,19 @@ Fiserv terms of use: https://www.fiserv.com/en/about-fiserv/terms-of-use.html
 Fiserv privacy notice: https://www.fiserv.com/en/about-fiserv/privacy-notice.html
 CardPointe developer documentation: https://developer.cardpointe.com/
 
+**3. Apple Pay merchant validation** (`https://apple-pay-gateway.apple.com/paymentservices/…` and Apple's regional equivalents)
+
+Only when Apple Pay is enabled and a shopper taps the Apple Pay button. Safari gives the store a one-time validation URL and your server calls it to prove the store's identity to Apple, sending your Apple merchant identifier, the store name shown on the payment sheet and this site's domain, authenticated with your merchant identity certificate. No cart, customer or card data is included. The Apple Pay sheet itself is part of Safari; this plugin loads no script from Apple. The encrypted token Apple returns is sent to CardSecure (service 2 above) to be decrypted and tokenized.
+
+Apple Pay on the web terms: https://developer.apple.com/apple-pay/acceptable-use-guidelines-for-websites/
+Apple privacy policy: https://www.apple.com/legal/privacy/
+
 == Changelog ==
+
+= 1.1.0 =
+* Added Apple Pay. An Apple Pay button appears in the credit card box for shoppers using Safari with Apple Pay set up, on the classic checkout, CheckoutWC and order-pay pages. The encrypted Apple token is tokenized by CardSecure and charged like any card payment, with the usual authorize/capture, refund and receipt handling.
+* New Apple Pay section in the card gateway settings: merchant identifier, merchant identity certificate and key (paths or wp-config constants), domain verification file served from WordPress, button style and label, and a status row that lists anything still missing.
+* Apple Pay is not offered for orders that need a saved payment method (subscriptions, charge-on-release pre-orders), on the My Account payment method screens, or on the Cart & Checkout blocks yet.
 
 = 1.0.2 =
 * Fixed the hosted tokenizer iframe sometimes stalling the first time the payment form was shown, when reloading the page would display it correctly.
@@ -113,6 +136,9 @@ CardPointe developer documentation: https://developer.cardpointe.com/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Adds Apple Pay for the classic checkout, CheckoutWC and order-pay pages. Configure it in the card gateway settings.
 
 = 1.0.2 =
 Fixes the secure payment form occasionally failing to appear until the checkout page was reloaded.

@@ -7,6 +7,9 @@
 
 namespace ParadoxSolutions\CardPointe\Gateway;
 
+use ParadoxSolutions\CardPointe\Api\ApiException;
+use ParadoxSolutions\CardPointe\ApplePay\ApplePay;
+use ParadoxSolutions\CardPointe\ApplePay\PaymentData;
 use ParadoxSolutions\CardPointe\Plugin;
 use ParadoxSolutions\CardPointe\Settings\Credentials;
 
@@ -53,16 +56,30 @@ final class PaymentSource {
 	/** @var bool eCheck authorization checkbox. */
 	public $consent = false;
 
+	/** @var string Wallet that produced the token (apple_pay), or empty for typed card details. */
+	public $wallet = '';
+
+	/** @var string The wallet's own description of the card, e.g. "Visa 1234". */
+	public $wallet_display = '';
+
 	/**
 	 * Builds the source from the current request for the given gateway.
 	 *
-	 * @param AbstractGateway $gateway Gateway.
+	 * @param AbstractGateway $gateway         Gateway.
+	 * @param bool            $tokenize_wallet Whether a wallet payload should be exchanged
+	 *                                         for a token now (see from_wallet()).
 	 *
 	 * @throws \Exception With a customer-facing message when the input is missing or invalid.
 	 */
-	public static function from_request( AbstractGateway $gateway ): PaymentSource {
+	public static function from_request( AbstractGateway $gateway, bool $tokenize_wallet = true ): PaymentSource {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce verifies the checkout nonce before calling the gateway.
-		$id     = $gateway->id;
+		$id = $gateway->id;
+
+		$wallet = isset( $_POST[ $id . '_wallet' ] ) ? sanitize_key( wp_unslash( $_POST[ $id . '_wallet' ] ) ) : '';
+		if ( '' !== $wallet ) {
+			return self::from_wallet( $gateway, $wallet, $tokenize_wallet );
+		}
+
 		$source = new self();
 		$source->type = $gateway->payment_type();
 		$source->save = self::posted_bool( 'wc-' . $id . '-new-payment-method' );
@@ -117,6 +134,142 @@ final class PaymentSource {
 
 		return $source;
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Builds the source from an encrypted wallet token (Apple Pay).
+	 *
+	 * The classic checkout calls from_request() twice, once to validate the fields and
+	 * once to pay, and a wallet payload is only good for one tokenization. So the
+	 * CardSecure call happens on the paying call only, after every other checkout field
+	 * has validated, and is memoised for the life of the request.
+	 *
+	 * @param AbstractGateway $gateway  Gateway.
+	 * @param string          $wallet   Wallet identifier posted with the form.
+	 * @param bool            $tokenize Whether to exchange the payload for a token now.
+	 *
+	 * @throws \Exception With a customer-facing message.
+	 */
+	private static function from_wallet( AbstractGateway $gateway, string $wallet, bool $tokenize ): PaymentSource {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing
+		$id = $gateway->id;
+
+		if ( ApplePay::WALLET !== $wallet || ! $gateway instanceof CardGateway || ! ApplePay::is_configured() ) {
+			throw new \Exception( __( 'Apple Pay is not available on this store. Please pay another way.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
+
+		$raw = isset( $_POST[ $id . '_wallet_data' ] ) ? (string) wp_unslash( $_POST[ $id . '_wallet_data' ] ) : '';
+		try {
+			$payment_data = PaymentData::from_json( $raw );
+		} catch ( \InvalidArgumentException $e ) {
+			// The reason names a field, never a value.
+			Plugin::instance()->logger()->warning( 'Apple Pay payload rejected before tokenization', array( 'reason' => $e->getMessage() ) );
+			throw new \Exception( __( 'The Apple Pay payment could not be read. Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
+
+		$network = isset( $_POST[ $id . '_wallet_network' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $id . '_wallet_network' ] ) ) : '';
+		$display = isset( $_POST[ $id . '_wallet_display' ] ) ? sanitize_text_field( wp_unslash( $_POST[ $id . '_wallet_display' ] ) ) : '';
+
+		$source                 = new self();
+		$source->kind           = self::KIND_NEW;
+		$source->type           = 'card';
+		$source->wallet         = ApplePay::WALLET;
+		$source->wallet_display = function_exists( 'mb_substr' ) ? mb_substr( $display, 0, 40 ) : substr( $display, 0, 40 );
+		$source->brand          = PaymentData::brand_from_network( $network );
+		$source->save           = false;
+
+		if ( $tokenize ) {
+			list( $source->token, $source->expiry ) = self::tokenize_wallet( $gateway, $payment_data );
+			if ( '' === $source->brand ) {
+				$source->brand = (string) CardTypes::from_token_prefix( $source->token );
+			}
+		}
+
+		return $source;
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+	}
+
+	/**
+	 * Exchanges an Apple Pay payload for a CardSecure token, once per request.
+	 *
+	 * @param CardGateway $gateway      Gateway.
+	 * @param array       $payment_data Validated payload (PaymentData::from_json()).
+	 * @return array Token, then expiry as YYYYMM or an empty string when CardSecure returned none.
+	 *
+	 * @throws \Exception With a customer-facing message.
+	 */
+	private static function tokenize_wallet( CardGateway $gateway, array $payment_data ): array {
+		static $memo = array();
+
+		$key = PaymentData::fingerprint( $payment_data );
+		if ( isset( $memo[ $key ] ) ) {
+			return $memo[ $key ];
+		}
+
+		$logger = Plugin::instance()->logger();
+
+		try {
+			$response = $gateway->client()->tokenize_devicedata( PaymentData::devicedata( $payment_data ), PaymentData::HANDLER );
+		} catch ( ApiException $e ) {
+			$logger->error( 'Apple Pay tokenization failed', array( 'error' => $e->getMessage() ) );
+			throw new \Exception( __( 'Apple Pay could not be processed right now. Please try again or pay another way.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
+
+		// CardSecure reports failures with a non-zero errorcode and the reason in message;
+		// on success message carries the token (some responses name it token instead).
+		$errorcode = $response->string( 'errorcode', '0' );
+		$token     = $response->string( 'token' );
+		if ( '' === $token ) {
+			$token = $response->string( 'message' );
+		}
+		$token = preg_replace( '/\D/', '', $token );
+
+		if ( ( '' !== $errorcode && '0' !== $errorcode ) || ! preg_match( '/^\d{15,19}$/', $token ) ) {
+			$logger->warning( 'CardSecure rejected the Apple Pay payload', array( 'errorcode' => $errorcode, 'message' => $response->string( 'message' ) ) );
+			throw new \Exception( __( 'Apple Pay could not be processed (the payment token was not accepted). Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
+
+		$raw_expiry = $response->string( 'expiry' );
+		$expiry     = self::normalise_wallet_expiry( $raw_expiry );
+
+		$logger->info(
+			'Apple Pay payload tokenized',
+			array(
+				'token'          => $token,
+				'expiry_present' => '' !== $raw_expiry ? 'yes' : 'no',
+				'expiry_usable'  => '' !== $expiry ? 'yes' : 'no',
+			)
+		);
+
+		$memo[ $key ] = array( $token, $expiry );
+		return $memo[ $key ];
+	}
+
+	/**
+	 * Expiry from a CardSecure wallet response as YYYYMM.
+	 *
+	 * The layouts the card tokenizer uses are tried first; decrypted wallet data can
+	 * also carry the application expiration date as YYMMDD.
+	 *
+	 * @param string $expiry Raw value, possibly empty.
+	 */
+	public static function normalise_wallet_expiry( string $expiry ): string {
+		$digits = preg_replace( '/\D/', '', $expiry );
+		if ( '' === $digits ) {
+			return '';
+		}
+		$normalised = self::normalise_expiry( $digits );
+		if ( '' !== $normalised ) {
+			return $normalised;
+		}
+		if ( 6 === strlen( $digits ) ) {
+			$year  = 2000 + (int) substr( $digits, 0, 2 );
+			$month = (int) substr( $digits, 2, 2 );
+			if ( self::is_plausible_expiry( $year, $month ) ) {
+				return sprintf( '%04d%02d', $year, $month );
+			}
+		}
+		return '';
 	}
 
 	/**
@@ -198,6 +351,13 @@ final class PaymentSource {
 	 */
 	public function is_saved(): bool {
 		return self::KIND_SAVED === $this->kind;
+	}
+
+	/**
+	 * Whether the token came from a digital wallet rather than typed card details.
+	 */
+	public function is_wallet(): bool {
+		return '' !== $this->wallet;
 	}
 
 	/**

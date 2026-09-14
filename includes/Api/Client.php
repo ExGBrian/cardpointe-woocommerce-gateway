@@ -222,6 +222,56 @@ final class Client {
 		 */
 		$timeout = (int) apply_filters( 'paradox_cardpointe_http_timeout', $timeout, $path, $method );
 
+		if ( ! $is_get ) {
+			$body = array_merge( array( 'merchid' => $this->credentials->merchant_id ), $body );
+		}
+
+		return $this->send( $method, $url, $is_get ? null : $body, true, $timeout, $path );
+	}
+
+	/**
+	 * Tokenizes encrypted wallet data (Apple Pay) through CardSecure.
+	 *
+	 * CardSecure lives on the same host under /cardsecure/, takes no merchant ID and no
+	 * credentials: this is the same unauthenticated call the hosted iframe makes from the
+	 * shopper's browser, made from the server instead because a wallet payload arrives
+	 * with the checkout form.
+	 *
+	 * @param string $devicedata Wallet payload in CardSecure's devicedata format.
+	 * @param string $handler    Encryption handler, e.g. EC_APPLE_PAY.
+	 */
+	public function tokenize_devicedata( string $devicedata, string $handler ): Response {
+		$url     = 'https://' . $this->credentials->host() . '/cardsecure/api/v1/ccn/tokenize';
+		$body    = array(
+			'devicedata'        => $devicedata,
+			'encryptionhandler' => $handler,
+		);
+		$timeout = (int) apply_filters( 'paradox_cardpointe_http_timeout', self::TIMEOUT_WRITE, 'cardsecure/tokenize', 'POST' );
+
+		return $this->send( 'POST', $url, $body, false, $timeout, 'cardsecure/tokenize' );
+	}
+
+	/**
+	 * Sends one request and normalises transport, HTTP and parse failures into ApiException.
+	 *
+	 * @param string     $method        HTTP method.
+	 * @param string     $url           Absolute URL.
+	 * @param array|null $body          JSON body, or null for bodiless requests.
+	 * @param bool       $authenticated Whether to send the gateway credentials.
+	 * @param int        $timeout       Seconds.
+	 * @param string     $label         Short name for logs and error messages.
+	 *
+	 * @throws ApiException On transport/HTTP/parse failures.
+	 */
+	private function send( string $method, string $url, ?array $body, bool $authenticated, int $timeout, string $label ): Response {
+		$headers = array(
+			'Content-Type' => 'application/json',
+			'Accept'       => 'application/json',
+		);
+		if ( $authenticated ) {
+			$headers['Authorization'] = $this->credentials->auth_header();
+		}
+
 		$args = array(
 			'method'      => $method,
 			'timeout'     => max( 5, $timeout ),
@@ -229,19 +279,14 @@ final class Client {
 			'httpversion' => '1.1',
 			'sslverify'   => true,
 			'user-agent'  => 'ParadoxCardPointe/' . PARADOX_CARDPOINTE_VERSION . ' WooCommerce/' . ( defined( 'WC_VERSION' ) ? WC_VERSION : '' ) . ' WordPress/' . get_bloginfo( 'version' ),
-			'headers'     => array(
-				'Authorization' => $this->credentials->auth_header(),
-				'Content-Type'  => 'application/json',
-				'Accept'        => 'application/json',
-			),
+			'headers'     => $headers,
 		);
 
-		if ( ! $is_get ) {
-			$body            = array_merge( array( 'merchid' => $this->credentials->merchant_id ), $body );
-			$args['body']    = wp_json_encode( $body );
+		if ( null !== $body ) {
+			$args['body'] = wp_json_encode( $body );
 		}
 
-		$this->logger->debug( 'Request ' . $method . ' ' . $this->redact_url( $url ), $is_get ? array() : array( 'body' => $body ) );
+		$this->logger->debug( 'Request ' . $method . ' ' . $this->redact_url( $url ), null === $body ? array() : array( 'body' => $body ) );
 
 		$started  = microtime( true );
 		$response = wp_remote_request( $url, $args );
@@ -249,7 +294,7 @@ final class Client {
 
 		if ( is_wp_error( $response ) ) {
 			$message = $response->get_error_message();
-			$this->logger->error( 'HTTP failure for ' . $path, array( 'error' => $message, 'ms' => $elapsed ) );
+			$this->logger->error( 'HTTP failure for ' . $label, array( 'error' => $message, 'ms' => $elapsed ) );
 			if ( false !== stripos( $message, 'timed out' ) || false !== stripos( $message, 'timeout' ) || false !== strpos( $message, 'cURL error 28' ) ) {
 				throw new ApiException( ApiException::TIMEOUT, $message );
 			}
@@ -261,7 +306,7 @@ final class Client {
 		$decoded  = json_decode( $raw_body, true );
 
 		$this->logger->debug(
-			'Response ' . $status . ' for ' . $path,
+			'Response ' . $status . ' for ' . $label,
 			array(
 				'ms'   => $elapsed,
 				'body' => is_array( $decoded ) ? $decoded : array( 'raw' => substr( $raw_body, 0, 500 ) ),

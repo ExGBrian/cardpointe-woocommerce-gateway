@@ -126,6 +126,7 @@ final class OrderActions {
 			__( 'Authorized', 'paradox-cardpointe-gateway-for-woocommerce' )   => $authorized > 0 ? wp_strip_all_tags( wc_price( $authorized, $currency ) ) : '',
 			__( 'Captured', 'paradox-cardpointe-gateway-for-woocommerce' )     => $captured ? wp_strip_all_tags( wc_price( (float) OrderMeta::get( $order, OrderMeta::CAPTURED_AMOUNT, $authorized ), $currency ) ) : '',
 			__( 'Method', 'paradox-cardpointe-gateway-for-woocommerce' )       => $method,
+			__( 'Wallet', 'paradox-cardpointe-gateway-for-woocommerce' )       => 'apple_pay' === OrderMeta::get( $order, OrderMeta::WALLET ) ? trim( __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . (string) OrderMeta::get( $order, OrderMeta::WALLET_DISPLAY ) ) : '',
 			__( 'AVS', 'paradox-cardpointe-gateway-for-woocommerce' )          => '' !== $retref ? OrderMeta::avs_text( (string) OrderMeta::get( $order, OrderMeta::AVSRESP ) ) : '',
 			__( 'CVV', 'paradox-cardpointe-gateway-for-woocommerce' )          => '' !== $retref && 'card' === $stored['type'] ? OrderMeta::cvv_text( (string) OrderMeta::get( $order, OrderMeta::CVVRESP ) ) : '',
 			__( 'Profile', 'paradox-cardpointe-gateway-for-woocommerce' )      => '' !== $stored['profile_id'] ? $stored['profile_id'] . ( '' !== $stored['acct_id'] ? '/' . $stored['acct_id'] : '' ) : '',

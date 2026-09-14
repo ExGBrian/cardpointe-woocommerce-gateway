@@ -75,6 +75,7 @@ final class Plugin {
 		add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
 
 		new Frontend\Assets();
+		new ApplePay\ApplePay();
 		new Tokens\TokenManager();
 		new Gateway\Receipt();
 

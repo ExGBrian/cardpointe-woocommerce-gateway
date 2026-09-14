@@ -70,9 +70,15 @@ final class PaymentProcessor {
 
 		$this->enforce_card_type( $source );
 
-		if ( Compatibility::has_pre_orders()
+		$pre_order_vault = Compatibility::has_pre_orders()
 			&& \WC_Pre_Orders_Order::order_contains_pre_order( $order )
-			&& \WC_Pre_Orders_Order::order_requires_payment_tokenization( $order ) ) {
+			&& \WC_Pre_Orders_Order::order_requires_payment_tokenization( $order );
+
+		if ( $source->is_wallet() && ( $pre_order_vault || (float) $order->get_total() <= 0 ) ) {
+			throw new PaymentException( self::wallet_vault_message() );
+		}
+
+		if ( $pre_order_vault ) {
 			return $this->process_pre_order( $order, $source );
 		}
 
@@ -99,6 +105,10 @@ final class PaymentProcessor {
 		$user_id               = (int) $order->get_user_id();
 		$existing_profile      = '';
 		$create_profile        = false;
+
+		if ( $source->is_wallet() && $needs_vault ) {
+			throw new PaymentException( self::wallet_vault_message() );
+		}
 
 		if ( $needs_vault && ! $source->is_saved() ) {
 			$existing_profile = $user_id ? ProfileService::get_user_profile_id( $user_id, $this->credentials ) : '';
@@ -241,6 +251,10 @@ final class PaymentProcessor {
 	 */
 	private function process_subscription_change( \WC_Order $subscription, PaymentSource $source ): array {
 		$this->enforce_card_type( $source );
+
+		if ( $source->is_wallet() ) {
+			throw new PaymentException( self::wallet_vault_message() );
+		}
 
 		if ( ! $source->is_saved() ) {
 			$this->verify_and_vault(
@@ -430,6 +444,11 @@ final class PaymentProcessor {
 	 */
 	public function record_approval( \WC_Order $order, Response $response, PaymentSource $source, bool $captured ) {
 		OrderMeta::apply_auth_response( $order, $response, $source, $this->credentials, $captured );
+
+		if ( $source->is_wallet() ) {
+			// Order screens and emails name the wallet rather than the card gateway's title.
+			$order->set_payment_method_title( __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
 
 		$amount = wc_price( (float) $response->string( 'amount', (string) $order->get_total() ), array( 'currency' => $order->get_currency() ) );
 		$detail = sprintf(
@@ -649,6 +668,16 @@ final class PaymentProcessor {
 	 * ------------------------------------------------------------------ */
 
 	/**
+	 * Why a wallet payment is refused wherever the method would have to be charged again.
+	 *
+	 * Wallet tokens are single-use and cannot be stored in a CardPointe profile. The
+	 * button is not offered in those contexts; this is the server-side guard behind it.
+	 */
+	private static function wallet_vault_message(): string {
+		return __( 'Apple Pay cannot be used for this order because the payment method must be kept on file for a later charge. Please pay with a card instead.', 'paradox-cardpointe-gateway-for-woocommerce' );
+	}
+
+	/**
 	 * Rejects unsupported card brands before any charge (cards only, new tokens and saved tokens).
 	 *
 	 * @param PaymentSource $source Source.
@@ -666,6 +695,12 @@ final class PaymentProcessor {
 
 		if ( $source->is_saved() ) {
 			$brand = $source->brand;
+		} elseif ( $source->is_wallet() ) {
+			// The sheet was already limited to the accepted networks. The wallet names the
+			// network; failing that, the token prefix does. No BIN lookup: it would add a
+			// round trip inside the sheet's completion window and tell us nothing new.
+			$brand         = '' !== $source->brand ? $source->brand : (string) CardTypes::from_token_prefix( $source->token );
+			$source->brand = $brand;
 		} else {
 			$brand = CardTypes::resolve( $source->token, $this->gateway->bin_enforcement() ? $this->client : null );
 			if ( null === $brand ) {
@@ -723,7 +758,13 @@ final class PaymentProcessor {
 		}
 		$brand = '' !== $source->brand ? CardTypes::label( $source->brand ) : __( 'card', 'paradox-cardpointe-gateway-for-woocommerce' );
 		/* translators: 1: card brand, 2: last four digits */
-		return sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ), $brand, $source->last4() );
+		$card = sprintf( __( '%1$s ending in %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ), $brand, $source->last4() );
+
+		if ( $source->is_wallet() ) {
+			/* translators: %s: card description, e.g. "Visa 1234" */
+			return sprintf( __( 'Apple Pay (%s)', 'paradox-cardpointe-gateway-for-woocommerce' ), '' !== $source->wallet_display ? $source->wallet_display : $card );
+		}
+		return $card;
 	}
 
 	/**

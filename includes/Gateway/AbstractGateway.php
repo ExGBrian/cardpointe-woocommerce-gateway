@@ -263,7 +263,9 @@ abstract class AbstractGateway extends \WC_Payment_Gateway {
 	 */
 	public function validate_fields() {
 		try {
-			PaymentSource::from_request( $this );
+			// Shape only. A wallet payload is exchanged for a token in process_payment(),
+			// once every other checkout field has validated, because it is single-use.
+			PaymentSource::from_request( $this, false );
 			return true;
 		} catch ( \Exception $e ) {
 			wc_add_notice( $e->getMessage(), 'error' );

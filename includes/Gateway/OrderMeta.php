@@ -48,6 +48,8 @@ final class OrderMeta {
 	const TOKEN_EXPIRY      = 'token_expiry';
 	const RECEIPT           = 'receipt';
 	const REFUNDS           = 'refunds';
+	const WALLET            = 'wallet';
+	const WALLET_DISPLAY    = 'wallet_display';
 
 	/**
 	 * Full meta key for a name.
@@ -166,6 +168,10 @@ final class OrderMeta {
 			self::set( $order, self::EXPIRY, $source->expiry );
 		} else {
 			self::set( $order, self::ACCTTYPE, $source->accttype );
+		}
+		if ( '' !== $source->wallet ) {
+			self::set( $order, self::WALLET, $source->wallet );
+			self::set( $order, self::WALLET_DISPLAY, $source->wallet_display );
 		}
 
 		if ( '' !== $retref ) {

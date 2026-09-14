@@ -36,6 +36,60 @@
 	text-decoration: underline;
 	cursor: pointer;
 }
+/* Apple Pay: rendered hidden by PHP, revealed by one class on <html> once Safari confirms support. */
+.paradox-cardpointe-apple-pay {
+	margin: 0 0 14px;
+}
+html.paradox-cardpointe-apple-pay-available .paradox-cardpointe-apple-pay[hidden] {
+	display: block;
+}
+.paradox-cardpointe-apple-pay-button {
+	display: block;
+	width: 100%;
+	height: 44px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 6px;
+	cursor: pointer;
+	-webkit-appearance: -apple-pay-button;
+	appearance: -apple-pay-button;
+	-apple-pay-button-type: plain;
+	-apple-pay-button-style: black;
+}
+.paradox-cardpointe-apple-pay-button.is-style-white {
+	-apple-pay-button-style: white;
+}
+.paradox-cardpointe-apple-pay-button.is-style-white-outline {
+	-apple-pay-button-style: white-outline;
+}
+.paradox-cardpointe-apple-pay-button.is-type-buy {
+	-apple-pay-button-type: buy;
+}
+.paradox-cardpointe-apple-pay-button.is-type-pay {
+	-apple-pay-button-type: pay;
+}
+.paradox-cardpointe-apple-pay-button.is-type-check-out {
+	-apple-pay-button-type: check-out;
+}
+.paradox-cardpointe-apple-pay-button.is-type-order {
+	-apple-pay-button-type: order;
+}
+.paradox-cardpointe-apple-pay-divider {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 12px 0 4px;
+	font-size: 0.9em;
+	opacity: 0.75;
+}
+.paradox-cardpointe-apple-pay-divider::before,
+.paradox-cardpointe-apple-pay-divider::after {
+	content: "";
+	flex: 1;
+	border-top: 1px solid currentColor;
+	opacity: 0.35;
+}
 .paradox-cardpointe-errors {
 	margin: 0 0 12px;
 }

@@ -104,7 +104,7 @@ final class Logger {
 	 */
 	public static function redact( array $data ): array {
 		$last4_keys  = array( 'account', 'token', 'profile' );
-		$remove_keys = array( 'cvv2', 'bankaba', 'password', 'authorization', 'track', 'signature', 'emvtagdata', 'receipt', 'receiptobj', 'securevalue' );
+		$remove_keys = array( 'cvv2', 'bankaba', 'password', 'authorization', 'track', 'signature', 'emvtagdata', 'receipt', 'receiptobj', 'securevalue', 'devicedata', 'paymentdata', 'wallet_data', 'paradox_cardpointe_wallet_data' );
 		$mask_keys   = array( 'expiry', 'address', 'address2', 'phone', 'email', 'api_password', 'production_api_password', 'sandbox_api_password' );
 
 		/**
