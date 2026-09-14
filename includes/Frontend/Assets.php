@@ -7,6 +7,7 @@
 
 namespace ParadoxSolutions\CardPointe\Frontend;
 
+use ParadoxSolutions\CardPointe\ApplePay\ApplePay;
 use ParadoxSolutions\CardPointe\Compatibility;
 use ParadoxSolutions\CardPointe\Gateway\CardTypes;
 use ParadoxSolutions\CardPointe\Plugin;
@@ -54,6 +55,10 @@ final class Assets {
 		wp_register_script( 'paradox-cardpointe-checkout', PARADOX_CARDPOINTE_URL . 'assets/js/checkout-classic.js', array( 'jquery', 'paradox-cardpointe-tokenizer' ), PARADOX_CARDPOINTE_VERSION, true );
 		wp_localize_script( 'paradox-cardpointe-checkout', 'paradox_cardpointe_params', self::params() );
 		wp_enqueue_script( 'paradox-cardpointe-checkout' );
+
+		if ( ApplePay::is_enabled() ) {
+			wp_enqueue_script( 'paradox-cardpointe-apple-pay', PARADOX_CARDPOINTE_URL . 'assets/js/apple-pay.js', array( 'paradox-cardpointe-checkout' ), PARADOX_CARDPOINTE_VERSION, true );
+		}
 	}
 
 	/**
@@ -66,6 +71,7 @@ final class Assets {
 			'gateways'         => Plugin::gateway_ids(),
 			'allowedCardTypes' => $card ? $card->accepted_card_types() : CardTypes::ALL,
 			'iconUrls'         => array(),
+			'applePay'         => ApplePay::is_enabled() ? ApplePay::client_config() : null,
 			'i18n'             => self::i18n(),
 		);
 		foreach ( CardTypes::ALL as $brand ) {
@@ -128,6 +134,8 @@ final class Assets {
 			'timeout'          => __( 'The secure payment form did not respond. Please re-enter your details.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'loading'          => __( 'Loading secure payment form…', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'retryLoad'        => __( 'Reload the payment form', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'applePayFailed'   => __( 'Apple Pay could not be completed. Please try again or pay with a card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			'applePayValidation' => __( 'Apple Pay could not be started. Please try again or pay with a card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'detected'         => __( 'Card type: %s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'brands'           => CardTypes::options(),
 			'errorCodes'       => array(

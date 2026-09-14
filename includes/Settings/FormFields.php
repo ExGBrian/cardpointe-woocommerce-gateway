@@ -7,6 +7,7 @@
 
 namespace ParadoxSolutions\CardPointe\Settings;
 
+use ParadoxSolutions\CardPointe\ApplePay\ApplePay;
 use ParadoxSolutions\CardPointe\Gateway\CardTypes;
 use ParadoxSolutions\CardPointe\Logging\Logger;
 use ParadoxSolutions\CardPointe\Plugin;
@@ -103,6 +104,7 @@ final class FormFields {
 			),
 		);
 
+		$fields += self::apple_pay_fields();
 		$fields += self::receipt_fields();
 
 		$fields += array(
@@ -325,6 +327,133 @@ final class FormFields {
 				esc_url( Logger::log_viewer_url() )
 			),
 			'default'     => 'no',
+		);
+
+		return $fields;
+	}
+
+	/**
+	 * Apple Pay section (card gateway only).
+	 */
+	private static function apple_pay_fields(): array {
+		if ( ! ApplePay::is_enabled() ) {
+			$status = __( 'Apple Pay is switched off.', 'paradox-cardpointe-gateway-for-woocommerce' );
+		} else {
+			$problems = ApplePay::configuration_problems();
+			$status   = empty( $problems )
+				? __( 'Configured. The button is offered to shoppers using Safari on a device with Apple Pay set up, on HTTPS checkout and order-pay pages, for orders that do not need a saved payment method.', 'paradox-cardpointe-gateway-for-woocommerce' )
+				: __( 'Not yet usable:', 'paradox-cardpointe-gateway-for-woocommerce' ) . ' ' . implode( ' ', $problems );
+		}
+
+		$fields = array(
+			'apple_pay_section'            => array(
+				'title'       => __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'title',
+				'description' => sprintf(
+					/* translators: %s: verification file URL */
+					__( 'Apple Pay on the web through CardSecure. Setup: (1) ask Fiserv Integration Delivery (integrationdelivery@fiserv.com) for a Payment Processing Certificate CSR, allow up to 5 business days, create the certificate under your Apple merchant ID from that CSR, and send the resulting .cer file back to your representative so CardSecure can decrypt Apple Pay tokens. (2) Create a Merchant Identity Certificate under the same merchant ID from a CSR you generate yourself (RSA 2048), convert it and its private key to PEM, and store both outside the web root. (3) Register this domain under the merchant ID, paste Apple\'s verification file below, and let Apple verify %s. Apple Pay always requires HTTPS, in sandbox mode too.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'<code>' . esc_html( ApplePay::association_url() ) . '</code>'
+				),
+			),
+			'apple_pay_status'             => array(
+				'title'       => __( 'Status', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'paradox_notice',
+				'description' => esc_html( $status ),
+			),
+			'apple_pay_enabled'            => array(
+				'title'   => __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'label'   => __( 'Offer Apple Pay in the credit card payment box on the checkout and order-pay pages', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'    => 'checkbox',
+				'default' => 'no',
+			),
+			'apple_pay_merchant_id'        => array(
+				'title'             => __( 'Apple merchant identifier', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'              => 'text',
+				'description'       => __( 'From the Apple Developer portal, for example merchant.com.example.store.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'default'           => '',
+				'desc_tip'          => true,
+				'custom_attributes' => array( 'autocomplete' => 'off' ),
+			),
+			'apple_pay_display_name'       => array(
+				'title'       => __( 'Name on the payment sheet', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Up to 64 characters. Defaults to the site title.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'default'     => '',
+				'placeholder' => wp_specialchars_decode( (string) get_bloginfo( 'name' ), ENT_QUOTES ),
+				'desc_tip'    => true,
+			),
+		);
+
+		$paths = array(
+			'cert_path'      => array(
+				'title'       => __( 'Merchant identity certificate', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Absolute server path to the certificate in PEM format. Keep it outside the web root.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			),
+			'key_path'       => array(
+				'title'       => __( 'Private key', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'text',
+				'description' => __( 'Absolute server path to the private key in PEM format. Leave empty if the certificate file also contains the key.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			),
+			'key_passphrase' => array(
+				'title'       => __( 'Private key passphrase', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'password',
+				'description' => __( 'Only if the private key is encrypted.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			),
+		);
+		foreach ( $paths as $key => $field ) {
+			$field['default']           = '';
+			$field['custom_attributes'] = array( 'autocomplete' => 'password' === $field['type'] ? 'new-password' : 'off' );
+			$constant                   = 'PARADOX_CARDPOINTE_APPLE_PAY_' . strtoupper( $key );
+			if ( ApplePay::has_constant( $key ) ) {
+				$field['description']                   = sprintf(
+					/* translators: %s: constant name */
+					__( 'Defined in wp-config.php via %s; the value stored here is ignored.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					$constant
+				);
+				$field['custom_attributes']['disabled'] = 'disabled';
+			} else {
+				$field['description'] .= ' ' . sprintf(
+					/* translators: %s: constant name */
+					__( 'Can also be set in wp-config.php with the %s constant.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					$constant
+				);
+			}
+			$fields[ 'apple_pay_' . $key ] = $field;
+		}
+
+		$fields += array(
+			'apple_pay_domain_association' => array(
+				'title'       => __( 'Domain verification file', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'textarea',
+				'css'         => 'min-height:90px;font-family:monospace;',
+				'description' => __( 'Contents of the apple-developer-merchantid-domain-association.txt file from the Apple Developer portal. It is served at /.well-known/apple-developer-merchantid-domain-association.txt. If your host does not pass that path to WordPress, upload the file there yourself and leave this empty.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'default'     => '',
+			),
+			'apple_pay_button_style'       => array(
+				'title'   => __( 'Button style', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'    => 'select',
+				'class'   => 'wc-enhanced-select',
+				'default' => 'black',
+				'options' => array(
+					'black'         => __( 'Black', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'white'         => __( 'White', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'white-outline' => __( 'White with outline', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				),
+			),
+			'apple_pay_button_type'        => array(
+				'title'   => __( 'Button label', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'    => 'select',
+				'class'   => 'wc-enhanced-select',
+				'default' => 'plain',
+				'options' => array(
+					'plain'     => __( 'Apple Pay logo only', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'buy'       => __( 'Buy with Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'pay'       => __( 'Pay with Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'check-out' => __( 'Check out with Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'order'     => __( 'Order with Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				),
+			),
 		);
 
 		return $fields;

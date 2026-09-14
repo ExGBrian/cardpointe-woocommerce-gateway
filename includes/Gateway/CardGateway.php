@@ -7,6 +7,7 @@
 
 namespace ParadoxSolutions\CardPointe\Gateway;
 
+use ParadoxSolutions\CardPointe\ApplePay\ApplePay;
 use ParadoxSolutions\CardPointe\Frontend\TokenizerConfig;
 use ParadoxSolutions\CardPointe\Plugin;
 use ParadoxSolutions\CardPointe\Settings\Credentials;
@@ -119,6 +120,7 @@ class CardGateway extends AbstractGateway {
 				'tokenizer_url' => $this->tokenizer_url(),
 				'iframe_height' => TokenizerConfig::height( $this ),
 				'card_types'    => $this->accepted_card_types(),
+				'apple_pay'     => ApplePay::button_context( $this ),
 			)
 		);
 	}
@@ -192,5 +194,104 @@ class CardGateway extends AbstractGateway {
 	public function validate_accepted_card_types_field( $key, $value ) {
 		$value = is_array( $value ) ? array_map( 'sanitize_key', wp_unslash( $value ) ) : array();
 		return array_values( array_intersect( $value, CardTypes::ALL ) );
+	}
+
+	/* ---------------------------------------------------------------------
+	 * Apple Pay settings
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Apple merchant identifiers are reverse-DNS names.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_merchant_id_field( $key, $value ) {
+		return substr( preg_replace( '/[^A-Za-z0-9.\-_]/', '', (string) wp_unslash( $value ) ), 0, 128 );
+	}
+
+	/**
+	 * Apple caps the sheet's display name at 64 characters.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_display_name_field( $key, $value ) {
+		$name = sanitize_text_field( wp_unslash( $value ) );
+		return function_exists( 'mb_substr' ) ? mb_substr( $name, 0, 64 ) : substr( $name, 0, 64 );
+	}
+
+	/**
+	 * Keeps the stored path when a constant overrides it.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_cert_path_field( $key, $value ) {
+		return ApplePay::has_constant( 'cert_path' ) ? (string) $this->get_option( $key ) : $this->sanitize_path( $value );
+	}
+
+	/**
+	 * Keeps the stored path when a constant overrides it.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_key_path_field( $key, $value ) {
+		return ApplePay::has_constant( 'key_path' ) ? (string) $this->get_option( $key ) : $this->sanitize_path( $value );
+	}
+
+	/**
+	 * Keeps the stored passphrase when a constant overrides it.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_key_passphrase_field( $key, $value ) {
+		return ApplePay::has_constant( 'key_passphrase' ) ? (string) $this->get_option( $key ) : (string) wp_unslash( $value );
+	}
+
+	/**
+	 * The verification file is an opaque blob Apple issues; only markup is stripped.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_domain_association_field( $key, $value ) {
+		$value = wp_strip_all_tags( (string) wp_unslash( $value ) );
+		return substr( trim( $value ), 0, 20000 );
+	}
+
+	/**
+	 * Whitelists the button style.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_button_style_field( $key, $value ) {
+		$value = sanitize_key( wp_unslash( $value ) );
+		return in_array( $value, array( 'black', 'white', 'white-outline' ), true ) ? $value : 'black';
+	}
+
+	/**
+	 * Whitelists the button type.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_button_type_field( $key, $value ) {
+		$value = sanitize_key( wp_unslash( $value ) );
+		return in_array( $value, array( 'plain', 'buy', 'pay', 'check-out', 'order' ), true ) ? $value : 'plain';
+	}
+
+	/**
+	 * A server path: trimmed, control characters removed, nothing else assumed.
+	 *
+	 * @param mixed $value Value.
+	 */
+	private function sanitize_path( $value ): string {
+		$path = trim( (string) wp_unslash( $value ) );
+		$path = str_replace( array( "\0", "\n", "\r" ), '', $path );
+		return substr( $path, 0, 500 );
 	}
 }
