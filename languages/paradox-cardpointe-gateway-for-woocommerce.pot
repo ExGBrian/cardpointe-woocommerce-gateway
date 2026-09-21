@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Paradox CardPointe Gateway for WooCommerce 1.1.0\n"
+"Project-Id-Version: Paradox CardPointe Gateway for WooCommerce 1.1.1\n"
 "Report-Msgid-Bugs-To: https://paradoxsolutions.io\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,9 +120,10 @@ msgid "Wallet"
 msgstr ""
 
 #: includes/Admin/OrderActions.php:129
+#: includes/Frontend/Assets.php:176
+#: includes/Gateway/CardGateway.php:345
 #: includes/Gateway/PaymentProcessor.php:450
-#: includes/Settings/FormFields.php:350
-#: includes/Settings/FormFields.php:364
+#: includes/Settings/FormFields.php:353
 msgid "Apple Pay"
 msgstr ""
 
@@ -209,7 +210,8 @@ msgid "unknown"
 msgstr ""
 
 #: includes/Admin/OrderActions.php:317
-#: includes/Admin/SettingsUi.php:36
+#: includes/Admin/SettingsUi.php:41
+#: includes/Admin/SettingsUi.php:106
 msgid "You are not allowed to do that."
 msgstr ""
 
@@ -226,17 +228,62 @@ msgstr ""
 msgid "CardPointe automatic void failed:"
 msgstr ""
 
-#: includes/Admin/SettingsUi.php:55
+#: includes/Admin/SettingsUi.php:60
 msgid "Please fill in the site name, merchant ID, API username and API password first."
 msgstr ""
 
 #. translators: %s: site name
-#: includes/Admin/SettingsUi.php:72
+#: includes/Admin/SettingsUi.php:77
 msgid "CardPointe reports this merchant ID is boarded to site \"%s\". Use that as the site name if requests fail."
 msgstr ""
 
-#: includes/Admin/SettingsUi.php:77
+#: includes/Admin/SettingsUi.php:82
 msgid "The merchant account is not enabled for processing."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:123
+msgid "The upload did not complete. Please try again."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:126
+#: includes/ApplePay/CertificateStore.php:95
+#: includes/ApplePay/CertificateStore.php:216
+msgid "The file is too large to be a certificate."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:133
+msgid "This file cannot be used, so nothing was changed:"
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:172
+msgid "Certificate saved in a protected uploads folder under a random name, because the folder above the web root is not writable."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:173
+msgid "Certificate saved above the web root, where no web address can reach it."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:199
+msgid "The certificate file is not usable yet:"
+msgstr ""
+
+#. translators: 1: merchant ID in the certificate, 2: merchant ID entered
+#: includes/Admin/SettingsUi.php:209
+#: includes/ApplePay/ApplePay.php:179
+msgid "The certificate was issued for %1$s but the Apple Merchant ID entered is %2$s. They must be the same."
+msgstr ""
+
+#. translators: %s: domain
+#: includes/Admin/SettingsUi.php:248
+msgid "Apple accepted the Merchant ID, the certificate and the domain %s. Apple Pay is set up correctly."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:254
+msgid "These values are not saved yet. Click \"Save changes\" to keep them."
+msgstr ""
+
+#: includes/Admin/SettingsUi.php:255
+msgid "Tick \"Accept Apple Pay\" and save to show the button to shoppers."
 msgstr ""
 
 #: includes/Api/ApiException.php:91
@@ -277,40 +324,153 @@ msgstr ""
 msgid "Unknown gateway response"
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:176
-msgid "The Apple merchant identifier is empty."
+#: includes/ApplePay/ApplePay.php:160
+msgid "Apple Pay is not switched on for shoppers yet (\"Accept Apple Pay\"). You can still test the setup first."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:179
-msgid "PHP cURL is not available; merchant validation needs it to present the merchant identity certificate to Apple."
+#: includes/ApplePay/ApplePay.php:163
+#: includes/ApplePay/MerchantValidator.php:78
+msgid "The Apple Merchant ID is empty."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:184
-msgid "The merchant identity certificate path is empty."
+#: includes/ApplePay/ApplePay.php:166
+msgid "PHP cURL is not available. It is needed to present the certificate to Apple; ask your host to enable it."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:186
-msgid "The merchant identity certificate file cannot be read at the configured path."
+#: includes/ApplePay/ApplePay.php:169
+msgid "This site is not served over HTTPS. Apple Pay only works on HTTPS pages, in sandbox mode too."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:191
-msgid "The private key file cannot be read at the configured path."
+#. translators: 1: folder path, 2: URL
+#: includes/ApplePay/ApplePay.php:188
+msgid "Apple's domain verification file was not found in %1$s. Apple has to be able to load it from %2$s to verify this domain. If the domain already shows as verified in the Apple Developer portal, you can ignore this."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:195
-msgid "The domain verification file is not configured and none was found under /.well-known/."
-msgstr ""
-
-#: includes/ApplePay/ApplePay.php:386
+#: includes/ApplePay/ApplePay.php:405
 msgid "Your session has expired. Please reload the page and try again."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:389
+#: includes/ApplePay/ApplePay.php:408
 msgid "Apple Pay is not configured on this store."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:398
+#: includes/ApplePay/ApplePay.php:417
 msgid "Apple Pay could not be started. Please try again or pay another way."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:91
+msgid "The file is empty."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:104
+msgid "No certificate was found in the file. It must contain a block that starts with -----BEGIN CERTIFICATE-----. The .cer file Apple gives you is in binary format and has to be converted to PEM first."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:107
+msgid "The private key in this file is protected by a passphrase. Export it again without one by adding -nodes to the openssl command."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:109
+msgid "No private key was found in the file. The PEM must contain both the certificate and the private key it was created with."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:116
+msgid "PHP OpenSSL is not available, so the certificate could not be checked in depth."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:123
+msgid "The private key could not be read. Make sure it was exported without a passphrase and the file was not altered."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:137
+msgid "The file contains several certificates and the Merchant Identity Certificate is not the first one. Upload the file here to have it tidied automatically."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:143
+msgid "The private key does not belong to the certificate in this file. Use the key that was generated together with the certificate signing request you gave Apple."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:156
+msgid "This is the Payment Processing Certificate. That one goes to Fiserv. The file needed here is the Merchant Identity Certificate."
+msgstr ""
+
+#. translators: %s: certificate common name
+#: includes/ApplePay/CertificateStore.php:160
+msgid "The certificate does not look like an Apple Pay Merchant Identity Certificate (its name is \"%s\")."
+msgstr ""
+
+#. translators: %s: date
+#: includes/ApplePay/CertificateStore.php:169
+msgid "The certificate expired on %s. Create a new Merchant Identity Certificate in the Apple Developer portal."
+msgstr ""
+
+#. translators: %s: date
+#: includes/ApplePay/CertificateStore.php:175
+msgid "The certificate expires on %s. Renew it in the Apple Developer portal before then."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:206
+msgid "No certificate has been uploaded yet."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:211
+msgid "The file cannot be read at this path. Check that the path is complete, the file exists, and the web server user is allowed to read it."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:224
+msgid "This file is inside the web root, so anyone who guesses its address may be able to download your private key. Move it above the web root, or upload it here and it will be stored safely."
+msgstr ""
+
+#: includes/ApplePay/CertificateStore.php:261
+msgid "The certificate could not be saved: neither the folder above the web root nor the uploads folder is writable. Place the file on the server yourself and enter its path."
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:68
+msgid "The validation URL is not an Apple Pay gateway host."
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:71
+msgid "PHP cURL is required to present the certificate to Apple."
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:81
+msgid "The certificate file cannot be read at the configured path."
+msgstr ""
+
+#. translators: %s: transport error
+#: includes/ApplePay/MerchantValidator.php:138
+msgid "The connection to Apple failed: %s"
+msgstr ""
+
+#. translators: 1: HTTP status, 2: Apple's message
+#: includes/ApplePay/MerchantValidator.php:153
+msgid "Apple refused the request (HTTP %1$d): %2$s"
+msgstr ""
+
+#. translators: 1: HTTP status, 2: Apple's message
+#: includes/ApplePay/MerchantValidator.php:155
+msgid "no details given"
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:160
+msgid "Apple returned an unreadable merchant session."
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:186
+msgid "cURL could not use the PEM as a client certificate. It must contain both the certificate and its private key, with no passphrase."
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:189
+msgid "Apple turned the certificate away during the TLS handshake. That usually means it is the wrong certificate (it must be the Merchant Identity Certificate, not the Payment Processing Certificate), or it has expired or been revoked."
+msgstr ""
+
+#. translators: %s: domain
+#: includes/ApplePay/MerchantValidator.php:194
+msgid "Apple accepted the certificate but not the request. Check that the Apple Merchant ID is exactly the one the certificate was created under, and that the domain %s is registered and shows as verified under that Merchant ID in the Apple Developer portal."
+msgstr ""
+
+#: includes/ApplePay/MerchantValidator.php:199
+msgid "The server could not reach apple-pay-gateway.apple.com on port 443. Ask your host whether outbound connections are blocked by a firewall."
 msgstr ""
 
 #: includes/Blocks/AbstractBlocksMethod.php:115
@@ -435,70 +595,127 @@ msgid "Expiration date is required."
 msgstr ""
 
 #: includes/Frontend/Assets.php:175
-msgid "Testing connection…"
-msgstr ""
-
-#: includes/Frontend/Assets.php:176
-msgid "Connected."
+msgid "General"
 msgstr ""
 
 #: includes/Frontend/Assets.php:177
-msgid "Connection failed."
+msgid "Checking and saving the certificate…"
 msgstr ""
 
 #: includes/Frontend/Assets.php:178
-msgid "Yes"
+msgid "The upload failed. Please try again."
 msgstr ""
 
 #: includes/Frontend/Assets.php:179
-msgid "No"
+#: includes/Gateway/CardGateway.php:367
+msgid "Certificate and private key found, and they belong together."
 msgstr ""
 
+#. translators: %s: date
 #: includes/Frontend/Assets.php:181
-msgid "Host"
+#: includes/Gateway/CardGateway.php:373
+msgid "Valid until %s."
 msgstr ""
 
+#. translators: %s: date
 #: includes/Frontend/Assets.php:182
-msgid "Site"
+msgid "The Apple Merchant ID was read from the certificate."
 msgstr ""
 
+#. translators: %s: date
 #: includes/Frontend/Assets.php:183
-msgid "Merchant enabled"
+msgid "Asking Apple for a merchant session…"
 msgstr ""
 
 #: includes/Frontend/Assets.php:184
-msgid "ACH / eCheck"
+msgid "Apple Pay is not set up yet:"
 msgstr ""
 
 #: includes/Frontend/Assets.php:185
-msgid "CVV verification"
+msgid "The request to this site failed. Please reload the page and try again."
 msgstr ""
 
 #: includes/Frontend/Assets.php:186
-msgid "AVS verification"
+msgid "Test (not charged)"
 msgstr ""
 
 #: includes/Frontend/Assets.php:187
-msgid "Account updater"
+msgid "The Apple Pay sheet completed. This was a test: nothing was sent to CardPointe and no payment was taken."
 msgstr ""
 
 #: includes/Frontend/Assets.php:188
+msgid "Apple opened the payment sheet, so merchant validation works from Safari too. You can cancel it, or authorize to finish the test; nothing is charged."
+msgstr ""
+
+#: includes/Frontend/Assets.php:189
+msgid "The Apple Pay sheet could not be opened:"
+msgstr ""
+
+#: includes/Frontend/Assets.php:192
+msgid "Testing connection…"
+msgstr ""
+
+#: includes/Frontend/Assets.php:193
+msgid "Connected."
+msgstr ""
+
+#: includes/Frontend/Assets.php:194
+msgid "Connection failed."
+msgstr ""
+
+#: includes/Frontend/Assets.php:195
+msgid "Yes"
+msgstr ""
+
+#: includes/Frontend/Assets.php:196
+msgid "No"
+msgstr ""
+
+#: includes/Frontend/Assets.php:198
+msgid "Host"
+msgstr ""
+
+#: includes/Frontend/Assets.php:199
+msgid "Site"
+msgstr ""
+
+#: includes/Frontend/Assets.php:200
+msgid "Merchant enabled"
+msgstr ""
+
+#: includes/Frontend/Assets.php:201
+msgid "ACH / eCheck"
+msgstr ""
+
+#: includes/Frontend/Assets.php:202
+msgid "CVV verification"
+msgstr ""
+
+#: includes/Frontend/Assets.php:203
+msgid "AVS verification"
+msgstr ""
+
+#: includes/Frontend/Assets.php:204
+msgid "Account updater"
+msgstr ""
+
+#: includes/Frontend/Assets.php:205
 msgid "Processor"
 msgstr ""
 
-#: includes/Frontend/Assets.php:206
+#: includes/Frontend/Assets.php:223
 msgid "Void this transaction? The customer will not be charged."
 msgstr ""
 
-#: includes/Frontend/Assets.php:207
+#: includes/Frontend/Assets.php:224
 msgid "Capture %s now?"
 msgstr ""
 
-#: includes/Frontend/Assets.php:208
+#: includes/Frontend/Assets.php:225
 msgid "Working…"
 msgstr ""
 
-#: includes/Frontend/Assets.php:209
+#: includes/Frontend/Assets.php:226
 msgid "The request failed. Please try again."
 msgstr ""
 
@@ -561,12 +778,59 @@ msgstr ""
 msgid "Checks the credentials of the environment selected above using the values currently in the form (unsaved changes included)."
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:28
+#: includes/Gateway/CardGateway.php:29
+#: includes/Settings/FormFields.php:424
 msgid "CardPointe - Credit Card"
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:29
+#: includes/Gateway/CardGateway.php:30
 msgid "Accept credit and debit cards through CardPointe. Card data is entered in a hosted iframe and tokenized by CardSecure, so it never touches your server."
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:291
+msgid "Upload PEM file"
+msgstr ""
+
+#. translators: %s: web root path
+#: includes/Gateway/CardGateway.php:297
+msgid "For reference, your current web root path is: %s"
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:302
+msgid "One PEM file containing the Merchant Identity Certificate and its private key, with no passphrase. Upload it here, or place it on the server yourself and enter its full path. Because the file contains a private key, an upload is stored just above the web root when the server allows it, where no web address can reach it."
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:330
+msgid "Test Apple Pay setup"
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:333
+msgid "Asks Apple for a merchant session using the Merchant ID and certificate path currently in the form (unsaved changes included) and this site's domain. Passing proves Apple accepts all three. Nothing is charged."
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:343
+msgid "Apple Pay is set up. This is the button shoppers see in the credit card box:"
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:344
+msgid "Test Apple Pay"
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:346
+msgid "Click it to open the Apple Pay sheet. This is a test: nothing is sent to CardPointe and no payment is taken."
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:347
+msgid "This is a preview. Browsers other than Safari cannot draw the real Apple Pay button; open this page in Safari on a device with Apple Pay to try the payment sheet."
+msgstr ""
+
+#. translators: 1: date, 2: domain
+#: includes/Gateway/CardGateway.php:398
+msgid "Verified with Apple on %1$s for %2$s."
+msgstr ""
+
+#: includes/Gateway/CardGateway.php:404
+msgid "Not tested with Apple yet. Run the test below."
 msgstr ""
 
 #: includes/Gateway/CardTypes.php:30
@@ -1376,7 +1640,6 @@ msgstr ""
 
 #. translators: %s: constant name
 #: includes/Settings/FormFields.php:312
-#: includes/Settings/FormFields.php:411
 msgid "Defined in wp-config.php via %s; the value stored here is ignored."
 msgstr ""
 
@@ -1394,153 +1657,146 @@ msgid "View the log under <a href=\"%s\">WooCommerce &rarr; Status &rarr; Logs</
 msgstr ""
 
 #: includes/Settings/FormFields.php:340
-msgid "Apple Pay is switched off."
+msgid "<strong>1. Payment Processing Certificate.</strong> Email integrationdelivery@fiserv.com and ask for an Apple Pay CSR for your merchant ID (allow up to 5 business days). Create the Payment Processing Certificate under your Apple Merchant ID with that CSR and send the resulting .cer file back to them. This is what lets CardPointe decrypt Apple Pay payments."
 msgstr ""
 
+#: includes/Settings/FormFields.php:341
+msgid "<strong>2. Merchant Identity Certificate.</strong> Create it under the same Merchant ID, then put the certificate and its private key into one PEM file with no passphrase. From a .p12 exported out of Keychain Access: <code>openssl pkcs12 -in merchant_id.p12 -out certificates.pem -nodes</code>. Upload that file below."
+msgstr ""
+
+#. translators: 1: folder path, 2: URL
 #: includes/Settings/FormFields.php:344
-msgid "Configured. The button is offered to shoppers using Safari on a device with Apple Pay set up, on HTTPS checkout and order-pay pages, for orders that do not need a saved payment method."
+msgid "<strong>3. Domain.</strong> Register this domain under the Merchant ID, upload the verification file Apple gives you to %1$s so that it loads at %2$s, and click Verify in the Apple Developer portal."
 msgstr ""
 
-#: includes/Settings/FormFields.php:345
-msgid "Not yet usable:"
+#: includes/Settings/FormFields.php:348
+msgid "<strong>4.</strong> Save, then run the setup check at the bottom of this page."
 msgstr ""
 
-#. translators: %s: verification file URL
-#: includes/Settings/FormFields.php:354
-msgid "Apple Pay on the web through CardSecure. Setup: (1) ask Fiserv Integration Delivery (integrationdelivery@fiserv.com) for a Payment Processing Certificate CSR, allow up to 5 business days, create the certificate under your Apple merchant ID from that CSR, and send the resulting .cer file back to your representative so CardSecure can decrypt Apple Pay tokens. (2) Create a Merchant Identity Certificate under the same merchant ID from a CSR you generate yourself (RSA 2048), convert it and its private key to PEM, and store both outside the web root. (3) Register this domain under the merchant ID, paste Apple's verification file below, and let Apple verify %s. Apple Pay always requires HTTPS, in sandbox mode too."
+#: includes/Settings/FormFields.php:355
+msgid "Adds an Apple Pay button to the credit card box on the checkout and order-pay pages for shoppers using Safari with Apple Pay set up. Payments use the transaction type, receipts and sandbox setting of this gateway. Apple Pay always needs HTTPS, and is not offered for orders that have to keep a card on file (subscriptions, pre-orders charged on release)."
+msgstr ""
+
+#: includes/Settings/FormFields.php:358
+msgid "Enable / Disable"
 msgstr ""
 
 #: includes/Settings/FormFields.php:359
-msgid "Status"
+msgid "Accept Apple Pay"
 msgstr ""
 
-#: includes/Settings/FormFields.php:365
-msgid "Offer Apple Pay in the credit card payment box on the checkout and order-pay pages"
+#: includes/Settings/FormFields.php:364
+msgid "Button Style"
 msgstr ""
 
-#: includes/Settings/FormFields.php:370
-msgid "Apple merchant identifier"
-msgstr ""
-
-#: includes/Settings/FormFields.php:372
-msgid "From the Apple Developer portal, for example merchant.com.example.store."
-msgstr ""
-
-#: includes/Settings/FormFields.php:378
-msgid "Name on the payment sheet"
-msgstr ""
-
-#: includes/Settings/FormFields.php:380
-msgid "Up to 64 characters. Defaults to the site title."
-msgstr ""
-
-#: includes/Settings/FormFields.php:389
-msgid "Merchant identity certificate"
-msgstr ""
-
-#: includes/Settings/FormFields.php:391
-msgid "Absolute server path to the certificate in PEM format. Keep it outside the web root."
-msgstr ""
-
-#: includes/Settings/FormFields.php:394
-msgid "Private key"
-msgstr ""
-
-#: includes/Settings/FormFields.php:396
-msgid "Absolute server path to the private key in PEM format. Leave empty if the certificate file also contains the key."
-msgstr ""
-
-#: includes/Settings/FormFields.php:399
-msgid "Private key passphrase"
-msgstr ""
-
-#: includes/Settings/FormFields.php:401
-msgid "Only if the private key is encrypted."
-msgstr ""
-
-#. translators: %s: constant name
-#: includes/Settings/FormFields.php:418
-msgid "Can also be set in wp-config.php with the %s constant."
-msgstr ""
-
-#: includes/Settings/FormFields.php:427
-msgid "Domain verification file"
-msgstr ""
-
-#: includes/Settings/FormFields.php:430
-msgid "Contents of the apple-developer-merchantid-domain-association.txt file from the Apple Developer portal. It is served at /.well-known/apple-developer-merchantid-domain-association.txt. If your host does not pass that path to WordPress, upload the file there yourself and leave this empty."
-msgstr ""
-
-#: includes/Settings/FormFields.php:434
-msgid "Button style"
-msgstr ""
-
-#: includes/Settings/FormFields.php:439
+#: includes/Settings/FormFields.php:369
 msgid "Black"
 msgstr ""
 
-#: includes/Settings/FormFields.php:440
+#: includes/Settings/FormFields.php:370
 msgid "White"
 msgstr ""
 
-#: includes/Settings/FormFields.php:441
+#: includes/Settings/FormFields.php:371
 msgid "White with outline"
 msgstr ""
 
-#: includes/Settings/FormFields.php:445
-msgid "Button label"
+#: includes/Settings/FormFields.php:375
+msgid "Button Label"
 msgstr ""
 
-#: includes/Settings/FormFields.php:450
+#: includes/Settings/FormFields.php:380
 msgid "Apple Pay logo only"
 msgstr ""
 
-#: includes/Settings/FormFields.php:451
+#: includes/Settings/FormFields.php:381
 msgid "Buy with Apple Pay"
 msgstr ""
 
-#: includes/Settings/FormFields.php:452
+#: includes/Settings/FormFields.php:382
 #: templates/checkout/card-fields.php:40
 msgid "Pay with Apple Pay"
 msgstr ""
 
-#: includes/Settings/FormFields.php:453
+#: includes/Settings/FormFields.php:383
 msgid "Check out with Apple Pay"
 msgstr ""
 
-#: includes/Settings/FormFields.php:454
+#: includes/Settings/FormFields.php:384
 msgid "Order with Apple Pay"
 msgstr ""
 
-#: includes/Settings/FormFields.php:468
+#: includes/Settings/FormFields.php:388
+msgid "Name on the Payment Sheet"
+msgstr ""
+
+#: includes/Settings/FormFields.php:390
+msgid "Up to 64 characters. Defaults to the site title."
+msgstr ""
+
+#: includes/Settings/FormFields.php:396
+msgid "Connection Settings"
+msgstr ""
+
+#: includes/Settings/FormFields.php:401
+msgid "Apple Merchant ID"
+msgstr ""
+
+#. translators: %s: link to the Apple developer account
+#: includes/Settings/FormFields.php:405
+msgid "This is found in your %s. It is filled in for you when you upload the certificate."
+msgstr ""
+
+#. translators: %s: link to the Apple developer account
+#: includes/Settings/FormFields.php:406
+msgid "Apple developer account"
+msgstr ""
+
+#: includes/Settings/FormFields.php:416
+msgid "Certificate Path"
+msgstr ""
+
+#: includes/Settings/FormFields.php:418
+msgid "Full server path to the PEM file that holds your Merchant Identity Certificate and its private key."
+msgstr ""
+
+#: includes/Settings/FormFields.php:422
+msgid "Processing Gateway"
+msgstr ""
+
+#: includes/Settings/FormFields.php:427
+msgid "Setup Check"
+msgstr ""
+
+#: includes/Settings/FormFields.php:439
 msgid "Gateway receipts"
 msgstr ""
 
-#: includes/Settings/FormFields.php:470
+#: includes/Settings/FormFields.php:441
 msgid "CardPointe can return receipt details (merchant DBA, address, authorization code) with each transaction."
 msgstr ""
 
-#: includes/Settings/FormFields.php:473
+#: includes/Settings/FormFields.php:444
 msgid "Request receipts"
 msgstr ""
 
-#: includes/Settings/FormFields.php:474
+#: includes/Settings/FormFields.php:445
 msgid "Request gateway receipt data and store it with the order"
 msgstr ""
 
-#: includes/Settings/FormFields.php:479
+#: includes/Settings/FormFields.php:450
 msgid "Show on order pages"
 msgstr ""
 
-#: includes/Settings/FormFields.php:480
+#: includes/Settings/FormFields.php:451
 msgid "Display the receipt on the order received page and in My Account order details"
 msgstr ""
 
-#: includes/Settings/FormFields.php:485
+#: includes/Settings/FormFields.php:456
 msgid "Include in emails"
 msgstr ""
 
-#: includes/Settings/FormFields.php:486
+#: includes/Settings/FormFields.php:457
 msgid "Append the receipt to customer order emails"
 msgstr ""
 

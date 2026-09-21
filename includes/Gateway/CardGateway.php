@@ -8,6 +8,7 @@
 namespace ParadoxSolutions\CardPointe\Gateway;
 
 use ParadoxSolutions\CardPointe\ApplePay\ApplePay;
+use ParadoxSolutions\CardPointe\ApplePay\CertificateStore;
 use ParadoxSolutions\CardPointe\Frontend\TokenizerConfig;
 use ParadoxSolutions\CardPointe\Plugin;
 use ParadoxSolutions\CardPointe\Settings\Credentials;
@@ -222,44 +223,15 @@ class CardGateway extends AbstractGateway {
 	}
 
 	/**
-	 * Keeps the stored path when a constant overrides it.
+	 * A server path: trimmed, control characters removed, nothing else assumed.
 	 *
 	 * @param string $key   Key.
 	 * @param mixed  $value Value.
 	 */
 	public function validate_apple_pay_cert_path_field( $key, $value ) {
-		return ApplePay::has_constant( 'cert_path' ) ? (string) $this->get_option( $key ) : $this->sanitize_path( $value );
-	}
-
-	/**
-	 * Keeps the stored path when a constant overrides it.
-	 *
-	 * @param string $key   Key.
-	 * @param mixed  $value Value.
-	 */
-	public function validate_apple_pay_key_path_field( $key, $value ) {
-		return ApplePay::has_constant( 'key_path' ) ? (string) $this->get_option( $key ) : $this->sanitize_path( $value );
-	}
-
-	/**
-	 * Keeps the stored passphrase when a constant overrides it.
-	 *
-	 * @param string $key   Key.
-	 * @param mixed  $value Value.
-	 */
-	public function validate_apple_pay_key_passphrase_field( $key, $value ) {
-		return ApplePay::has_constant( 'key_passphrase' ) ? (string) $this->get_option( $key ) : (string) wp_unslash( $value );
-	}
-
-	/**
-	 * The verification file is an opaque blob Apple issues; only markup is stripped.
-	 *
-	 * @param string $key   Key.
-	 * @param mixed  $value Value.
-	 */
-	public function validate_apple_pay_domain_association_field( $key, $value ) {
-		$value = wp_strip_all_tags( (string) wp_unslash( $value ) );
-		return substr( trim( $value ), 0, 20000 );
+		$path = trim( (string) wp_unslash( $value ) );
+		$path = str_replace( array( "\0", "\n", "\r" ), '', $path );
+		return substr( $path, 0, 500 );
 	}
 
 	/**
@@ -285,13 +257,171 @@ class CardGateway extends AbstractGateway {
 	}
 
 	/**
-	 * A server path: trimmed, control characters removed, nothing else assumed.
+	 * The setup check row stores nothing.
 	 *
-	 * @param mixed $value Value.
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
 	 */
-	private function sanitize_path( $value ): string {
-		$path = trim( (string) wp_unslash( $value ) );
-		$path = str_replace( array( "\0", "\n", "\r" ), '', $path );
-		return substr( $path, 0, 500 );
+	public function validate_paradox_apple_pay_test_field( $key, $value ) {
+		return '';
+	}
+
+	/**
+	 * Certificate path row: the path, an upload button, the web root for reference and
+	 * what the plugin makes of the file currently configured.
+	 *
+	 * @param string $key  Field key.
+	 * @param array  $data Field definition.
+	 */
+	public function generate_paradox_apple_pay_certificate_html( $key, $data ) {
+		$field_key = $this->get_field_key( $key );
+		$value     = (string) $this->get_option( $key );
+		$report    = '' !== $value ? CertificateStore::inspect_file( $value ) : null;
+		$example   = trailingslashit( dirname( untrailingslashit( CertificateStore::web_root() ) ) ) . 'certificates.pem';
+
+		ob_start();
+		?>
+		<tr valign="top" class="paradox-cardpointe-cert-row">
+			<th scope="row" class="titledesc">
+				<label for="<?php echo esc_attr( $field_key ); ?>"><?php echo esc_html( $data['title'] ?? '' ); ?> <?php echo $this->get_tooltip_html( $data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce escapes the tooltip. ?></label>
+			</th>
+			<td class="forminp">
+				<input class="input-text regular-input" type="text" name="<?php echo esc_attr( $field_key ); ?>" id="<?php echo esc_attr( $field_key ); ?>" value="<?php echo esc_attr( $value ); ?>" placeholder="<?php echo esc_attr( $example ); ?>" autocomplete="off" spellcheck="false" />
+				<input type="file" id="paradox-cardpointe-apple-pay-file" accept=".pem,.txt,.crt,.key,application/x-pem-file" hidden />
+				<button type="button" class="button" id="paradox-cardpointe-apple-pay-upload" data-nonce="<?php echo esc_attr( wp_create_nonce( 'paradox_cardpointe_admin' ) ); ?>"><?php esc_html_e( 'Upload PEM file', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></button>
+				<span class="spinner"></span>
+				<p class="description paradox-cardpointe-webroot">
+					<?php
+					printf(
+						/* translators: %s: web root path */
+						esc_html__( 'For reference, your current web root path is: %s', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'<code>' . esc_html( CertificateStore::web_root() ) . '</code>'
+					);
+					?>
+				</p>
+				<p class="description"><?php esc_html_e( 'One PEM file containing the Merchant Identity Certificate and its private key, with no passphrase. Upload it here, or place it on the server yourself and enter its full path. Because the file contains a private key, an upload is stored just above the web root when the server allows it, where no web address can reach it.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
+				<div id="paradox-cardpointe-apple-pay-cert-result" aria-live="polite"><?php echo $report ? $this->certificate_report_html( $report ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper. ?></div>
+			</td>
+		</tr>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * Setup check row: what is still missing, a test against Apple, and once that has
+	 * passed, the Apple Pay button itself.
+	 *
+	 * @param string $key  Field key.
+	 * @param array  $data Field definition.
+	 */
+	public function generate_paradox_apple_pay_test_html( $key, $data ) {
+		$report   = ApplePay::setup_report();
+		$verified = ApplePay::is_verified();
+		$style    = ApplePay::button_style();
+		$type     = ApplePay::button_type();
+
+		ob_start();
+		?>
+		<tr valign="top" class="paradox-cardpointe-apple-pay-test-row">
+			<th scope="row" class="titledesc"><?php echo esc_html( $data['title'] ?? '' ); ?></th>
+			<td class="forminp">
+				<div id="paradox-cardpointe-apple-pay-status"><?php echo $this->setup_report_html( $report, $verified ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in the helper. ?></div>
+				<p>
+					<button type="button" class="button button-secondary" id="paradox-cardpointe-apple-pay-test" data-nonce="<?php echo esc_attr( wp_create_nonce( 'paradox_cardpointe_admin' ) ); ?>"><?php esc_html_e( 'Test Apple Pay setup', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></button>
+					<span class="spinner"></span>
+				</p>
+				<p class="description"><?php esc_html_e( 'Asks Apple for a merchant session using the Merchant ID and certificate path currently in the form (unsaved changes included) and this site\'s domain. Passing proves Apple accepts all three. Nothing is charged.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
+				<div id="paradox-cardpointe-apple-pay-test-result" class="paradox-cardpointe-test-result" aria-live="polite"></div>
+
+				<div id="paradox-cardpointe-apple-pay-preview" class="paradox-cardpointe-apple-pay-preview"
+					data-verified="<?php echo $verified ? '1' : '0'; ?>"
+					data-label="<?php echo esc_attr( ApplePay::display_name() ); ?>"
+					data-currency="<?php echo esc_attr( get_woocommerce_currency() ); ?>"
+					data-country="<?php echo esc_attr( WC()->countries->get_base_country() ); ?>"
+					data-networks="<?php echo esc_attr( implode( ',', ApplePay::networks( $this ) ) ); ?>"
+					hidden>
+					<p class="paradox-cardpointe-ok"><?php esc_html_e( 'Apple Pay is set up. This is the button shoppers see in the credit card box:', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
+					<button type="button" class="paradox-cardpointe-apple-pay-button is-style-<?php echo esc_attr( $style ); ?> is-type-<?php echo esc_attr( $type ); ?>" aria-label="<?php esc_attr_e( 'Test Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ); ?>" hidden></button>
+					<div class="paradox-cardpointe-apple-pay-mock is-style-<?php echo esc_attr( $style ); ?>" aria-hidden="true" hidden><?php esc_html_e( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></div>
+					<p class="description paradox-cardpointe-apple-pay-sheet-hint" hidden><?php esc_html_e( 'Click it to open the Apple Pay sheet. This is a test: nothing is sent to CardPointe and no payment is taken.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
+					<p class="description paradox-cardpointe-apple-pay-nosafari" hidden><?php esc_html_e( 'This is a preview. Browsers other than Safari cannot draw the real Apple Pay button; open this page in Safari on a device with Apple Pay to try the payment sheet.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
+					<div id="paradox-cardpointe-apple-pay-sheet-result" class="paradox-cardpointe-test-result" aria-live="polite"></div>
+				</div>
+			</td>
+		</tr>
+		<?php
+		return ob_get_clean();
+	}
+
+	/**
+	 * What the plugin found in the configured certificate file.
+	 *
+	 * @param array $report CertificateStore::inspect_file() result.
+	 */
+	private function certificate_report_html( array $report ): string {
+		$lines = array();
+		foreach ( $report['errors'] as $message ) {
+			$lines[] = array( 'fail', $message );
+		}
+		if ( empty( $report['errors'] ) ) {
+			$lines[] = array( 'ok', __( 'Certificate and private key found, and they belong together.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+			if ( '' !== $report['common_name'] ) {
+				$lines[] = array( 'ok', $report['common_name'] );
+			}
+			if ( $report['expires'] > 0 ) {
+				/* translators: %s: date */
+				$lines[] = array( 'ok', sprintf( __( 'Valid until %s.', 'paradox-cardpointe-gateway-for-woocommerce' ), wp_date( get_option( 'date_format' ), $report['expires'] ) ) );
+			}
+		}
+		foreach ( $report['warnings'] as $message ) {
+			$lines[] = array( 'warn', $message );
+		}
+		return self::report_list_html( $lines );
+	}
+
+	/**
+	 * Overall setup state for the setup check row.
+	 *
+	 * @param array $report   ApplePay::setup_report() result.
+	 * @param bool  $verified Whether Apple accepted the saved settings.
+	 */
+	private function setup_report_html( array $report, bool $verified ): string {
+		$lines = array();
+		foreach ( $report['problems'] as $message ) {
+			$lines[] = array( 'fail', $message );
+		}
+		if ( $verified ) {
+			$lines[] = array(
+				'ok',
+				sprintf(
+					/* translators: 1: date, 2: domain */
+					__( 'Verified with Apple on %1$s for %2$s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					wp_date( get_option( 'date_format' ), ApplePay::verified_at() ),
+					ApplePay::domain()
+				),
+			);
+		} elseif ( empty( $report['problems'] ) ) {
+			$lines[] = array( 'info', __( 'Not tested with Apple yet. Run the test below.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
+		foreach ( $report['notes'] as $message ) {
+			$lines[] = array( 'warn', $message );
+		}
+		return self::report_list_html( $lines );
+	}
+
+	/**
+	 * Renders status lines.
+	 *
+	 * @param array $lines Pairs of state (ok|fail|warn|info) and message.
+	 */
+	private static function report_list_html( array $lines ): string {
+		if ( empty( $lines ) ) {
+			return '';
+		}
+		$html = '<ul class="paradox-cardpointe-report">';
+		foreach ( $lines as $line ) {
+			$html .= '<li class="is-' . esc_attr( $line[0] ) . '">' . esc_html( $line[1] ) . '</li>';
+		}
+		return $html . '</ul>';
 	}
 }

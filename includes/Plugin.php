@@ -152,7 +152,17 @@ final class Plugin {
 		if ( PARADOX_CARDPOINTE_VERSION === $stored ) {
 			return;
 		}
-		// Future migrations go here, keyed on $stored.
+		// 1.1.1 replaced the separate private key, passphrase and verification file settings
+		// with a single PEM. Drop what is left of them; a passphrase has no reason to linger.
+		$option   = 'woocommerce_' . self::CARD_GATEWAY_ID . '_settings';
+		$settings = get_option( $option );
+		if ( is_array( $settings ) ) {
+			$stale = array_intersect_key( $settings, array_flip( array( 'apple_pay_key_path', 'apple_pay_key_passphrase', 'apple_pay_domain_association', 'apple_pay_status' ) ) );
+			if ( ! empty( $stale ) ) {
+				update_option( $option, array_diff_key( $settings, $stale ) );
+			}
+		}
+
 		update_option( self::VERSION_OPTION, PARADOX_CARDPOINTE_VERSION, false );
 		do_action( 'paradox_cardpointe_upgraded', $stored, PARADOX_CARDPOINTE_VERSION );
 	}

@@ -101,3 +101,136 @@ tr.paradox-cardpointe-env-active th {
 	margin-top: 6px;
 	min-height: 1em;
 }
+
+/* Settings sub-navigation (General | Apple Pay) */
+.paradox-cardpointe-subnav.subsubsub {
+	float: none;
+	margin: 0 0 4px;
+	font-size: 14px;
+}
+
+/* Apple Pay tab */
+.paradox-cardpointe-cert-row .spinner,
+.paradox-cardpointe-apple-pay-test-row .spinner {
+	float: none;
+	margin: 0 6px;
+	vertical-align: middle;
+}
+.paradox-cardpointe-cert-row .regular-input {
+	width: 25em;
+	max-width: 100%;
+	vertical-align: middle;
+}
+.paradox-cardpointe-webroot code {
+	font-size: 12px;
+	word-break: break-all;
+}
+.paradox-cardpointe-report {
+	margin: 8px 0 0;
+	max-width: 46em;
+}
+.paradox-cardpointe-report li {
+	margin: 3px 0;
+	padding-left: 20px;
+	position: relative;
+}
+.paradox-cardpointe-report li::before {
+	position: absolute;
+	left: 0;
+	font-weight: 700;
+}
+.paradox-cardpointe-report .is-ok {
+	color: #1a5f2a;
+}
+.paradox-cardpointe-report .is-ok::before {
+	content: "\2713";
+}
+.paradox-cardpointe-report .is-fail {
+	color: #b32d2e;
+}
+.paradox-cardpointe-report .is-fail::before {
+	content: "\2715";
+}
+.paradox-cardpointe-report .is-warn {
+	color: #7a5200;
+}
+.paradox-cardpointe-report .is-warn::before {
+	content: "!";
+}
+.paradox-cardpointe-report .is-info {
+	color: #50575e;
+}
+.paradox-cardpointe-report .is-info::before {
+	content: "\2022";
+}
+.paradox-cardpointe-apple-pay-preview {
+	margin-top: 14px;
+	padding: 12px 16px 14px;
+	max-width: 420px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-left: 4px solid #00a32a;
+}
+.paradox-cardpointe-apple-pay-preview > p:first-child {
+	margin-top: 0;
+}
+.paradox-cardpointe-apple-pay-preview .paradox-cardpointe-apple-pay-button {
+	display: block;
+	width: 100%;
+	max-width: 320px;
+	height: 44px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 6px;
+	cursor: pointer;
+	-webkit-appearance: -apple-pay-button;
+	appearance: -apple-pay-button;
+	-apple-pay-button-type: plain;
+	-apple-pay-button-style: black;
+}
+.paradox-cardpointe-apple-pay-button.is-style-white {
+	-apple-pay-button-style: white;
+}
+.paradox-cardpointe-apple-pay-button.is-style-white-outline {
+	-apple-pay-button-style: white-outline;
+}
+.paradox-cardpointe-apple-pay-button.is-type-buy {
+	-apple-pay-button-type: buy;
+}
+.paradox-cardpointe-apple-pay-button.is-type-pay {
+	-apple-pay-button-type: pay;
+}
+.paradox-cardpointe-apple-pay-button.is-type-check-out {
+	-apple-pay-button-type: check-out;
+}
+.paradox-cardpointe-apple-pay-button.is-type-order {
+	-apple-pay-button-type: order;
+}
+.paradox-cardpointe-apple-pay-mock {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 320px;
+	height: 44px;
+	border-radius: 6px;
+	background: #000;
+	color: #fff;
+	font: 600 17px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	letter-spacing: 0.2px;
+	cursor: default;
+	user-select: none;
+}
+.paradox-cardpointe-apple-pay-mock.is-style-white,
+.paradox-cardpointe-apple-pay-mock.is-style-white-outline {
+	background: #fff;
+	color: #000;
+}
+.paradox-cardpointe-apple-pay-mock.is-style-white-outline {
+	border: 1px solid #000;
+}
+/* These set display themselves, which would otherwise beat the hidden attribute. */
+.paradox-cardpointe-apple-pay-preview[hidden],
+.paradox-cardpointe-apple-pay-preview [hidden] {
+	display: none !important;
+}
