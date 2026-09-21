@@ -38,26 +38,6 @@ Card and bank account details are entered in CardPointe's Hosted iFrame Tokenize
 
 See `readme.txt` for the full WordPress.org style documentation and FAQ.
 
-## Development notes
-
-- No build step: the Checkout Block integration is plain JavaScript using `wp.element`.
-- PHP is namespaced under `ParadoxSolutions\CardPointe` with a simple autoloader (`includes/`).
-- Templates in `templates/` can be overridden from a theme under `paradox-cardpointe-gateway-for-woocommerce/`.
-- Regenerate translations with `wp i18n make-pot . languages/paradox-cardpointe-gateway-for-woocommerce.pot`.
-
-## Releasing
-
-Publishing to the WordPress.org plugin directory is automated from tags. See
-[RELEASING.md](RELEASING.md) for the checklist and the required repository secrets.
-
-```sh
-git tag v1.0.1 && git push origin v1.0.1
-```
-
-Continuous integration runs PHP syntax checks on 7.4, 8.1 and 8.3, PHP_CodeSniffer
-against the WordPress standards, and the official Plugin Check tool that the review
-team uses.
-
 ## License
 
 GPL-3.0-or-later. See `LICENSE`.
