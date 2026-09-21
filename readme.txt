@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -82,12 +82,15 @@ Yes. Define `PARADOX_CARDPOINTE_PRODUCTION_API_PASSWORD` and/or `PARADOX_CARDPOI
 
 = How do I set up Apple Pay? =
 
-1. Email integrationdelivery@fiserv.com and ask for an Apple Pay Payment Processing Certificate CSR for your merchant ID (allow up to 5 business days). In the Apple Developer portal, create a merchant ID, create a Payment Processing Certificate from that CSR, and send the resulting .cer file back to your Fiserv representative. This is what lets CardSecure decrypt Apple Pay tokens.
-2. Under the same merchant ID, create a Merchant Identity Certificate from a CSR you generate yourself (RSA 2048). Convert the certificate and its private key to PEM and place them on the server outside the web root.
-3. Register your store's domain under the merchant ID and download the verification file.
-4. In WooCommerce > Settings > Payments > CardPointe - Credit Card, enable Apple Pay, enter the merchant identifier and the certificate and key paths, paste the verification file, and save. Then complete verification in the Apple portal. The Status row on that screen lists anything still missing.
+1. Email integrationdelivery@fiserv.com and ask for an Apple Pay Payment Processing Certificate CSR for your merchant ID (allow up to 5 business days). In the Apple Developer portal, create a Merchant ID, create a Payment Processing Certificate from that CSR, and send the resulting .cer file back to your Fiserv representative. This is what lets CardSecure decrypt Apple Pay payments.
+2. Under the same Merchant ID, create a Merchant Identity Certificate. Put the certificate and its private key into one PEM file with no passphrase. From a .p12 exported out of Keychain Access: `openssl pkcs12 -in merchant_id.p12 -out certificates.pem -nodes`.
+3. Register your store's domain under the Merchant ID, upload the verification file Apple gives you to the `.well-known` folder in your web root, and click Verify in the Apple portal.
+4. In WooCommerce > Settings > Payments > CardPointe - Credit Card, open the Apple Pay tab, tick Accept Apple Pay and click Upload PEM file. The Apple Merchant ID is read from the certificate. You can instead place the file on the server yourself and enter its path; the screen shows your web root for reference. Save.
+5. Click Test Apple Pay setup. The plugin asks Apple for a merchant session with your Merchant ID, certificate and domain, and says exactly what is wrong if Apple refuses. Once it passes, a test Apple Pay button appears; in Safari it opens the real Apple Pay sheet without charging anything.
 
-Apple Pay needs HTTPS even in sandbox mode. To test in the sandbox, use an Apple sandbox tester account with Apple's test cards.
+The PEM contains a private key, so an uploaded file is stored one level above the web root when the server allows it, and otherwise in a protected uploads folder under a random name. The upload is checked first and refused with a clear reason if the key is missing or passphrase-protected, if it is the Payment Processing Certificate by mistake, if it has expired, or if the key does not belong to the certificate.
+
+Apple Pay needs HTTPS even in sandbox mode. To test payments in the sandbox, use an Apple sandbox tester account with Apple's test cards.
 
 == External services ==
 
@@ -111,12 +114,19 @@ CardPointe developer documentation: https://developer.cardpointe.com/
 
 **3. Apple Pay merchant validation** (`https://apple-pay-gateway.apple.com/paymentservices/…` and Apple's regional equivalents)
 
-Only when Apple Pay is enabled and a shopper taps the Apple Pay button. Safari gives the store a one-time validation URL and your server calls it to prove the store's identity to Apple, sending your Apple merchant identifier, the store name shown on the payment sheet and this site's domain, authenticated with your merchant identity certificate. No cart, customer or card data is included. The Apple Pay sheet itself is part of Safari; this plugin loads no script from Apple. The encrypted token Apple returns is sent to CardSecure (service 2 above) to be decrypted and tokenized.
+When a shopper taps the Apple Pay button, and when an administrator runs the setup check on the settings screen. Safari (or, for the setup check, Apple's standard endpoint) gives the store a one-time validation URL and your server calls it to prove the store's identity to Apple, sending your Apple merchant identifier, the store name shown on the payment sheet and this site's domain, authenticated with your merchant identity certificate. No cart, customer or card data is included. The Apple Pay sheet itself is part of Safari; this plugin loads no script from Apple. The encrypted token Apple returns is sent to CardSecure (service 2 above) to be decrypted and tokenized.
 
 Apple Pay on the web terms: https://developer.apple.com/apple-pay/acceptable-use-guidelines-for-websites/
 Apple privacy policy: https://www.apple.com/legal/privacy/
 
 == Changelog ==
+
+= 1.1.1 =
+* Apple Pay settings now have their own tab, laid out as Apple Pay and Connection Settings.
+* The Merchant Identity Certificate is a single PEM file (certificate plus private key, no passphrase). The separate private key, passphrase and domain verification file settings were removed; existing values are cleaned up on upgrade.
+* Added an Upload PEM file button. The file is checked before it is accepted (missing or passphrase-protected key, Payment Processing Certificate used by mistake, expired, key not matching) and stored above the web root where the server allows it, so the private key cannot be downloaded. The Apple Merchant ID is read from the certificate.
+* The settings show the site's web root path for reference.
+* Added a setup check that asks Apple for a merchant session and explains any refusal, and a test Apple Pay button that appears once Apple has accepted the setup. In Safari it opens the real payment sheet without charging anything.
 
 = 1.1.0 =
 * Added Apple Pay. An Apple Pay button appears in the credit card box for shoppers using Safari with Apple Pay set up, on the classic checkout, CheckoutWC and order-pay pages. The encrypted Apple token is tokenized by CardSecure and charged like any card payment, with the usual authorize/capture, refund and receipt handling.
@@ -136,6 +146,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Simpler Apple Pay setup: one PEM file with an upload button, a setup check against Apple and a test button. If you used a separate private key file, combine it with the certificate into one PEM and upload it.
 
 = 1.1.0 =
 Adds Apple Pay for the classic checkout, CheckoutWC and order-pay pages. Configure it in the card gateway settings.

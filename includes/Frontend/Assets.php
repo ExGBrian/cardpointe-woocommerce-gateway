@@ -171,6 +171,23 @@ final class Assets {
 				array(
 					'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
 					'gatewayId' => Plugin::CARD_GATEWAY_ID,
+					'applePay'  => array(
+						'tabGeneral'   => __( 'General', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'tabApplePay'  => __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'uploading'    => __( 'Checking and saving the certificate…', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'uploadFailed' => __( 'The upload failed. Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'pairOk'       => __( 'Certificate and private key found, and they belong together.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						/* translators: %s: date */
+						'validUntil'   => __( 'Valid until %s.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'merchantSet'  => __( 'The Apple Merchant ID was read from the certificate.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'testing'      => __( 'Asking Apple for a merchant session…', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'testFailed'   => __( 'Apple Pay is not set up yet:', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'requestError' => __( 'The request to this site failed. Please reload the page and try again.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'sheetLabel'   => __( 'Test (not charged)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'sheetOk'      => __( 'The Apple Pay sheet completed. This was a test: nothing was sent to CardPointe and no payment was taken.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'sheetOpened'  => __( 'Apple opened the payment sheet, so merchant validation works from Safari too. You can cancel it, or authorize to finish the test; nothing is charged.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+						'sheetFailed'  => __( 'The Apple Pay sheet could not be opened:', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					),
 					'i18n'      => array(
 						'testing'   => __( 'Testing connection…', 'paradox-cardpointe-gateway-for-woocommerce' ),
 						'success'   => __( 'Connected.', 'paradox-cardpointe-gateway-for-woocommerce' ),

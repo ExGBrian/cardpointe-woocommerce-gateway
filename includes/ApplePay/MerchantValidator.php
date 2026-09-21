@@ -12,18 +12,22 @@ use ParadoxSolutions\CardPointe\Plugin;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Turns the validation URL Safari hands us into a merchant session.
+ * Turns a validation URL into a merchant session.
  *
- * Apple requires the request to present the merchant identity certificate as a TLS
- * client certificate, which WordPress's HTTP API cannot express directly, so the
- * certificate is attached to the underlying cURL handle for this one request only.
+ * Apple requires the request to present the Merchant Identity Certificate as a TLS
+ * client certificate, which WordPress's HTTP API cannot express directly, so the PEM
+ * is attached to the underlying cURL handle for this one request only.
+ *
+ * The same call doubles as the setup test: a session from Apple's production endpoint
+ * proves the Merchant ID, the certificate and the domain registration in one go.
  */
 final class MerchantValidator {
 
-	/**
-	 * Hosts Apple documents for merchant validation, production and sandbox, all regions.
-	 */
+	/** Hosts Apple documents for merchant validation, production and sandbox, all regions. */
 	const HOST_PATTERN = '/^(?:cn-)?apple-pay-gateway(?:-[a-z0-9]+)*\.apple\.com$/i';
+
+	/** Endpoint used by the settings screen test, where there is no Safari to supply one. */
+	const TEST_URL = 'https://apple-pay-gateway.apple.com/paymentservices/paymentSession';
 
 	const TIMEOUT = 20;
 
@@ -52,27 +56,33 @@ final class MerchantValidator {
 	/**
 	 * Requests a merchant session from Apple.
 	 *
-	 * @param string $validation_url URL from the onvalidatemerchant event.
+	 * @param string $validation_url URL from the onvalidatemerchant event, or TEST_URL.
+	 * @param array  $overrides      Optional merchant_id and cert_path to use instead of the
+	 *                               saved settings (the settings screen tests unsaved values).
 	 * @return array Merchant session, to be passed verbatim to completeMerchantValidation().
 	 *
-	 * @throws \RuntimeException When the URL, certificate, transport or response is unusable.
+	 * @throws \RuntimeException With an administrator-facing explanation.
 	 */
-	public static function validate( string $validation_url ): array {
+	public static function validate( string $validation_url, array $overrides = array() ): array {
 		if ( ! self::is_valid_url( $validation_url ) ) {
-			throw new \RuntimeException( 'The validation URL is not an Apple Pay gateway host.' );
+			throw new \RuntimeException( __( 'The validation URL is not an Apple Pay gateway host.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 		if ( ! function_exists( 'curl_init' ) ) {
-			throw new \RuntimeException( 'PHP cURL is required to present the merchant identity certificate.' );
+			throw new \RuntimeException( __( 'PHP cURL is required to present the certificate to Apple.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
-		$cert = ApplePay::cert_path();
-		$key  = ApplePay::key_path();
-		if ( '' === $cert || ! is_readable( $cert ) || '' === $key || ! is_readable( $key ) ) {
-			throw new \RuntimeException( 'The merchant identity certificate or key is not readable.' );
+		$merchant_id = ! empty( $overrides['merchant_id'] ) ? (string) $overrides['merchant_id'] : ApplePay::merchant_id();
+		$pem         = ! empty( $overrides['cert_path'] ) ? (string) $overrides['cert_path'] : ApplePay::cert_path();
+
+		if ( '' === $merchant_id ) {
+			throw new \RuntimeException( __( 'The Apple Merchant ID is empty.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
+		}
+		if ( '' === $pem || ! @is_readable( $pem ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			throw new \RuntimeException( __( 'The certificate file cannot be read at the configured path.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
 		$body = array(
-			'merchantIdentifier' => ApplePay::merchant_id(),
+			'merchantIdentifier' => $merchant_id,
 			'displayName'        => ApplePay::display_name(),
 			'initiative'         => 'web',
 			'initiativeContext'  => ApplePay::domain(),
@@ -86,21 +96,17 @@ final class MerchantValidator {
 		 */
 		$body = apply_filters( 'paradox_cardpointe_apple_pay_validation_body', $body, $validation_url );
 
-		$passphrase = ApplePay::key_passphrase();
-		$attach     = static function ( $handle, $parsed_args, $url ) use ( $validation_url, $cert, $key, $passphrase ) {
+		// One PEM holds both halves, so it serves as certificate and key.
+		$attach = static function ( $handle, $parsed_args, $url ) use ( $validation_url, $pem ) {
 			if ( $url !== $validation_url ) {
 				return;
 			}
-			curl_setopt( $handle, CURLOPT_SSLCERT, $cert ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
+			curl_setopt( $handle, CURLOPT_SSLCERT, $pem ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
 			curl_setopt( $handle, CURLOPT_SSLCERTTYPE, 'PEM' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
-			curl_setopt( $handle, CURLOPT_SSLKEY, $key ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
+			curl_setopt( $handle, CURLOPT_SSLKEY, $pem ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
 			curl_setopt( $handle, CURLOPT_SSLKEYTYPE, 'PEM' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
-			if ( '' !== $passphrase ) {
-				curl_setopt( $handle, CURLOPT_KEYPASSWD, $passphrase ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt
-			}
 		};
 
-		$logger  = Plugin::instance()->logger();
 		$started = microtime( true );
 
 		add_action( 'http_api_curl', $attach, 10, 3 );
@@ -124,10 +130,15 @@ final class MerchantValidator {
 		}
 
 		$elapsed = (int) round( ( microtime( true ) - $started ) * 1000 );
-		$host    = (string) wp_parse_url( $validation_url, PHP_URL_HOST );
 
 		if ( is_wp_error( $response ) ) {
-			throw new \RuntimeException( 'Apple did not accept the connection: ' . $response->get_error_message() );
+			throw new \RuntimeException(
+				sprintf(
+					/* translators: %s: transport error */
+					__( 'The connection to Apple failed: %s', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					$response->get_error_message()
+				)
+			);
 		}
 
 		$status  = (int) wp_remote_retrieve_response_code( $response );
@@ -135,14 +146,59 @@ final class MerchantValidator {
 		$session = json_decode( $raw, true );
 
 		if ( 200 !== $status ) {
-			throw new \RuntimeException( sprintf( 'Apple returned HTTP %d: %s', $status, substr( wp_strip_all_tags( $raw ), 0, 300 ) ) );
+			$detail = is_array( $session ) && ! empty( $session['statusMessage'] ) ? (string) $session['statusMessage'] : wp_strip_all_tags( $raw );
+			throw new \RuntimeException(
+				sprintf(
+					/* translators: 1: HTTP status, 2: Apple's message */
+					__( 'Apple refused the request (HTTP %1$d): %2$s', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					$status,
+					'' !== trim( $detail ) ? substr( trim( $detail ), 0, 300 ) : __( 'no details given', 'paradox-cardpointe-gateway-for-woocommerce' )
+				)
+			);
 		}
 		if ( ! is_array( $session ) || empty( $session['merchantSessionIdentifier'] ) ) {
-			throw new \RuntimeException( 'Apple returned an unreadable merchant session.' );
+			throw new \RuntimeException( __( 'Apple returned an unreadable merchant session.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
-		$logger->info( 'Apple Pay merchant session created', array( 'host' => $host, 'domain' => $body['initiativeContext'], 'ms' => $elapsed ) );
+		Plugin::instance()->logger()->info(
+			'Apple Pay merchant session created',
+			array(
+				'host'   => (string) wp_parse_url( $validation_url, PHP_URL_HOST ),
+				'domain' => $body['initiativeContext'],
+				'ms'     => $elapsed,
+			)
+		);
 
 		return $session;
+	}
+
+	/**
+	 * Likely causes for a failed validation, for the settings screen.
+	 *
+	 * @param string $message Exception message from validate().
+	 * @return string[]
+	 */
+	public static function explain( string $message ): array {
+		$hints = array();
+		$lower = strtolower( $message );
+
+		if ( false !== strpos( $lower, 'could not load pem' ) || false !== strpos( $lower, 'unable to set private key' ) || false !== strpos( $lower, 'error 58' ) || false !== strpos( $lower, 'unable to use client certificate' ) ) {
+			$hints[] = __( 'cURL could not use the PEM as a client certificate. It must contain both the certificate and its private key, with no passphrase.', 'paradox-cardpointe-gateway-for-woocommerce' );
+		}
+		if ( false !== strpos( $lower, 'handshake' ) || false !== strpos( $lower, 'error 35' ) || false !== strpos( $lower, 'error 56' ) || false !== strpos( $lower, 'alert' ) ) {
+			$hints[] = __( 'Apple turned the certificate away during the TLS handshake. That usually means it is the wrong certificate (it must be the Merchant Identity Certificate, not the Payment Processing Certificate), or it has expired or been revoked.', 'paradox-cardpointe-gateway-for-woocommerce' );
+		}
+		if ( false !== strpos( $lower, 'http 4' ) || false !== strpos( $lower, 'http 5' ) ) {
+			$hints[] = sprintf(
+				/* translators: %s: domain */
+				__( 'Apple accepted the certificate but not the request. Check that the Apple Merchant ID is exactly the one the certificate was created under, and that the domain %s is registered and shows as verified under that Merchant ID in the Apple Developer portal.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				ApplePay::domain()
+			);
+		}
+		if ( false !== strpos( $lower, 'timed out' ) || false !== strpos( $lower, 'error 28' ) || false !== strpos( $lower, 'could not resolve' ) || false !== strpos( $lower, 'error 6' ) || false !== strpos( $lower, 'error 7' ) ) {
+			$hints[] = __( 'The server could not reach apple-pay-gateway.apple.com on port 443. Ask your host whether outbound connections are blocked by a firewall.', 'paradox-cardpointe-gateway-for-woocommerce' );
+		}
+
+		return $hints;
 	}
 }
