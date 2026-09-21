@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Paradox CardPointe Gateway for WooCommerce 1.2.1\n"
+"Project-Id-Version: Paradox CardPointe Gateway for WooCommerce 1.2.2\n"
 "Report-Msgid-Bugs-To: https://paradoxsolutions.io\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1136,19 +1136,19 @@ msgstr ""
 msgid "The Apple Pay payment could not be read. Please try again."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:219
+#: includes/Gateway/PaymentSource.php:232
 msgid "Apple Pay could not be processed right now. Please try again or pay another way."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:233
+#: includes/Gateway/PaymentSource.php:246
 msgid "Apple Pay could not be processed (the payment token was not accepted). Please try again."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:292
+#: includes/Gateway/PaymentSource.php:305
 msgid "The selected saved payment method is not available. Please choose another one."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:297
+#: includes/Gateway/PaymentSource.php:310
 msgid "The selected saved payment method belongs to a different environment. Please add it again."
 msgstr ""
 

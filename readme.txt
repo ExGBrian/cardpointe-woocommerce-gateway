@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -135,6 +135,10 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 
 == Changelog ==
 
+= 1.2.2 =
+* Fixed Apple Pay payments being refused by CardSecure with "Decryption failure". The token sent to CardSecure left out the echash parameter when the payment carried no application data; CardPointe requires it to be present, even when empty, whenever ecpublickeyhash is sent.
+* When CardSecure cannot decrypt an Apple Pay token, the log now records which CardSecure host was used and the hash identifying the Payment Processing Certificate Apple encrypted to, so Fiserv can confirm whether it holds the matching key.
+
 = 1.2.1 =
 * Fixed the Apple Pay button showing as an empty box in Chrome, Edge and Firefox. Apple's script registers its button element shortly after it starts running; the button is now created as that element whenever "Other Browsers" is on, instead of only when it was already registered, and falls back to Safari's own button if Apple's script never loads.
 * Fixed an empty error box appearing under express buttons on themes and page builders that style WooCommerce notices in a way that overrides the hidden state.
@@ -174,6 +178,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.2 =
+Fixes Apple Pay payments failing with a CardSecure decryption error.
 
 = 1.2.1 =
 Fixes the Apple Pay button not drawing in Chrome and other non-Safari browsers, and the express button missing from CheckoutWC.
