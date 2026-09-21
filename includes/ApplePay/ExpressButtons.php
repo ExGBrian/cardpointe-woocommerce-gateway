@@ -23,8 +23,17 @@ defined( 'ABSPATH' ) || exit;
  */
 final class ExpressButtons {
 
-	/** @var bool The checkout hooks can both fire on one page; render once. */
-	private $checkout_rendered = false;
+	/**
+	 * Hooks that have already printed the checkout button, so each prints once.
+	 *
+	 * Tracked per hook on purpose. CheckoutWC runs woocommerce_checkout_before_customer_details
+	 * itself, inside an output buffer it throws away, and only afterwards runs its own
+	 * cfw_payment_request_buttons. A single "already rendered" flag is spent on the
+	 * discarded render and leaves CheckoutWC's express area empty.
+	 *
+	 * @var array<string,bool>
+	 */
+	private $checkout_rendered = array();
 
 	/**
 	 * Registers hooks.
@@ -33,7 +42,23 @@ final class ExpressButtons {
 		add_action( 'woocommerce_after_add_to_cart_form', array( $this, 'product' ), 5 );
 		add_action( 'woocommerce_proceed_to_checkout', array( $this, 'cart' ), 5 );
 		add_action( 'woocommerce_checkout_before_customer_details', array( $this, 'checkout' ), 5 );
-		add_action( 'cfw_payment_request_buttons', array( $this, 'checkout_cfw' ), 5 );
+		add_action( 'cfw_payment_request_buttons', array( $this, 'checkout_cfw' ), 1 );
+		add_filter( 'cfw_detected_gateways', array( $this, 'register_with_checkoutwc' ) );
+	}
+
+	/**
+	 * Tells CheckoutWC this gateway provides its own express checkout.
+	 *
+	 * @param array $gateways Gateways CheckoutWC has detected.
+	 * @return array
+	 */
+	public function register_with_checkoutwc( $gateways ) {
+		$model   = '\\Objectiv\\Plugins\\Checkout\\Model\\DetectedPaymentGateway';
+		$support = '\\Objectiv\\Plugins\\Checkout\\Model\\GatewaySupport';
+		if ( is_array( $gateways ) && class_exists( $model ) && class_exists( $support ) ) {
+			$gateways[] = new $model( 'Paradox CardPointe Gateway for WooCommerce', $support::FULLY_SUPPORTED );
+		}
+		return $gateways;
 	}
 
 	/**
@@ -79,23 +104,24 @@ final class ExpressButtons {
 	 * Top of the classic checkout.
 	 */
 	public function checkout() {
-		$this->render_checkout( 'after' );
+		$this->render_checkout( 'wc', 'after' );
 	}
 
 	/**
 	 * CheckoutWC's express area, which draws its own separator.
 	 */
 	public function checkout_cfw() {
-		$this->render_checkout( '' );
+		$this->render_checkout( 'cfw', '' );
 	}
 
 	/**
 	 * Renders the checkout button once per page.
 	 *
+	 * @param string $hook    Which hook is rendering: wc or cfw.
 	 * @param string $divider Where the "or" divider goes: before, after, or empty for none.
 	 */
-	private function render_checkout( string $divider ) {
-		if ( $this->checkout_rendered ) {
+	private function render_checkout( string $hook, string $divider ) {
+		if ( ! empty( $this->checkout_rendered[ $hook ] ) ) {
 			return;
 		}
 		$gateway = $this->gateway();
@@ -103,7 +129,7 @@ final class ExpressButtons {
 		if ( null === $context ) {
 			return;
 		}
-		$this->checkout_rendered = true;
+		$this->checkout_rendered[ $hook ] = true;
 		$this->render( $context, $divider );
 	}
 

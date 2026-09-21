@@ -42,10 +42,13 @@
 .paradox-cardpointe-apple-pay-express {
 	margin: 0 0 14px;
 }
+/* Themes and page builders style .woocommerce-error with a display of their own, which
+   beats the hidden attribute; an empty pink box is the result. */
 .paradox-cardpointe-apple-pay[hidden],
 .paradox-cardpointe-apple-pay-express[hidden],
-.paradox-cardpointe-apple-pay-message[hidden] {
-	display: none;
+.paradox-cardpointe-apple-pay-message[hidden],
+.paradox-cardpointe-apple-pay-slot[hidden] {
+	display: none !important;
 }
 .paradox-cardpointe-apple-pay-express.is-product {
 	margin: 14px 0 0;
@@ -53,6 +56,14 @@
 }
 .paradox-cardpointe-apple-pay-express.is-cart {
 	margin: 0 0 12px;
+}
+/* CheckoutWC's express area is a centred flex row, where a percentage-width button
+   collapses to its minimum; give it a definite width there instead. */
+#cfw-payment-request-buttons .paradox-cardpointe-apple-pay-express {
+	flex: 0 1 300px;
+	width: 300px;
+	max-width: 100%;
+	margin: 0;
 }
 .paradox-cardpointe-apple-pay-message {
 	margin: 8px 0 0;
@@ -145,7 +156,7 @@
 	margin: 0 0 12px;
 }
 .paradox-cardpointe-errors[hidden] {
-	display: none;
+	display: none !important;
 }
 .paradox-cardpointe-status {
 	margin: 4px 0 8px;
