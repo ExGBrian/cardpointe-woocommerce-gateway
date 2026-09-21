@@ -197,9 +197,20 @@
 	 * Button
 	 * ------------------------------------------------------------------ */
 
+	function elementDefined() {
+		return !! ( window.customElements && window.customElements.get && window.customElements.get( 'apple-pay-button' ) );
+	}
+
 	/**
-	 * Puts an Apple Pay button into a slot, once. Uses Apple's element when the SDK
-	 * defined it (it draws in every browser), otherwise the CSS button Safari draws.
+	 * Puts an Apple Pay button into a slot, once.
+	 *
+	 * With Apple's SDK in use the button is Apple's <apple-pay-button> element, which
+	 * draws in every browser. The SDK registers that element a moment after it starts
+	 * running, which is later than this script mounts its first buttons, so the element
+	 * is created whether or not it is defined yet: a custom element created early is
+	 * upgraded in place when its definition arrives. Deciding by "is it defined right
+	 * now" is what left an empty box in Chrome, where the alternative, the CSS button,
+	 * cannot be drawn.
 	 *
 	 * @param {HTMLElement} slot    Empty container.
 	 * @param {Object}      options { style, type, onClick }
@@ -215,31 +226,57 @@
 		options = options || {};
 		var style = options.style || config.buttonStyle || 'black';
 		var type = options.type || config.buttonType || 'plain';
-		var button;
 
-		if ( window.customElements && window.customElements.get && window.customElements.get( 'apple-pay-button' ) ) {
-			button = document.createElement( 'apple-pay-button' );
+		function wire( button ) {
+			button.classList.add( 'paradox-cardpointe-apple-pay-trigger' );
+			if ( typeof options.onClick === 'function' ) {
+				button.addEventListener( 'click', function ( event ) {
+					event.preventDefault();
+					options.onClick( event );
+				} );
+			}
+			return button;
+		}
+
+		function appleElement() {
+			var button = document.createElement( 'apple-pay-button' );
 			button.setAttribute( 'buttonstyle', style );
 			button.setAttribute( 'type', type );
 			button.setAttribute( 'locale', config.locale || 'en-US' );
-		} else {
-			button = document.createElement( 'button' );
+			return wire( button );
+		}
+
+		// Only Safari can draw this one.
+		function cssButton() {
+			var button = document.createElement( 'button' );
 			button.type = 'button';
 			button.className = 'paradox-cardpointe-apple-pay-button is-style-' + style + ' is-type-' + type;
 			button.setAttribute( 'aria-label', i18n.applePayLabel || 'Apple Pay' );
+			return wire( button );
 		}
-		button.classList.add( 'paradox-cardpointe-apple-pay-trigger' );
-		if ( typeof options.onClick === 'function' ) {
-			button.addEventListener( 'click', function ( event ) {
-				event.preventDefault();
-				options.onClick( event );
-			} );
-		}
+
+		var defined = elementDefined();
+		var useElement = defined || ( !! config.sdk && !! window.customElements );
+		var button = useElement ? appleElement() : cssButton();
+
 		while ( slot.firstChild ) {
 			slot.removeChild( slot.firstChild );
 		}
 		slot.appendChild( button );
 		slot.setAttribute( 'data-mounted', '1' );
+
+		if ( useElement && ! defined ) {
+			// The SDK may never arrive (blocked, offline). Without it only Safari can have
+			// got this far, and Safari can draw the CSS button.
+			window.setTimeout( function () {
+				if ( elementDefined() || button.parentNode !== slot ) {
+					return;
+				}
+				log( 'Apple\'s button element never became available; falling back to the CSS button' );
+				slot.replaceChild( cssButton(), button );
+			}, 4000 );
+		}
+
 		return button;
 	}
 

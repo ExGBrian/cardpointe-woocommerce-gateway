@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -135,6 +135,11 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 
 == Changelog ==
 
+= 1.2.1 =
+* Fixed the Apple Pay button showing as an empty box in Chrome, Edge and Firefox. Apple's script registers its button element shortly after it starts running; the button is now created as that element whenever "Other Browsers" is on, instead of only when it was already registered, and falls back to Safari's own button if Apple's script never loads.
+* Fixed an empty error box appearing under express buttons on themes and page builders that style WooCommerce notices in a way that overrides the hidden state.
+* Fixed the express button missing from CheckoutWC. CheckoutWC runs WooCommerce's own checkout hook and discards what it prints before running its express checkout hook, which used up the plugin's "print once" guard. Each hook is now tracked separately, and the gateway registers itself with CheckoutWC as providing express checkout.
+
 = 1.2.0 =
 * Apple Pay express buttons on single product pages (simple and variable products), the cart and the top of the checkout. The Apple Pay sheet collects the contact details and address, and shipping methods, shipping cost and tax update live as the shopper chooses. Runs on the WooCommerce Store API, so it works the same on classic pages, the Cart and Checkout blocks and CheckoutWC (in its express area).
 * Apple Pay on the Checkout block: an express button in the block's express area, and a button inside the credit card form that uses the address already entered.
@@ -169,6 +174,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+Fixes the Apple Pay button not drawing in Chrome and other non-Safari browsers, and the express button missing from CheckoutWC.
 
 = 1.2.0 =
 Apple Pay express buttons for product pages, cart and checkout, Checkout block support, and Apple Pay in Chrome. New buttons are on by default; choose where they appear under Apple Pay > Allow Apple Pay on.
