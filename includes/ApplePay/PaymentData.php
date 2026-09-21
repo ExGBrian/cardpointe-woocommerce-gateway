@@ -75,6 +75,11 @@ final class PaymentData {
 	 * parameters are key=value pairs and their order is not significant. The values
 	 * are base64 and hex exactly as Apple produced them, not URL-encoded.
 	 *
+	 * echash is always sent, empty when the payment request carried no application
+	 * data (which is every request this plugin makes). The guide is explicit: "If you
+	 * have an ecpublickeyhash, you must provide the echash property in your request,
+	 * even if it is empty." Leaving it out is answered with "Decryption failure".
+	 *
 	 * @param array $payment_data Output of from_json().
 	 */
 	public static function devicedata( array $payment_data ): string {
@@ -82,13 +87,9 @@ final class PaymentData {
 			. '&ectype=apple'
 			. '&ecsig=' . $payment_data['signature']
 			. '&eckey=' . $payment_data['ephemeralPublicKey']
-			. '&ectid=' . $payment_data['transactionId'];
-
-		if ( '' !== $payment_data['applicationData'] ) {
-			$string .= '&echash=' . $payment_data['applicationData'];
-		}
-
-		$string .= '&ecpublickeyhash=' . $payment_data['publicKeyHash'];
+			. '&ectid=' . $payment_data['transactionId']
+			. '&echash=' . $payment_data['applicationData']
+			. '&ecpublickeyhash=' . $payment_data['publicKeyHash'];
 
 		/**
 		 * Filters the devicedata string sent to CardSecure for an Apple Pay payload.

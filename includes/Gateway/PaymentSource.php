@@ -215,7 +215,20 @@ final class PaymentSource {
 		try {
 			$response = $gateway->client()->tokenize_devicedata( PaymentData::devicedata( $payment_data ), PaymentData::HANDLER );
 		} catch ( ApiException $e ) {
-			$logger->error( 'Apple Pay tokenization failed', array( 'error' => $e->getMessage() ) );
+			// Nothing here is secret: the hash identifies the public half of the Payment
+			// Processing Certificate Apple encrypted to, which is what Fiserv needs in order
+			// to say whether CardSecure holds the matching key.
+			$context = array(
+				'error'                => $e->getMessage(),
+				'host'                 => $gateway->credentials()->host(),
+				'processing_cert_hash' => $payment_data['publicKeyHash'],
+				'data_length'          => strlen( $payment_data['data'] ),
+				'application_data'     => '' !== $payment_data['applicationData'] ? 'yes' : 'no',
+			);
+			if ( false !== stripos( $e->getMessage(), 'decryption' ) ) {
+				$context['hint'] = 'CardSecure could not decrypt the Apple Pay token. It can only decrypt tokens made with a Payment Processing Certificate created from the CSR Fiserv issued for this merchant ID and this environment (sandbox and production are separate). Give Fiserv the processing_cert_hash above to confirm which certificate Apple used.';
+			}
+			$logger->error( 'Apple Pay tokenization failed', $context );
 			throw new \Exception( __( 'Apple Pay could not be processed right now. Please try again or pay another way.', 'paradox-cardpointe-gateway-for-woocommerce' ) );
 		}
 
