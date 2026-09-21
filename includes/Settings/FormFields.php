@@ -352,13 +352,34 @@ final class FormFields {
 			'apple_pay_section'            => array(
 				'title'       => __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				'type'        => 'title',
-				'description' => __( 'Adds an Apple Pay button to the credit card box on the checkout and order-pay pages for shoppers using Safari with Apple Pay set up. Payments use the transaction type, receipts and sandbox setting of this gateway. Apple Pay always needs HTTPS, and is not offered for orders that have to keep a card on file (subscriptions, pre-orders charged on release).', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'description' => __( 'Adds Apple Pay buttons to single products, the cart and the checkout, on classic pages, the Cart and Checkout blocks and CheckoutWC. Payments use the transaction type, receipts and sandbox setting of this gateway. Apple Pay always needs HTTPS, and is not offered for orders that have to keep a card on file (subscriptions, pre-orders charged on release).', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			),
 			'apple_pay_enabled'            => array(
 				'title'   => __( 'Enable / Disable', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				'label'   => __( 'Accept Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
 				'type'    => 'checkbox',
 				'default' => 'no',
+			),
+			'apple_pay_locations'          => array(
+				'title'       => __( 'Allow Apple Pay on', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'multiselect',
+				'class'       => 'wc-enhanced-select',
+				'css'         => 'min-width:350px;',
+				'description' => __( 'On single products, the cart and the top of the checkout it is an express button: the Apple Pay sheet collects the address and shows shipping and tax as they are chosen, and the order is placed from the sheet. Inside the credit card box it uses the address already entered on the checkout form. Product page buttons appear on simple and variable products.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'default'     => array( 'product', 'cart', 'checkout', 'payment_box' ),
+				'options'     => array(
+					'product'     => __( 'Single products', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'cart'        => __( 'Cart', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'checkout'    => __( 'Checkout (express button at the top)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+					'payment_box' => __( 'Checkout (inside the credit card box)', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				),
+			),
+			'apple_pay_other_browsers'     => array(
+				'title'       => __( 'Other Browsers', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'label'       => __( 'Offer Apple Pay in Chrome, Edge and Firefox as well', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'type'        => 'checkbox',
+				'description' => __( 'Outside Safari the shopper pays by scanning a code with an iPhone (iOS 18 or later). This loads Apple\'s script, apple-pay-sdk.js from applepay.cdn-apple.com, on the pages that show a button. When off, the button only appears in Safari.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'default'     => 'yes',
 			),
 			'apple_pay_button_style'       => array(
 				'title'   => __( 'Button Style', 'paradox-cardpointe-gateway-for-woocommerce' ),

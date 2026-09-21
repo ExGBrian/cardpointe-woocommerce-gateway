@@ -26,6 +26,68 @@ final class Assets {
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin' ) );
 		add_filter( 'wp_resource_hints', array( $this, 'resource_hints' ), 10, 2 );
+		add_filter( 'script_loader_tag', array( $this, 'sdk_crossorigin' ), 10, 2 );
+	}
+
+	/**
+	 * Registers the Apple Pay core script, with Apple's SDK in front of it when other
+	 * browsers are to be supported. Used by the classic pages, the blocks and the settings screen.
+	 *
+	 * Both are deferred, which keeps them off the critical path and still runs them in
+	 * order; WordPress quietly makes them blocking where a non-deferred script depends on them.
+	 */
+	public static function register_apple_pay() {
+		if ( wp_script_is( 'paradox-cardpointe-apple-pay-core', 'registered' ) ) {
+			return;
+		}
+		$deps = array();
+		if ( ApplePay::other_browsers() ) {
+			wp_register_script( 'paradox-cardpointe-apple-pay-sdk', ApplePay::SDK_URL, array(), null, array( 'in_footer' => true, 'strategy' => 'defer' ) ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Apple versions the URL itself.
+			$deps[] = 'paradox-cardpointe-apple-pay-sdk';
+		}
+		wp_register_script( 'paradox-cardpointe-apple-pay-core', PARADOX_CARDPOINTE_URL . 'assets/js/apple-pay-core.js', $deps, PARADOX_CARDPOINTE_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+		wp_localize_script( 'paradox-cardpointe-apple-pay-core', 'paradox_cardpointe_apple_pay', ApplePay::client_config() );
+	}
+
+	/**
+	 * Apple Pay for classic (shortcode) pages: the credit card box and the express buttons.
+	 */
+	public static function enqueue_apple_pay() {
+		self::register_tokenizer();
+		self::register_apple_pay();
+		wp_enqueue_style( 'paradox-cardpointe-checkout' );
+		wp_enqueue_script( 'paradox-cardpointe-apple-pay', PARADOX_CARDPOINTE_URL . 'assets/js/apple-pay.js', array( 'paradox-cardpointe-apple-pay-core' ), PARADOX_CARDPOINTE_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
+	}
+
+	/**
+	 * Apple asks for its SDK to be loaded with the crossorigin attribute.
+	 *
+	 * @param string $tag    Script tag.
+	 * @param string $handle Script handle.
+	 */
+	public function sdk_crossorigin( $tag, $handle ) {
+		if ( 'paradox-cardpointe-apple-pay-sdk' === $handle && false === strpos( $tag, 'crossorigin' ) ) {
+			$tag = str_replace( '<script ', '<script crossorigin ', $tag );
+		}
+		return $tag;
+	}
+
+	/**
+	 * Whether the current front-end page can show an Apple Pay button.
+	 *
+	 * @param bool $checkoutish Whether this is a checkout-like page.
+	 */
+	private function page_wants_apple_pay( bool $checkoutish ): bool {
+		if ( ! ApplePay::is_configured() || is_add_payment_method_page() || isset( $_GET['change_payment_method'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return false;
+		}
+		if ( $checkoutish ) {
+			return ApplePay::is_location_enabled( 'payment_box' ) || ApplePay::is_location_enabled( 'checkout' );
+		}
+		if ( is_cart() ) {
+			return ApplePay::is_location_enabled( 'cart' );
+		}
+		return is_product() && ApplePay::is_location_enabled( 'product' );
 	}
 
 	/**
@@ -41,23 +103,24 @@ final class Assets {
 	}
 
 	/**
-	 * Front-end assets for checkout-like pages.
+	 * Front-end assets: the card form on checkout-like pages, and Apple Pay wherever a
+	 * button may appear (which also includes the cart and single product pages).
 	 */
 	public function frontend() {
 		self::register_tokenizer();
 
 		$is_change_payment = isset( $_GET['change_payment_method'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! is_checkout() && ! is_checkout_pay_page() && ! is_add_payment_method_page() && ! $is_change_payment ) {
-			return;
+		$checkoutish       = is_checkout() || is_checkout_pay_page() || is_add_payment_method_page() || $is_change_payment;
+
+		if ( $checkoutish ) {
+			wp_enqueue_style( 'paradox-cardpointe-checkout' );
+			wp_register_script( 'paradox-cardpointe-checkout', PARADOX_CARDPOINTE_URL . 'assets/js/checkout-classic.js', array( 'jquery', 'paradox-cardpointe-tokenizer' ), PARADOX_CARDPOINTE_VERSION, true );
+			wp_localize_script( 'paradox-cardpointe-checkout', 'paradox_cardpointe_params', self::params() );
+			wp_enqueue_script( 'paradox-cardpointe-checkout' );
 		}
 
-		wp_enqueue_style( 'paradox-cardpointe-checkout' );
-		wp_register_script( 'paradox-cardpointe-checkout', PARADOX_CARDPOINTE_URL . 'assets/js/checkout-classic.js', array( 'jquery', 'paradox-cardpointe-tokenizer' ), PARADOX_CARDPOINTE_VERSION, true );
-		wp_localize_script( 'paradox-cardpointe-checkout', 'paradox_cardpointe_params', self::params() );
-		wp_enqueue_script( 'paradox-cardpointe-checkout' );
-
-		if ( ApplePay::is_enabled() ) {
-			wp_enqueue_script( 'paradox-cardpointe-apple-pay', PARADOX_CARDPOINTE_URL . 'assets/js/apple-pay.js', array( 'paradox-cardpointe-checkout' ), PARADOX_CARDPOINTE_VERSION, true );
+		if ( $this->page_wants_apple_pay( $checkoutish ) ) {
+			self::enqueue_apple_pay();
 		}
 	}
 
@@ -71,7 +134,6 @@ final class Assets {
 			'gateways'         => Plugin::gateway_ids(),
 			'allowedCardTypes' => $card ? $card->accepted_card_types() : CardTypes::ALL,
 			'iconUrls'         => array(),
-			'applePay'         => ApplePay::is_enabled() ? ApplePay::client_config() : null,
 			'i18n'             => self::i18n(),
 		);
 		foreach ( CardTypes::ALL as $brand ) {
@@ -103,12 +165,9 @@ final class Assets {
 		if ( 'preconnect' !== $relation_type && 'dns-prefetch' !== $relation_type ) {
 			return $urls;
 		}
-		if ( ! is_checkout() && ! is_checkout_pay_page() && ! is_add_payment_method_page() ) {
-			return $urls;
-		}
-
 		$origins = array();
-		foreach ( Plugin::gateway_ids() as $gateway_id ) {
+		$ids     = is_checkout() || is_checkout_pay_page() || is_add_payment_method_page() ? Plugin::gateway_ids() : array();
+		foreach ( $ids as $gateway_id ) {
 			$gateway = Plugin::gateway( $gateway_id );
 			if ( ! $gateway || 'yes' !== $gateway->enabled ) {
 				continue;
@@ -117,6 +176,11 @@ final class Assets {
 			if ( '' !== $origin && ! in_array( $origin, $origins, true ) && ! in_array( $origin, $urls, true ) ) {
 				$origins[] = $origin;
 			}
+		}
+
+		// The SDK comes in as a dependency, so it is never "enqueued" in its own right.
+		if ( ApplePay::other_browsers() && ( wp_script_is( 'paradox-cardpointe-apple-pay', 'enqueued' ) || wp_script_is( 'paradox-cardpointe-blocks-apple-pay', 'enqueued' ) ) ) {
+			$origins[] = 'https://applepay.cdn-apple.com';
 		}
 
 		return array_merge( $urls, $origins );
@@ -134,8 +198,6 @@ final class Assets {
 			'timeout'          => __( 'The secure payment form did not respond. Please re-enter your details.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'loading'          => __( 'Loading secure payment form…', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'retryLoad'        => __( 'Reload the payment form', 'paradox-cardpointe-gateway-for-woocommerce' ),
-			'applePayFailed'   => __( 'Apple Pay could not be completed. Please try again or pay with a card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
-			'applePayValidation' => __( 'Apple Pay could not be started. Please try again or pay with a card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'detected'         => __( 'Card type: %s', 'paradox-cardpointe-gateway-for-woocommerce' ),
 			'brands'           => CardTypes::options(),
 			'errorCodes'       => array(
@@ -164,7 +226,8 @@ final class Assets {
 		$section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( 'woocommerce_page_wc-settings' === $screen_id && Plugin::is_our_gateway( $section ) ) {
 			wp_enqueue_style( 'paradox-cardpointe-admin' );
-			wp_enqueue_script( 'paradox-cardpointe-admin-settings', PARADOX_CARDPOINTE_URL . 'assets/js/admin-settings.js', array( 'jquery' ), PARADOX_CARDPOINTE_VERSION, true );
+			self::register_apple_pay();
+			wp_enqueue_script( 'paradox-cardpointe-admin-settings', PARADOX_CARDPOINTE_URL . 'assets/js/admin-settings.js', array( 'jquery', 'paradox-cardpointe-apple-pay-core' ), PARADOX_CARDPOINTE_VERSION, true );
 			wp_localize_script(
 				'paradox-cardpointe-admin-settings',
 				'paradox_cardpointe_admin',

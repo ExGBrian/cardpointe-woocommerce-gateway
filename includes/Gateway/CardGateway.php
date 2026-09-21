@@ -235,6 +235,18 @@ class CardGateway extends AbstractGateway {
 	}
 
 	/**
+	 * Only known placements may be stored. Always an array, so that deselecting
+	 * everything means "nowhere" rather than falling back to the default of everywhere.
+	 *
+	 * @param string $key   Key.
+	 * @param mixed  $value Value.
+	 */
+	public function validate_apple_pay_locations_field( $key, $value ) {
+		$value = is_array( $value ) ? array_map( 'sanitize_key', wp_unslash( $value ) ) : array();
+		return array_values( array_intersect( ApplePay::LOCATIONS, $value ) );
+	}
+
+	/**
 	 * Whitelists the button style.
 	 *
 	 * @param string $key   Key.
@@ -341,10 +353,10 @@ class CardGateway extends AbstractGateway {
 					data-networks="<?php echo esc_attr( implode( ',', ApplePay::networks( $this ) ) ); ?>"
 					hidden>
 					<p class="paradox-cardpointe-ok"><?php esc_html_e( 'Apple Pay is set up. This is the button shoppers see in the credit card box:', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
-					<button type="button" class="paradox-cardpointe-apple-pay-button is-style-<?php echo esc_attr( $style ); ?> is-type-<?php echo esc_attr( $type ); ?>" aria-label="<?php esc_attr_e( 'Test Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ); ?>" hidden></button>
+					<div class="paradox-cardpointe-apple-pay-slot" hidden></div>
 					<div class="paradox-cardpointe-apple-pay-mock is-style-<?php echo esc_attr( $style ); ?>" aria-hidden="true" hidden><?php esc_html_e( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></div>
 					<p class="description paradox-cardpointe-apple-pay-sheet-hint" hidden><?php esc_html_e( 'Click it to open the Apple Pay sheet. This is a test: nothing is sent to CardPointe and no payment is taken.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
-					<p class="description paradox-cardpointe-apple-pay-nosafari" hidden><?php esc_html_e( 'This is a preview. Browsers other than Safari cannot draw the real Apple Pay button; open this page in Safari on a device with Apple Pay to try the payment sheet.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
+					<p class="description paradox-cardpointe-apple-pay-nosafari" hidden><?php esc_html_e( 'This is a preview. This browser cannot show the real Apple Pay button: turn on "Other Browsers" above and save, or open this page in Safari on a device with Apple Pay.', 'paradox-cardpointe-gateway-for-woocommerce' ); ?></p>
 					<div id="paradox-cardpointe-apple-pay-sheet-result" class="paradox-cardpointe-test-result" aria-live="polite"></div>
 				</div>
 			</td>

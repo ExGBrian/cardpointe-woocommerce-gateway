@@ -62,6 +62,9 @@ final class PaymentSource {
 	/** @var string The wallet's own description of the card, e.g. "Visa 1234". */
 	public $wallet_display = '';
 
+	/** @var string Total the shopper approved in the wallet's payment sheet, as a decimal string. */
+	public $wallet_total = '';
+
 	/**
 	 * Builds the source from the current request for the given gateway.
 	 *
@@ -176,6 +179,7 @@ final class PaymentSource {
 		$source->wallet         = ApplePay::WALLET;
 		$source->wallet_display = function_exists( 'mb_substr' ) ? mb_substr( $display, 0, 40 ) : substr( $display, 0, 40 );
 		$source->brand          = PaymentData::brand_from_network( $network );
+		$source->wallet_total   = isset( $_POST[ $id . '_wallet_total' ] ) ? preg_replace( '/[^0-9.]/', '', (string) wp_unslash( $_POST[ $id . '_wallet_total' ] ) ) : '';
 		$source->save           = false;
 
 		if ( $tokenize ) {

@@ -7,6 +7,7 @@
 
 namespace ParadoxSolutions\CardPointe\ApplePay;
 
+use ParadoxSolutions\CardPointe\Compatibility;
 use ParadoxSolutions\CardPointe\Gateway\CardGateway;
 use ParadoxSolutions\CardPointe\Plugin;
 use ParadoxSolutions\CardPointe\Settings\Credentials;
@@ -32,6 +33,12 @@ final class ApplePay {
 	const AJAX_VALIDATE   = 'paradox_cardpointe_apple_pay_validate';
 	const NONCE_ACTION    = 'paradox_cardpointe_apple_pay';
 	const VERIFIED_OPTION = 'paradox_cardpointe_apple_pay_verified';
+
+	/** Apple's JS SDK: Apple Pay in browsers other than Safari, and the <apple-pay-button> element. */
+	const SDK_URL = 'https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js';
+
+	/** Places a button can appear. payment_box uses the checkout form; the others are express. */
+	const LOCATIONS = array( 'product', 'cart', 'checkout', 'payment_box' );
 
 	/** Where Apple looks for the domain verification file, with and without the .txt it now issues. */
 	const ASSOCIATION_PATHS = array(
@@ -121,6 +128,35 @@ final class ApplePay {
 	public static function button_type(): string {
 		$type = self::setting( 'button_type', 'plain' );
 		return in_array( $type, array( 'plain', 'buy', 'pay', 'check-out', 'order' ), true ) ? $type : 'plain';
+	}
+
+	/**
+	 * Places the merchant allows the button to appear: everywhere, until they choose.
+	 *
+	 * @return string[]
+	 */
+	public static function locations(): array {
+		$settings = Credentials::settings();
+		if ( ! isset( $settings['apple_pay_locations'] ) || ! is_array( $settings['apple_pay_locations'] ) ) {
+			return self::LOCATIONS;
+		}
+		return array_values( array_intersect( self::LOCATIONS, $settings['apple_pay_locations'] ) );
+	}
+
+	/**
+	 * Whether the button is allowed in one place.
+	 *
+	 * @param string $location One of LOCATIONS.
+	 */
+	public static function is_location_enabled( string $location ): bool {
+		return in_array( $location, self::locations(), true );
+	}
+
+	/**
+	 * Whether Apple's JS SDK is loaded so Apple Pay also works outside Safari.
+	 */
+	public static function other_browsers(): bool {
+		return 'no' !== self::setting( 'other_browsers', 'yes' );
 	}
 
 	/* ---------------------------------------------------------------------
@@ -346,7 +382,7 @@ final class ApplePay {
 	 * @return array|null
 	 */
 	public static function button_context( CardGateway $gateway ) {
-		if ( ! self::is_available( $gateway ) ) {
+		if ( ! self::is_location_enabled( 'payment_box' ) || ! self::is_available( $gateway ) ) {
 			return null;
 		}
 
@@ -379,16 +415,153 @@ final class ApplePay {
 		);
 	}
 
+	/* ---------------------------------------------------------------------
+	 * Express buttons (product page, cart, top of checkout)
+	 * ------------------------------------------------------------------ */
+
 	/**
-	 * Static configuration for the front-end script.
+	 * Whether express buttons can be offered at all on this request.
+	 *
+	 * An express order is placed from the Apple Pay sheet without the checkout form, so
+	 * there is nowhere to sign in or register: stores that forbid guest checkout only
+	 * get the button for shoppers who are already signed in.
+	 *
+	 * @param CardGateway $gateway Card gateway.
 	 */
-	public static function client_config(): array {
+	public static function express_available( CardGateway $gateway ): bool {
+		$available = self::is_configured()
+			&& $gateway->is_available()
+			&& ( is_ssl() || wc_checkout_is_https() )
+			&& ! empty( self::networks( $gateway ) )
+			&& ( is_user_logged_in() || 'yes' === get_option( 'woocommerce_enable_guest_checkout', 'yes' ) );
+
+		/**
+		 * Filters whether Apple Pay express buttons are offered.
+		 *
+		 * @param bool        $available Availability.
+		 * @param CardGateway $gateway   Gateway.
+		 */
+		return (bool) apply_filters( 'paradox_cardpointe_apple_pay_express_available', $available, $gateway );
+	}
+
+	/**
+	 * Whether a product can be bought straight from its page.
+	 *
+	 * Simple and variable products only: anything that has to keep a card on file
+	 * (subscriptions, pre-orders charged on release) cannot be paid with a wallet, and
+	 * composite types need choices the sheet cannot collect.
+	 *
+	 * @param \WC_Product $product Product.
+	 */
+	public static function product_supported( \WC_Product $product ): bool {
+		$supported = in_array( $product->get_type(), array( 'simple', 'variable' ), true )
+			&& $product->is_purchasable()
+			&& $product->is_in_stock()
+			&& (float) wc_get_price_to_display( $product ) > 0;
+
+		if ( $supported && Compatibility::has_pre_orders() && class_exists( 'WC_Pre_Orders_Product' ) && \WC_Pre_Orders_Product::product_is_charged_upon_release( $product ) ) {
+			$supported = false;
+		}
+
+		/**
+		 * Filters whether the product page button is offered for a product.
+		 *
+		 * @param bool        $supported Whether it is offered.
+		 * @param \WC_Product $product   Product.
+		 */
+		return (bool) apply_filters( 'paradox_cardpointe_apple_pay_product_supported', $supported, $product );
+	}
+
+	/**
+	 * Data for one express button, or null when it should not render.
+	 *
+	 * The amount is only the estimate the sheet opens with; the script replaces it from
+	 * the live cart as soon as the sheet is up.
+	 *
+	 * @param CardGateway      $gateway  Card gateway.
+	 * @param string           $location product|cart|checkout.
+	 * @param \WC_Product|null $product  Product, for the product page.
+	 * @return array|null
+	 */
+	public static function express_context( CardGateway $gateway, string $location, ?\WC_Product $product = null ) {
+		if ( ! self::is_location_enabled( $location ) || ! self::express_available( $gateway ) || $gateway->is_forced_save_context() ) {
+			return null;
+		}
+
+		$cart           = WC()->cart;
+		$needs_shipping = $cart ? $cart->needs_shipping() : false;
+
+		if ( 'product' === $location ) {
+			if ( ! $product || ! self::product_supported( $product ) ) {
+				return null;
+			}
+			$amount         = (float) wc_get_price_to_display( $product );
+			$needs_shipping = $needs_shipping || ( wc_shipping_enabled() && $product->needs_shipping() );
+		} else {
+			if ( ! $cart || $cart->is_empty() || ! $cart->needs_payment() ) {
+				return null;
+			}
+			$amount = (float) $cart->get_total( 'edit' );
+		}
+
+		if ( $amount <= 0 ) {
+			return null;
+		}
+
 		return array(
-			'validateUrl' => \WC_AJAX::get_endpoint( self::AJAX_VALIDATE ),
-			'checkoutUrl' => \WC_AJAX::get_endpoint( 'checkout' ),
-			'nonce'       => wp_create_nonce( self::NONCE_ACTION ),
-			'buttonStyle' => self::button_style(),
-			'buttonType'  => self::button_type(),
+			'location'       => $location,
+			'amount'         => number_format( $amount, wc_get_price_decimals(), '.', '' ),
+			'currency'       => get_woocommerce_currency(),
+			'needs_shipping' => $needs_shipping,
+			'product_id'     => $product ? $product->get_id() : 0,
+			'product_type'   => $product ? $product->get_type() : '',
+		);
+	}
+
+	/**
+	 * Configuration for apple-pay-core.js.
+	 *
+	 * @param CardGateway|null $gateway Card gateway; looked up when omitted.
+	 */
+	public static function client_config( ?CardGateway $gateway = null ): array {
+		if ( null === $gateway ) {
+			$found   = Plugin::gateway( Plugin::CARD_GATEWAY_ID );
+			$gateway = $found instanceof CardGateway ? $found : null;
+		}
+
+		return array(
+			'version'       => PARADOX_CARDPOINTE_VERSION,
+			'gateway'       => Plugin::CARD_GATEWAY_ID,
+			'validateUrl'   => \WC_AJAX::get_endpoint( self::AJAX_VALIDATE ),
+			'checkoutUrl'   => \WC_AJAX::get_endpoint( 'checkout' ),
+			'nonce'         => wp_create_nonce( self::NONCE_ACTION ),
+			'storeApiRoot'  => esc_url_raw( rest_url( 'wc/store/v1/' ) ),
+			'storeApiNonce' => wp_create_nonce( 'wc_store_api' ),
+			'loggedIn'      => is_user_logged_in(),
+			'restNonce'     => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
+			'countryCode'   => WC()->countries->get_base_country(),
+			'currencyCode'  => get_woocommerce_currency(),
+			'networks'      => $gateway ? self::networks( $gateway ) : array(),
+			'label'         => self::display_name(),
+			'buttonStyle'   => self::button_style(),
+			'buttonType'    => self::button_type(),
+			'locale'        => str_replace( '_', '-', determine_locale() ),
+			'sdk'           => self::other_browsers(),
+			'i18n'          => array(
+				'applePayLabel'         => __( 'Apple Pay', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'applePayFailed'        => __( 'Apple Pay could not be completed. Please try again or pay with a card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'applePayValidation'    => __( 'Apple Pay could not be started. Please try again or pay with a card.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'applePayUseCheckout'   => __( 'This order needs a shipping address. Please use the checkout page.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'applePayNoShipping'    => __( 'We cannot ship to this address.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'applePayChooseOptions' => __( 'Please choose the product options first.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'applePayCompleteForm'  => __( 'Please complete the checkout form first, then tap Apple Pay again.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'orCard'                => __( 'or enter your card details', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'lineSubtotal'          => __( 'Subtotal', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'lineDiscount'          => __( 'Discount', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'lineShipping'          => __( 'Shipping', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'lineFees'              => __( 'Fees', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				'lineTax'               => __( 'Tax', 'paradox-cardpointe-gateway-for-woocommerce' ),
+			),
 		);
 	}
 
@@ -400,8 +573,11 @@ final class ApplePay {
 	 * Exchanges Apple's validation URL for a merchant session (wc-ajax, shoppers need no login).
 	 */
 	public function ajax_validate_merchant() {
+		// Express buttons sit on pages that may be served from a cache, where a nonce printed
+		// into the page goes stale. They send the Store API nonce instead, which the script
+		// refreshes from every Store API response.
 		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
-		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) ) {
+		if ( ! wp_verify_nonce( $nonce, self::NONCE_ACTION ) && ! wp_verify_nonce( $nonce, 'wc_store_api' ) ) {
 			wp_send_json_error( array( 'message' => __( 'Your session has expired. Please reload the page and try again.', 'paradox-cardpointe-gateway-for-woocommerce' ) ), 403 );
 		}
 		if ( ! self::is_configured() ) {

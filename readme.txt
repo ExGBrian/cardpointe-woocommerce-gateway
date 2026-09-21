@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -34,7 +34,7 @@ Paradox CardPointe Gateway for WooCommerce, by [Paradox Solutions](https://parad
 
 **eCheck via ACH.** A separate "eCheck" payment method tokenizes routing and account numbers in the hosted iframe and processes them through the ACH network.
 
-**Apple Pay.** Shoppers using Safari on a device with Apple Pay set up can pay from the credit card box with one tap. The encrypted Apple Pay token is decrypted by CardSecure, never on your server. Available on the classic checkout, CheckoutWC and order-pay pages; the Cart & Checkout blocks are not yet supported for Apple Pay.
+**Apple Pay.** Express buttons on single product pages, the cart and the top of the checkout, plus a button inside the credit card box, each of which you can switch on or off. Works on classic pages, the Cart and Checkout blocks and CheckoutWC. In Safari the shopper pays with Touch ID or Face ID; in Chrome, Edge and Firefox they scan a code with their iPhone. Express buttons collect the address in the Apple Pay sheet and show shipping and tax as they are chosen. The encrypted Apple Pay token is decrypted by CardSecure, never on your server.
 
 **Save cards on file.** Customers can save cards and bank accounts for faster checkout. Details are stored in CardPointe profiles in the CardSecure vault, never on your site.
 
@@ -80,6 +80,16 @@ CardPointe can only void unsettled transactions in full. Partial refunds work af
 
 Yes. Define `PARADOX_CARDPOINTE_PRODUCTION_API_PASSWORD` and/or `PARADOX_CARDPOINTE_SANDBOX_API_PASSWORD` in wp-config.php.
 
+= Where does the Apple Pay button appear? =
+
+Wherever you allow it under "Allow Apple Pay on": single products (simple and variable), the cart, the top of the checkout, and inside the credit card box. The first three are express buttons: the Apple Pay sheet collects the contact details and address, shipping methods and tax update as the shopper chooses, and the order is placed straight from the sheet. On a product page the item is added to the cart first, so anything already in the cart is part of the order and is listed in the sheet; if the shopper cancels, the cart is put back as it was. The button inside the credit card box uses the address already entered on the checkout form.
+
+Apple Pay is not offered when the order has to keep a card on file (subscriptions, pre-orders charged on release), and express buttons are hidden from signed-out shoppers on stores that do not allow guest checkout.
+
+= Does Apple Pay work in Chrome? =
+
+Yes, with "Other Browsers" switched on. Outside Safari, Apple shows a code that the shopper scans with an iPhone running iOS 18 or later and approves there. This uses Apple's JavaScript SDK, which is then loaded from Apple on the pages that show a button. With the setting off, the button only appears in Safari and nothing is loaded from Apple.
+
 = How do I set up Apple Pay? =
 
 1. Email integrationdelivery@fiserv.com and ask for an Apple Pay Payment Processing Certificate CSR for your merchant ID (allow up to 5 business days). In the Apple Developer portal, create a Merchant ID, create a Payment Processing Certificate from that CSR, and send the resulting .cer file back to your Fiserv representative. This is what lets CardSecure decrypt Apple Pay payments.
@@ -116,10 +126,23 @@ CardPointe developer documentation: https://developer.cardpointe.com/
 
 When a shopper taps the Apple Pay button, and when an administrator runs the setup check on the settings screen. Safari (or, for the setup check, Apple's standard endpoint) gives the store a one-time validation URL and your server calls it to prove the store's identity to Apple, sending your Apple merchant identifier, the store name shown on the payment sheet and this site's domain, authenticated with your merchant identity certificate. No cart, customer or card data is included. The Apple Pay sheet itself is part of Safari; this plugin loads no script from Apple. The encrypted token Apple returns is sent to CardSecure (service 2 above) to be decrypted and tokenized.
 
+**4. Apple Pay JS SDK** (`https://applepay.cdn-apple.com/jsapi/1.latest/apple-pay-sdk.js`)
+
+Only when Apple Pay is enabled with "Other Browsers" switched on. The script is loaded by the shopper's browser from Apple on pages that show an Apple Pay button (single products, cart and checkout, according to your settings) and on the plugin's settings screen. It draws the Apple Pay button and, in browsers other than Safari, shows the code the shopper scans with their iPhone and talks to Apple to complete that hand-off. As with any script loaded from a third party, Apple receives the shopper's IP address and browser details. The plugin itself sends Apple nothing beyond the merchant validation described above.
+
 Apple Pay on the web terms: https://developer.apple.com/apple-pay/acceptable-use-guidelines-for-websites/
 Apple privacy policy: https://www.apple.com/legal/privacy/
 
 == Changelog ==
+
+= 1.2.0 =
+* Apple Pay express buttons on single product pages (simple and variable products), the cart and the top of the checkout. The Apple Pay sheet collects the contact details and address, and shipping methods, shipping cost and tax update live as the shopper chooses. Runs on the WooCommerce Store API, so it works the same on classic pages, the Cart and Checkout blocks and CheckoutWC (in its express area).
+* Apple Pay on the Checkout block: an express button in the block's express area, and a button inside the credit card form that uses the address already entered.
+* Apple Pay in Chrome, Edge and Firefox: with "Other Browsers" on, Apple's JS SDK is loaded and shoppers pay by scanning a code with an iPhone (iOS 18 or later). Buttons are drawn with Apple's own button element.
+* New "Allow Apple Pay on" setting to switch each placement on or off (single products, cart, checkout express, credit card box), and an "Other Browsers" setting.
+* The amount approved in the Apple Pay sheet is sent with the payment and the order is refused, uncharged, if its total differs.
+* Merchant validation accepts the Store API nonce, so express buttons keep working on product pages served from a page cache.
+* The setup check's test button on the settings screen is now the real Apple Pay button in every browser when "Other Browsers" is on.
 
 = 1.1.1 =
 * Apple Pay settings now have their own tab, laid out as Apple Pay and Connection Settings.
@@ -146,6 +169,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Apple Pay express buttons for product pages, cart and checkout, Checkout block support, and Apple Pay in Chrome. New buttons are on by default; choose where they appear under Apple Pay > Allow Apple Pay on.
 
 = 1.1.1 =
 Simpler Apple Pay setup: one PEM file with an upload button, a setup check against Apple and a test button. If you used a separate private key file, combine it with the certificate into one PEM and upload it.

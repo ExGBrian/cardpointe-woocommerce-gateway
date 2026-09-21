@@ -38,6 +38,15 @@ abstract class AbstractBlocksMethod extends AbstractPaymentMethodType {
 	abstract protected function extra_data( AbstractGateway $gateway ): array;
 
 	/**
+	 * Script handles the block client depends on.
+	 *
+	 * @return string[]
+	 */
+	protected function script_dependencies(): array {
+		return array( 'wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities', 'wp-i18n', 'paradox-cardpointe-tokenizer' );
+	}
+
+	/**
 	 * Loads settings.
 	 */
 	public function initialize() {
@@ -73,7 +82,7 @@ abstract class AbstractBlocksMethod extends AbstractPaymentMethodType {
 			wp_register_script(
 				$handle,
 				PARADOX_CARDPOINTE_URL . 'assets/js/' . $this->script_file(),
-				array( 'wc-blocks-registry', 'wc-settings', 'wp-element', 'wp-html-entities', 'wp-i18n', 'paradox-cardpointe-tokenizer' ),
+				$this->script_dependencies(),
 				PARADOX_CARDPOINTE_VERSION,
 				true
 			);
