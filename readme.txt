@@ -4,7 +4,7 @@ Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -135,6 +135,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 
 == Changelog ==
 
+= 1.2.3 =
+* Fixed Apple Pay express buttons showing the wrong total (for example one item's price when the cart held two) on sites behind a page cache that caches the REST API, such as LiteSpeed Cache with "Cache REST API" on. The cache was answering the plugin's read of the cart with an old copy, sometimes another shopper's. Reads of the cart are now made uncacheable. No wrong amount was ever charged: the plugin refuses a payment whose order total differs from the amount approved in the Apple Pay sheet.
+
 = 1.2.2 =
 * Fixed Apple Pay payments being refused by CardSecure with "Decryption failure". The token sent to CardSecure left out the echash parameter when the payment carried no application data; CardPointe requires it to be present, even when empty, whenever ecpublickeyhash is sent.
 * When CardSecure cannot decrypt an Apple Pay token, the log now records which CardSecure host was used and the hash identifying the Payment Processing Certificate Apple encrypted to, so Fiserv can confirm whether it holds the matching key.
@@ -178,6 +181,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+Fixes Apple Pay express buttons showing a wrong total on sites whose page cache also caches the REST API (LiteSpeed Cache does by default).
 
 = 1.2.2 =
 Fixes Apple Pay payments failing with a CardSecure decryption error.

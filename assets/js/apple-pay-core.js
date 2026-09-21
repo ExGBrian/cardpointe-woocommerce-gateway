@@ -376,6 +376,12 @@
 	/**
 	 * Minimal Store API client. Every response carries a fresh nonce, which is kept for
 	 * the next call, so a nonce baked into a cached product page never gets in the way.
+	 *
+	 * Reads are made uncacheable. Page caches (LiteSpeed's "Cache REST API" is on by
+	 * default) will store GET /cart and replay it, ignoring the no-store header
+	 * WooCommerce sends: to the same shopper after their cart has changed, and to other
+	 * shoppers altogether. The payment sheet then shows a total that is not the cart's.
+	 * A unique query string makes every read a cache miss; writes are never cached.
 	 */
 	function storeApi() {
 		var nonce = config.storeApiNonce || '';
@@ -394,9 +400,14 @@
 			if ( config.loggedIn && config.restNonce ) {
 				headers[ 'X-WP-Nonce' ] = config.restNonce;
 			}
-			return window.fetch( String( config.storeApiRoot || '' ) + path, {
+			var url = String( config.storeApiRoot || '' ) + path;
+			if ( method === 'GET' ) {
+				url += ( url.indexOf( '?' ) === -1 ? '?' : '&' ) + '_=' + Date.now() + Math.floor( Math.random() * 1000 );
+			}
+			return window.fetch( url, {
 				method: method,
 				credentials: 'same-origin',
+				cache: 'no-store',
 				headers: headers,
 				body: body ? JSON.stringify( body ) : undefined
 			} ).then( function ( response ) {
