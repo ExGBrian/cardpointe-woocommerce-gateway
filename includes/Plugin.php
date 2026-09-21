@@ -76,6 +76,7 @@ final class Plugin {
 
 		new Frontend\Assets();
 		new ApplePay\ApplePay();
+		new ApplePay\ExpressButtons();
 		new Tokens\TokenManager();
 		new Gateway\Receipt();
 

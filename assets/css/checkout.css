@@ -36,12 +36,63 @@
 	text-decoration: underline;
 	cursor: pointer;
 }
-/* Apple Pay: rendered hidden by PHP, revealed by one class on <html> once Safari confirms support. */
-.paradox-cardpointe-apple-pay {
+/* Apple Pay. PHP prints hidden containers with an empty slot; the script fills the slot and
+   reveals the container once the browser can use Apple Pay. */
+.paradox-cardpointe-apple-pay,
+.paradox-cardpointe-apple-pay-express {
 	margin: 0 0 14px;
 }
-html.paradox-cardpointe-apple-pay-available .paradox-cardpointe-apple-pay[hidden] {
+.paradox-cardpointe-apple-pay[hidden],
+.paradox-cardpointe-apple-pay-express[hidden],
+.paradox-cardpointe-apple-pay-message[hidden] {
+	display: none;
+}
+.paradox-cardpointe-apple-pay-express.is-product {
+	margin: 14px 0 0;
+	max-width: 420px;
+}
+.paradox-cardpointe-apple-pay-express.is-cart {
+	margin: 0 0 12px;
+}
+.paradox-cardpointe-apple-pay-message {
+	margin: 8px 0 0;
+}
+.paradox-cardpointe-apple-pay-slot {
 	display: block;
+	width: 100%;
+	min-height: 44px;
+}
+/* Apple's own element (present when the SDK is loaded) is sized through these properties. */
+.paradox-cardpointe-apple-pay-slot apple-pay-button {
+	--apple-pay-button-width: 100%;
+	--apple-pay-button-height: 44px;
+	--apple-pay-button-border-radius: 6px;
+	--apple-pay-button-padding: 0 0;
+	--apple-pay-button-box-sizing: border-box;
+	display: block;
+	width: 100%;
+	cursor: pointer;
+}
+/* Stand-in for places that cannot draw the real button (the block editor). */
+.paradox-cardpointe-apple-pay-mock {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 44px;
+	border-radius: 6px;
+	background: #000;
+	color: #fff;
+	font: 600 17px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	cursor: default;
+	user-select: none;
+}
+.paradox-cardpointe-apple-pay-mock.is-style-white,
+.paradox-cardpointe-apple-pay-mock.is-style-white-outline {
+	background: #fff;
+	color: #000;
+}
+.paradox-cardpointe-apple-pay-mock.is-style-white-outline {
+	border: 1px solid #000;
 }
 .paradox-cardpointe-apple-pay-button {
 	display: block;

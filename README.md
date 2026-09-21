@@ -15,7 +15,7 @@ Card and bank account details are entered in CardPointe's Hosted iFrame Tokenize
 - Full and partial refunds from the WooCommerce order screen (voids unsettled transactions automatically)
 - Optional gateway receipts on order pages and emails
 - Redacted request/response logging
-- Apple Pay in the credit card box on the classic checkout, CheckoutWC and order-pay pages; the encrypted token is decrypted by CardSecure, never on the server
+- Apple Pay: express buttons on product pages, cart and checkout plus a button in the credit card box, each toggleable; classic pages, Cart/Checkout blocks and CheckoutWC; Safari natively and Chrome/Edge/Firefox via Apple's SDK; tokens are decrypted by CardSecure, never on the server
 - Saved cards and bank accounts backed by CardPointe profiles
 - WooCommerce Subscriptions and WooCommerce Pre-Orders support
 - eCheck (ACH) as a separate payment method

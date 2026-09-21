@@ -77,6 +77,9 @@ final class PaymentProcessor {
 		if ( $source->is_wallet() && ( $pre_order_vault || (float) $order->get_total() <= 0 ) ) {
 			throw new PaymentException( self::wallet_vault_message() );
 		}
+		if ( $source->is_wallet() ) {
+			$this->assert_wallet_total( $order, $source );
+		}
 
 		if ( $pre_order_vault ) {
 			return $this->process_pre_order( $order, $source );
@@ -666,6 +669,45 @@ final class PaymentProcessor {
 	/* ---------------------------------------------------------------------
 	 * Helpers
 	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Refuses to charge any amount other than the one approved in the wallet's payment sheet.
+	 *
+	 * The sheet shows a total and the shopper authorizes that figure. If the order total
+	 * has moved since (a fee tied to the payment method, tax recalculated once the full
+	 * billing address is known), charging the new total is not what they agreed to.
+	 *
+	 * @param \WC_Order     $order  Order.
+	 * @param PaymentSource $source Wallet source.
+	 *
+	 * @throws PaymentException When the totals differ.
+	 */
+	private function assert_wallet_total( \WC_Order $order, PaymentSource $source ) {
+		if ( '' === $source->wallet_total ) {
+			return;
+		}
+		/**
+		 * Filters how far the order total may differ from the approved total. Negative disables the check.
+		 *
+		 * @param float         $tolerance Allowed difference.
+		 * @param \WC_Order     $order     Order.
+		 * @param PaymentSource $source    Source.
+		 */
+		$tolerance = (float) apply_filters( 'paradox_cardpointe_wallet_total_tolerance', 0.009, $order, $source );
+		if ( $tolerance < 0 || abs( (float) $source->wallet_total - (float) $order->get_total() ) <= $tolerance ) {
+			return;
+		}
+
+		$this->logger->warning( 'Wallet total does not match the order total', array( 'order_id' => $order->get_id(), 'approved' => $source->wallet_total, 'order_total' => $order->get_total() ) );
+
+		throw new PaymentException(
+			sprintf(
+				/* translators: %s: order total */
+				__( 'The order total is now %s, which is not the amount approved in Apple Pay, so nothing was charged. Please try again.', 'paradox-cardpointe-gateway-for-woocommerce' ),
+				html_entity_decode( wp_strip_all_tags( wc_price( (float) $order->get_total(), array( 'currency' => $order->get_currency() ) ) ), ENT_QUOTES, 'UTF-8' )
+			)
+		);
+	}
 
 	/**
 	 * Why a wallet payment is refused wherever the method would have to be charged again.

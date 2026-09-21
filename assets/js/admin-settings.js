@@ -139,31 +139,37 @@
 	/**
 	 * Keeps the test button and preview in step with the style and label selects.
 	 */
+	var core = window.ParadoxCardPointeApplePay;
+
+	function canUseApplePay() {
+		return !! ( core && core.supported() );
+	}
+
+	/**
+	 * (Re)draws the test button in the currently selected style and label, through the
+	 * same code the storefront uses: Apple's own element when the SDK is loaded (any
+	 * browser), the CSS button in Safari without it.
+	 */
 	function syncButtonLook() {
 		var style = field( 'apple_pay_button_style' ).val() || 'black';
 		var type = field( 'apple_pay_button_type' ).val() || 'plain';
 		var $preview = $( '#paradox-cardpointe-apple-pay-preview' );
-		$preview.find( '.paradox-cardpointe-apple-pay-button' ).attr( 'class', 'paradox-cardpointe-apple-pay-button is-style-' + style + ' is-type-' + type );
+		var slot = $preview.find( '.paradox-cardpointe-apple-pay-slot' ).get( 0 );
 		$preview.find( '.paradox-cardpointe-apple-pay-mock' ).attr( 'class', 'paradox-cardpointe-apple-pay-mock is-style-' + style );
-	}
-
-	function canUseApplePay() {
-		var Session = window.ApplePaySession;
-		try {
-			return !! ( Session && Session.canMakePayments && Session.canMakePayments() );
-		} catch ( e ) {
-			return false;
+		if ( slot && canUseApplePay() ) {
+			slot.removeAttribute( 'data-mounted' );
+			core.mountButton( slot, { style: style, type: type, onClick: openTestSheet } );
 		}
 	}
 
 	/**
-	 * Reveals the test button: the real one in Safari, a labelled preview elsewhere.
+	 * Reveals the test button: the real one where Apple Pay can run, a labelled preview elsewhere.
 	 */
 	function showPreview() {
 		var $preview = $( '#paradox-cardpointe-apple-pay-preview' );
 		var live = canUseApplePay();
 		$preview.prop( 'hidden', false );
-		$preview.find( '.paradox-cardpointe-apple-pay-button, .paradox-cardpointe-apple-pay-sheet-hint' ).prop( 'hidden', ! live );
+		$preview.find( '.paradox-cardpointe-apple-pay-slot, .paradox-cardpointe-apple-pay-sheet-hint' ).prop( 'hidden', ! live );
 		$preview.find( '.paradox-cardpointe-apple-pay-mock, .paradox-cardpointe-apple-pay-nosafari' ).prop( 'hidden', live );
 		syncButtonLook();
 	}
@@ -295,15 +301,10 @@
 	 * through the same server code as checkout; an authorized test is acknowledged to
 	 * the sheet and then dropped, so no token ever reaches CardPointe.
 	 */
-	function initSheetTest() {
+	function openTestSheet() {
 		var $preview = $( '#paradox-cardpointe-apple-pay-preview' );
 		var $result = $( '#paradox-cardpointe-apple-pay-sheet-result' );
-		if ( ! $preview.length ) {
-			return;
-		}
-
-		$preview.on( 'click', '.paradox-cardpointe-apple-pay-button', function ( event ) {
-			event.preventDefault();
+		( function () {
 			var Session = window.ApplePaySession;
 			if ( ! canUseApplePay() ) {
 				return;
@@ -360,7 +361,7 @@
 			};
 
 			session.begin();
-		} );
+		} )();
 	}
 
 	$( function () {
@@ -403,7 +404,6 @@
 		initTabs();
 		initUpload();
 		initTest();
-		initSheetTest();
 
 		field( 'apple_pay_button_style' ).add( field( 'apple_pay_button_type' ) ).on( 'change', syncButtonLook );
 		if ( $( '#paradox-cardpointe-apple-pay-preview' ).data( 'verified' ) ) {

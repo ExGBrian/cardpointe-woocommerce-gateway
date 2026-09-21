@@ -19,6 +19,12 @@
 	var i18n = settings.i18n || {};
 	var NAME = settings.name || 'paradox_cardpointe';
 
+	// Apple Pay inside the card form: the address is already on the checkout form, so the
+	// wallet token is simply what gets submitted instead of a card token.
+	var applePay = window.ParadoxCardPointeApplePay;
+	var applePayBox = !! ( applePay && settings.applePay && settings.applePay.paymentBox && applePay.supported() );
+	var applePayText = ( applePay && applePay.config && applePay.config.i18n ) || {};
+
 	function sprintf( text, value ) {
 		return String( text || '' ).replace( '%s', value );
 	}
@@ -62,6 +68,118 @@
 		var readyState = useState( false );
 		var ready = readyState[ 0 ];
 		var setReady = readyState[ 1 ];
+		var appleSlotRef = useRef( null );
+		var appleSessionRef = useRef( null );
+		var walletRef = useRef( null );
+		var propsRef = useRef( props );
+		propsRef.current = props;
+
+		/**
+		 * Tells the open sheet how it went and forgets the wallet token (it is single-use).
+		 */
+		function finishApplePay( ok, message ) {
+			var session = appleSessionRef.current;
+			appleSessionRef.current = null;
+			walletRef.current = null;
+			if ( session ) {
+				applePay.complete( session, ok, message );
+			}
+		}
+
+		/**
+		 * If the checkout form does not validate, the block never starts processing and
+		 * neither a success nor a failure event follows; without this the sheet would sit
+		 * there until Apple times it out.
+		 */
+		function settleIfIdle( attempts ) {
+			if ( ! appleSessionRef.current ) {
+				return;
+			}
+			var idle = false;
+			try {
+				var checkout = window.wp.data.select( 'wc/store/checkout' );
+				idle = !! ( checkout && checkout.isIdle && checkout.isIdle() );
+			} catch ( e ) {
+				idle = false;
+			}
+			if ( idle ) {
+				finishApplePay( false, applePayText.applePayCompleteForm );
+				setError( applePayText.applePayCompleteForm );
+				return;
+			}
+			if ( attempts < 24 ) {
+				window.setTimeout( function () {
+					settleIfIdle( attempts + 1 );
+				}, 1000 );
+			}
+		}
+
+		function startApplePay() {
+			var current = propsRef.current;
+			try {
+				var validation = window.wp.data.select( 'wc/store/validation' );
+				if ( validation && validation.hasValidationErrors && validation.hasValidationErrors() ) {
+					window.wp.data.dispatch( 'wc/store/validation' ).showAllValidationErrors();
+					setError( applePayText.applePayCompleteForm );
+					return;
+				}
+			} catch ( e ) {
+				// No validation store: let the checkout itself report what is missing.
+			}
+
+			var billing = current.billing || {};
+			var total = billing.cartTotal || {};
+			var currency = billing.currency || {};
+			var minor = typeof currency.minorUnit === 'number' ? currency.minorUnit : 2;
+			var amount = applePay.minorToDecimal( total.value, minor );
+			var session;
+
+			try {
+				session = applePay.createSession( applePay.baseRequest( { amount: amount, currency: currency.code } ) );
+			} catch ( e ) {
+				setError( applePayText.applePayFailed );
+				return;
+			}
+			setError( '' );
+
+			session.onvalidatemerchant = function ( event ) {
+				applePay.validateMerchant( event.validationURL ).then( function ( merchantSession ) {
+					session.completeMerchantValidation( merchantSession );
+				} ).catch( function () {
+					try {
+						session.abort();
+					} catch ( e ) {
+						// The sheet may already be gone.
+					}
+					setError( applePayText.applePayValidation );
+				} );
+			};
+
+			session.onpaymentauthorized = function ( event ) {
+				walletRef.current = { wallet: applePay.walletFromPayment( event.payment ), total: amount };
+				appleSessionRef.current = session;
+				current.onSubmit();
+				window.setTimeout( function () {
+					settleIfIdle( 0 );
+				}, 2500 );
+			};
+
+			session.oncancel = function () {
+				appleSessionRef.current = null;
+				walletRef.current = null;
+			};
+
+			session.begin();
+		}
+
+		// Put the Apple Pay button into its slot once.
+		useEffect( function () {
+			if ( ! applePayBox || ! appleSlotRef.current ) {
+				return undefined;
+			}
+			applePay.mountButton( appleSlotRef.current, { onClick: startApplePay } );
+			return undefined;
+		}, [] );
 
 		// Mount the iframe once; it stays mounted across re-renders.
 		useEffect( function () {
@@ -113,6 +231,16 @@
 				var current = stateRef.current;
 				var instance = instanceRef.current;
 
+				// An authorized Apple Pay sheet is waiting: submit its token, not a card's.
+				if ( walletRef.current && applePay ) {
+					return {
+						type: emitResponse.responseTypes.SUCCESS,
+						meta: {
+							paymentMethodData: applePay.walletFields( walletRef.current.wallet, walletRef.current.total )
+						}
+					};
+				}
+
 				function success( state ) {
 					return {
 						type: emitResponse.responseTypes.SUCCESS,
@@ -157,11 +285,23 @@
 				return undefined;
 			}
 			return eventRegistration.onCheckoutFail( function () {
+				finishApplePay( false );
 				stateRef.current = { token: '', expiry: '', brand: '' };
 				setBrand( '' );
 				if ( instanceRef.current ) {
 					instanceRef.current.reload();
 				}
+				return true;
+			} );
+		}, [ eventRegistration ] );
+
+		// The order went through: let the Apple Pay sheet close on a tick rather than a cross.
+		useEffect( function () {
+			if ( ! eventRegistration || ! eventRegistration.onCheckoutSuccess ) {
+				return undefined;
+			}
+			return eventRegistration.onCheckoutSuccess( function () {
+				finishApplePay( true );
 				return true;
 			} );
 		}, [ eventRegistration ] );
@@ -175,6 +315,16 @@
 		}
 		if ( error ) {
 			children.push( el( 'div', { key: 'error', className: 'paradox-cardpointe-errors wc-block-components-notice-banner is-error', role: 'alert' }, error ) );
+		}
+		if ( applePayBox ) {
+			children.push(
+				el(
+					'div',
+					{ key: 'applepay', className: 'paradox-cardpointe-apple-pay' },
+					el( 'div', { className: 'paradox-cardpointe-apple-pay-slot', ref: appleSlotRef } ),
+					el( 'p', { className: 'paradox-cardpointe-apple-pay-divider' }, el( 'span', null, applePayText.orCard ) )
+				)
+			);
 		}
 		children.push(
 			el(

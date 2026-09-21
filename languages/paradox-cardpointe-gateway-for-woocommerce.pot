@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-3.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Paradox CardPointe Gateway for WooCommerce 1.1.1\n"
+"Project-Id-Version: Paradox CardPointe Gateway for WooCommerce 1.2.0\n"
 "Report-Msgid-Bugs-To: https://paradoxsolutions.io\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -120,10 +120,10 @@ msgid "Wallet"
 msgstr ""
 
 #: includes/Admin/OrderActions.php:129
-#: includes/Frontend/Assets.php:176
-#: includes/Gateway/CardGateway.php:345
-#: includes/Gateway/PaymentProcessor.php:450
-#: includes/Settings/FormFields.php:353
+#: includes/ApplePay/ApplePay.php:551
+#: includes/Frontend/Assets.php:239
+#: includes/Gateway/CardGateway.php:357
+#: includes/Gateway/PaymentProcessor.php:453
 msgid "Apple Pay"
 msgstr ""
 
@@ -269,7 +269,7 @@ msgstr ""
 
 #. translators: 1: merchant ID in the certificate, 2: merchant ID entered
 #: includes/Admin/SettingsUi.php:209
-#: includes/ApplePay/ApplePay.php:179
+#: includes/ApplePay/ApplePay.php:215
 msgid "The certificate was issued for %1$s but the Apple Merchant ID entered is %2$s. They must be the same."
 msgstr ""
 
@@ -324,37 +324,86 @@ msgstr ""
 msgid "Unknown gateway response"
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:160
+#: includes/ApplePay/ApplePay.php:196
 msgid "Apple Pay is not switched on for shoppers yet (\"Accept Apple Pay\"). You can still test the setup first."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:163
+#: includes/ApplePay/ApplePay.php:199
 #: includes/ApplePay/MerchantValidator.php:78
 msgid "The Apple Merchant ID is empty."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:166
+#: includes/ApplePay/ApplePay.php:202
 msgid "PHP cURL is not available. It is needed to present the certificate to Apple; ask your host to enable it."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:169
+#: includes/ApplePay/ApplePay.php:205
 msgid "This site is not served over HTTPS. Apple Pay only works on HTTPS pages, in sandbox mode too."
 msgstr ""
 
 #. translators: 1: folder path, 2: URL
-#: includes/ApplePay/ApplePay.php:188
+#: includes/ApplePay/ApplePay.php:224
 msgid "Apple's domain verification file was not found in %1$s. Apple has to be able to load it from %2$s to verify this domain. If the domain already shows as verified in the Apple Developer portal, you can ignore this."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:405
+#: includes/ApplePay/ApplePay.php:552
+msgid "Apple Pay could not be completed. Please try again or pay with a card."
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:553
+msgid "Apple Pay could not be started. Please try again or pay with a card."
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:554
+msgid "This order needs a shipping address. Please use the checkout page."
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:555
+msgid "We cannot ship to this address."
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:556
+msgid "Please choose the product options first."
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:557
+msgid "Please complete the checkout form first, then tap Apple Pay again."
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:558
+#: templates/checkout/card-fields.php:38
+msgid "or enter your card details"
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:559
+msgid "Subtotal"
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:560
+msgid "Discount"
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:561
+msgid "Shipping"
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:562
+msgid "Fees"
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:563
+msgid "Tax"
+msgstr ""
+
+#: includes/ApplePay/ApplePay.php:581
 msgid "Your session has expired. Please reload the page and try again."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:408
+#: includes/ApplePay/ApplePay.php:584
 msgid "Apple Pay is not configured on this store."
 msgstr ""
 
-#: includes/ApplePay/ApplePay.php:417
+#: includes/ApplePay/ApplePay.php:593
 msgid "Apple Pay could not be started. Please try again or pay another way."
 msgstr ""
 
@@ -425,6 +474,10 @@ msgstr ""
 msgid "The certificate could not be saved: neither the folder above the web root nor the uploads folder is writable. Place the file on the server yourself and enter its path."
 msgstr ""
 
+#: includes/ApplePay/ExpressButtons.php:117
+msgid "or"
+msgstr ""
+
 #: includes/ApplePay/MerchantValidator.php:68
 msgid "The validation URL is not an Apple Pay gateway host."
 msgstr ""
@@ -473,7 +526,7 @@ msgstr ""
 msgid "The server could not reach apple-pay-gateway.apple.com on port 443. Ask your host whether outbound connections are blocked by a firewall."
 msgstr ""
 
-#: includes/Blocks/AbstractBlocksMethod.php:115
+#: includes/Blocks/AbstractBlocksMethod.php:124
 #: includes/Gateway/AbstractGateway.php:238
 msgid "SANDBOX MODE: no real payments are processed."
 msgstr ""
@@ -512,210 +565,202 @@ msgstr ""
 msgid "CardPointe Payment Gateway requires an HTTP transport with SSL support (cURL with OpenSSL) to talk to the CardPointe API."
 msgstr ""
 
-#: includes/Frontend/Assets.php:127
-#: includes/Gateway/PaymentSource.php:100
+#: includes/Frontend/Assets.php:191
+#: includes/Gateway/PaymentSource.php:103
 msgid "Please enter your card details."
 msgstr ""
 
-#: includes/Frontend/Assets.php:128
-#: includes/Gateway/PaymentSource.php:101
+#: includes/Frontend/Assets.php:192
+#: includes/Gateway/PaymentSource.php:104
 msgid "Please enter your bank routing and account numbers."
 msgstr ""
 
-#: includes/Frontend/Assets.php:129
+#: includes/Frontend/Assets.php:193
 msgid "The card details are not valid. Please check them and try again."
 msgstr ""
 
-#: includes/Frontend/Assets.php:130
+#: includes/Frontend/Assets.php:194
 msgid "Enter your routing number, a slash, then your account number (for example 123456789/000123456)."
 msgstr ""
 
-#: includes/Frontend/Assets.php:131
+#: includes/Frontend/Assets.php:195
 msgid "%s cards are not accepted."
 msgstr ""
 
-#: includes/Frontend/Assets.php:132
-#: includes/Gateway/PaymentSource.php:127
+#: includes/Frontend/Assets.php:196
+#: includes/Gateway/PaymentSource.php:130
 msgid "Please choose your bank account type."
 msgstr ""
 
-#: includes/Frontend/Assets.php:133
-#: includes/Gateway/PaymentSource.php:131
+#: includes/Frontend/Assets.php:197
+#: includes/Gateway/PaymentSource.php:134
 msgid "Please authorize the bank account debit to continue."
 msgstr ""
 
-#: includes/Frontend/Assets.php:134
+#: includes/Frontend/Assets.php:198
 msgid "The secure payment form did not respond. Please re-enter your details."
 msgstr ""
 
-#: includes/Frontend/Assets.php:135
-#: templates/checkout/card-fields.php:51
+#: includes/Frontend/Assets.php:199
+#: templates/checkout/card-fields.php:48
 #: templates/checkout/echeck-fields.php:52
 msgid "Loading secure payment form…"
 msgstr ""
 
-#: includes/Frontend/Assets.php:136
+#: includes/Frontend/Assets.php:200
 msgid "Reload the payment form"
 msgstr ""
 
-#: includes/Frontend/Assets.php:137
-msgid "Apple Pay could not be completed. Please try again or pay with a card."
-msgstr ""
-
-#: includes/Frontend/Assets.php:138
-msgid "Apple Pay could not be started. Please try again or pay with a card."
-msgstr ""
-
-#: includes/Frontend/Assets.php:139
+#: includes/Frontend/Assets.php:201
 msgid "Card type: %s"
 msgstr ""
 
-#: includes/Frontend/Assets.php:142
+#: includes/Frontend/Assets.php:204
 msgid "Invalid account number."
 msgstr ""
 
-#: includes/Frontend/Assets.php:143
+#: includes/Frontend/Assets.php:205
 msgid "Invalid security code."
 msgstr ""
 
-#: includes/Frontend/Assets.php:144
+#: includes/Frontend/Assets.php:206
 msgid "Invalid expiration date."
 msgstr ""
 
-#: includes/Frontend/Assets.php:145
+#: includes/Frontend/Assets.php:207
 msgid "Card number is required."
 msgstr ""
 
-#: includes/Frontend/Assets.php:146
+#: includes/Frontend/Assets.php:208
 msgid "Security code is required."
 msgstr ""
 
-#: includes/Frontend/Assets.php:147
+#: includes/Frontend/Assets.php:209
 msgid "Expiration date is required."
 msgstr ""
 
-#: includes/Frontend/Assets.php:175
+#: includes/Frontend/Assets.php:238
 msgid "General"
 msgstr ""
 
-#: includes/Frontend/Assets.php:177
+#: includes/Frontend/Assets.php:240
 msgid "Checking and saving the certificate…"
 msgstr ""
 
-#: includes/Frontend/Assets.php:178
+#: includes/Frontend/Assets.php:241
 msgid "The upload failed. Please try again."
 msgstr ""
 
-#: includes/Frontend/Assets.php:179
-#: includes/Gateway/CardGateway.php:367
+#: includes/Frontend/Assets.php:242
+#: includes/Gateway/CardGateway.php:379
 msgid "Certificate and private key found, and they belong together."
 msgstr ""
 
 #. translators: %s: date
-#: includes/Frontend/Assets.php:181
-#: includes/Gateway/CardGateway.php:373
+#: includes/Frontend/Assets.php:244
+#: includes/Gateway/CardGateway.php:385
 msgid "Valid until %s."
 msgstr ""
 
 #. translators: %s: date
-#: includes/Frontend/Assets.php:182
+#: includes/Frontend/Assets.php:245
 msgid "The Apple Merchant ID was read from the certificate."
 msgstr ""
 
 #. translators: %s: date
-#: includes/Frontend/Assets.php:183
+#: includes/Frontend/Assets.php:246
 msgid "Asking Apple for a merchant session…"
 msgstr ""
 
-#: includes/Frontend/Assets.php:184
+#: includes/Frontend/Assets.php:247
 msgid "Apple Pay is not set up yet:"
 msgstr ""
 
-#: includes/Frontend/Assets.php:185
+#: includes/Frontend/Assets.php:248
 msgid "The request to this site failed. Please reload the page and try again."
 msgstr ""
 
-#: includes/Frontend/Assets.php:186
+#: includes/Frontend/Assets.php:249
 msgid "Test (not charged)"
 msgstr ""
 
-#: includes/Frontend/Assets.php:187
+#: includes/Frontend/Assets.php:250
 msgid "The Apple Pay sheet completed. This was a test: nothing was sent to CardPointe and no payment was taken."
 msgstr ""
 
-#: includes/Frontend/Assets.php:188
+#: includes/Frontend/Assets.php:251
 msgid "Apple opened the payment sheet, so merchant validation works from Safari too. You can cancel it, or authorize to finish the test; nothing is charged."
 msgstr ""
 
-#: includes/Frontend/Assets.php:189
+#: includes/Frontend/Assets.php:252
 msgid "The Apple Pay sheet could not be opened:"
 msgstr ""
 
-#: includes/Frontend/Assets.php:192
+#: includes/Frontend/Assets.php:255
 msgid "Testing connection…"
 msgstr ""
 
-#: includes/Frontend/Assets.php:193
+#: includes/Frontend/Assets.php:256
 msgid "Connected."
 msgstr ""
 
-#: includes/Frontend/Assets.php:194
+#: includes/Frontend/Assets.php:257
 msgid "Connection failed."
 msgstr ""
 
-#: includes/Frontend/Assets.php:195
+#: includes/Frontend/Assets.php:258
 msgid "Yes"
 msgstr ""
 
-#: includes/Frontend/Assets.php:196
+#: includes/Frontend/Assets.php:259
 msgid "No"
 msgstr ""
 
-#: includes/Frontend/Assets.php:198
+#: includes/Frontend/Assets.php:261
 msgid "Host"
 msgstr ""
 
-#: includes/Frontend/Assets.php:199
+#: includes/Frontend/Assets.php:262
 msgid "Site"
 msgstr ""
 
-#: includes/Frontend/Assets.php:200
+#: includes/Frontend/Assets.php:263
 msgid "Merchant enabled"
 msgstr ""
 
-#: includes/Frontend/Assets.php:201
+#: includes/Frontend/Assets.php:264
 msgid "ACH / eCheck"
 msgstr ""
 
-#: includes/Frontend/Assets.php:202
+#: includes/Frontend/Assets.php:265
 msgid "CVV verification"
 msgstr ""
 
-#: includes/Frontend/Assets.php:203
+#: includes/Frontend/Assets.php:266
 msgid "AVS verification"
 msgstr ""
 
-#: includes/Frontend/Assets.php:204
+#: includes/Frontend/Assets.php:267
 msgid "Account updater"
 msgstr ""
 
-#: includes/Frontend/Assets.php:205
+#: includes/Frontend/Assets.php:268
 msgid "Processor"
 msgstr ""
 
-#: includes/Frontend/Assets.php:223
+#: includes/Frontend/Assets.php:286
 msgid "Void this transaction? The customer will not be charged."
 msgstr ""
 
-#: includes/Frontend/Assets.php:224
+#: includes/Frontend/Assets.php:287
 msgid "Capture %s now?"
 msgstr ""
 
-#: includes/Frontend/Assets.php:225
+#: includes/Frontend/Assets.php:288
 msgid "Working…"
 msgstr ""
 
-#: includes/Frontend/Assets.php:226
+#: includes/Frontend/Assets.php:289
 msgid "The request failed. Please try again."
 msgstr ""
 
@@ -779,7 +824,7 @@ msgid "Checks the credentials of the environment selected above using the values
 msgstr ""
 
 #: includes/Gateway/CardGateway.php:29
-#: includes/Settings/FormFields.php:424
+#: includes/Settings/FormFields.php:445
 msgid "CardPointe - Credit Card"
 msgstr ""
 
@@ -787,49 +832,45 @@ msgstr ""
 msgid "Accept credit and debit cards through CardPointe. Card data is entered in a hosted iframe and tokenized by CardSecure, so it never touches your server."
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:291
+#: includes/Gateway/CardGateway.php:303
 msgid "Upload PEM file"
 msgstr ""
 
 #. translators: %s: web root path
-#: includes/Gateway/CardGateway.php:297
+#: includes/Gateway/CardGateway.php:309
 msgid "For reference, your current web root path is: %s"
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:302
+#: includes/Gateway/CardGateway.php:314
 msgid "One PEM file containing the Merchant Identity Certificate and its private key, with no passphrase. Upload it here, or place it on the server yourself and enter its full path. Because the file contains a private key, an upload is stored just above the web root when the server allows it, where no web address can reach it."
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:330
+#: includes/Gateway/CardGateway.php:342
 msgid "Test Apple Pay setup"
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:333
+#: includes/Gateway/CardGateway.php:345
 msgid "Asks Apple for a merchant session using the Merchant ID and certificate path currently in the form (unsaved changes included) and this site's domain. Passing proves Apple accepts all three. Nothing is charged."
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:343
+#: includes/Gateway/CardGateway.php:355
 msgid "Apple Pay is set up. This is the button shoppers see in the credit card box:"
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:344
-msgid "Test Apple Pay"
-msgstr ""
-
-#: includes/Gateway/CardGateway.php:346
+#: includes/Gateway/CardGateway.php:358
 msgid "Click it to open the Apple Pay sheet. This is a test: nothing is sent to CardPointe and no payment is taken."
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:347
-msgid "This is a preview. Browsers other than Safari cannot draw the real Apple Pay button; open this page in Safari on a device with Apple Pay to try the payment sheet."
+#: includes/Gateway/CardGateway.php:359
+msgid "This is a preview. This browser cannot show the real Apple Pay button: turn on \"Other Browsers\" above and save, or open this page in Safari on a device with Apple Pay."
 msgstr ""
 
 #. translators: 1: date, 2: domain
-#: includes/Gateway/CardGateway.php:398
+#: includes/Gateway/CardGateway.php:410
 msgid "Verified with Apple on %1$s for %2$s."
 msgstr ""
 
-#: includes/Gateway/CardGateway.php:404
+#: includes/Gateway/CardGateway.php:416
 msgid "Not tested with Apple yet. Run the test below."
 msgstr ""
 
@@ -967,142 +1008,147 @@ msgid "No response"
 msgstr ""
 
 #. translators: %s: payment method description
-#: includes/Gateway/PaymentProcessor.php:187
+#: includes/Gateway/PaymentProcessor.php:190
 msgid "CardPointe: no charge required. Payment method verified and vaulted (%s)."
 msgstr ""
 
 #. translators: %s: payment method description
-#: includes/Gateway/PaymentProcessor.php:228
+#: includes/Gateway/PaymentProcessor.php:231
 msgid "CardPointe: payment method vaulted for pre-order (%s). It will be charged when the pre-order is released."
 msgstr ""
 
 #. translators: %s: payment method description
-#: includes/Gateway/PaymentProcessor.php:277
+#: includes/Gateway/PaymentProcessor.php:280
 msgid "CardPointe payment method updated (%s)."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:314
+#: includes/Gateway/PaymentProcessor.php:317
 msgid "No vaulted payment method is available for this order."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:373
+#: includes/Gateway/PaymentProcessor.php:376
 msgid "CardPointe did not respond in time and no approved transaction was found for this order."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:386
+#: includes/Gateway/PaymentProcessor.php:389
 msgid "We could not confirm your payment. You have not been charged. Please try again."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:414
+#: includes/Gateway/PaymentProcessor.php:417
 msgid "CardPointe timed out but the transaction was found approved via inquireByOrderid."
 msgstr ""
 
 #. translators: 1: amount, 2: payment method description, 3: retref, 4: auth code, 5: AVS text, 6: CVV text
-#: includes/Gateway/PaymentProcessor.php:456
+#: includes/Gateway/PaymentProcessor.php:459
 msgid "%1$s via %2$s. Retref: %3$s. Auth code: %4$s. AVS: %5$s. CVV: %6$s."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:466
+#: includes/Gateway/PaymentProcessor.php:469
 msgid "[Sandbox]"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:471
+#: includes/Gateway/PaymentProcessor.php:474
 msgid "CardPointe eCheck accepted, awaiting funds:"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:473
+#: includes/Gateway/PaymentProcessor.php:476
 msgid "CardPointe payment approved:"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:477
+#: includes/Gateway/PaymentProcessor.php:480
 msgid "CardPointe authorization approved (not yet captured):"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:477
+#: includes/Gateway/PaymentProcessor.php:480
 msgid "Capture from the CardPointe panel or by changing the status to Processing."
 msgstr ""
 
 #. translators: %s: gateway error text
-#: includes/Gateway/PaymentProcessor.php:494
+#: includes/Gateway/PaymentProcessor.php:497
 msgid "CardPointe declined the payment: %s"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:520
+#: includes/Gateway/PaymentProcessor.php:523
 msgid "CardPointe payment failed:"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:532
+#: includes/Gateway/PaymentProcessor.php:535
 msgid "the transaction was declined"
 msgstr ""
 
 #. translators: %s: decline reason
-#: includes/Gateway/PaymentProcessor.php:535
+#: includes/Gateway/PaymentProcessor.php:538
 msgid "Your payment was not approved (%s). Please check your details or try another payment method."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:639
+#: includes/Gateway/PaymentProcessor.php:642
 msgid "CardPointe: the payment method could not be added to the customer profile; the token will be used instead."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:677
+#. translators: %s: order total
+#: includes/Gateway/PaymentProcessor.php:706
+msgid "The order total is now %s, which is not the amount approved in Apple Pay, so nothing was charged. Please try again."
+msgstr ""
+
+#: includes/Gateway/PaymentProcessor.php:719
 msgid "Apple Pay cannot be used for this order because the payment method must be kept on file for a later charge. Please pay with a card instead."
 msgstr ""
 
 #. translators: %s: card brand
-#: includes/Gateway/PaymentProcessor.php:716
+#: includes/Gateway/PaymentProcessor.php:758
 msgid "%s cards are not accepted. Please use a different card."
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:755
+#: includes/Gateway/PaymentProcessor.php:797
 msgid "savings account"
 msgstr ""
 
-#: includes/Gateway/PaymentProcessor.php:755
+#: includes/Gateway/PaymentProcessor.php:797
 msgid "checking account"
 msgstr ""
 
 #. translators: 1: account type, 2: last four digits
-#: includes/Gateway/PaymentProcessor.php:757
-#: includes/Gateway/PaymentProcessor.php:761
+#: includes/Gateway/PaymentProcessor.php:799
+#: includes/Gateway/PaymentProcessor.php:803
 #: includes/Integrations/Subscriptions.php:231
 msgid "%1$s ending in %2$s"
 msgstr ""
 
 #. translators: 1: account type, 2: last four digits
-#: includes/Gateway/PaymentProcessor.php:759
+#: includes/Gateway/PaymentProcessor.php:801
 msgid "card"
 msgstr ""
 
 #. translators: %s: card description, e.g. "Visa 1234"
-#: includes/Gateway/PaymentProcessor.php:765
+#: includes/Gateway/PaymentProcessor.php:807
 msgid "Apple Pay (%s)"
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:118
+#: includes/Gateway/PaymentSource.php:121
 msgid "Please enter a valid card expiration date."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:158
+#: includes/Gateway/PaymentSource.php:161
 msgid "Apple Pay is not available on this store. Please pay another way."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:167
+#: includes/Gateway/PaymentSource.php:170
 msgid "The Apple Pay payment could not be read. Please try again."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:215
+#: includes/Gateway/PaymentSource.php:219
 msgid "Apple Pay could not be processed right now. Please try again or pay another way."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:229
+#: includes/Gateway/PaymentSource.php:233
 msgid "Apple Pay could not be processed (the payment token was not accepted). Please try again."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:288
+#: includes/Gateway/PaymentSource.php:292
 msgid "The selected saved payment method is not available. Please choose another one."
 msgstr ""
 
-#: includes/Gateway/PaymentSource.php:293
+#: includes/Gateway/PaymentSource.php:297
 msgid "The selected saved payment method belongs to a different environment. Please add it again."
 msgstr ""
 
@@ -1358,11 +1404,11 @@ msgstr ""
 msgid "Enter the token expiry as YYYYMM when using a CardSecure token."
 msgstr ""
 
-#: includes/Plugin.php:141
+#: includes/Plugin.php:142
 msgid "Settings"
 msgstr ""
 
-#: includes/Plugin.php:142
+#: includes/Plugin.php:143
 msgid "Paradox Solutions"
 msgstr ""
 
@@ -1674,7 +1720,7 @@ msgid "<strong>4.</strong> Save, then run the setup check at the bottom of this 
 msgstr ""
 
 #: includes/Settings/FormFields.php:355
-msgid "Adds an Apple Pay button to the credit card box on the checkout and order-pay pages for shoppers using Safari with Apple Pay set up. Payments use the transaction type, receipts and sandbox setting of this gateway. Apple Pay always needs HTTPS, and is not offered for orders that have to keep a card on file (subscriptions, pre-orders charged on release)."
+msgid "Adds Apple Pay buttons to single products, the cart and the checkout, on classic pages, the Cart and Checkout blocks and CheckoutWC. Payments use the transaction type, receipts and sandbox setting of this gateway. Apple Pay always needs HTTPS, and is not offered for orders that have to keep a card on file (subscriptions, pre-orders charged on release)."
 msgstr ""
 
 #: includes/Settings/FormFields.php:358
@@ -1686,117 +1732,152 @@ msgid "Accept Apple Pay"
 msgstr ""
 
 #: includes/Settings/FormFields.php:364
-msgid "Button Style"
+msgid "Allow Apple Pay on"
 msgstr ""
 
-#: includes/Settings/FormFields.php:369
-msgid "Black"
-msgstr ""
-
-#: includes/Settings/FormFields.php:370
-msgid "White"
+#: includes/Settings/FormFields.php:368
+msgid "On single products, the cart and the top of the checkout it is an express button: the Apple Pay sheet collects the address and shows shipping and tax as they are chosen, and the order is placed from the sheet. Inside the credit card box it uses the address already entered on the checkout form. Product page buttons appear on simple and variable products."
 msgstr ""
 
 #: includes/Settings/FormFields.php:371
-msgid "White with outline"
+msgid "Single products"
 msgstr ""
 
-#: includes/Settings/FormFields.php:375
-msgid "Button Label"
+#: includes/Settings/FormFields.php:372
+msgid "Cart"
 msgstr ""
 
-#: includes/Settings/FormFields.php:380
-msgid "Apple Pay logo only"
+#: includes/Settings/FormFields.php:373
+msgid "Checkout (express button at the top)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:374
+msgid "Checkout (inside the credit card box)"
+msgstr ""
+
+#: includes/Settings/FormFields.php:378
+msgid "Other Browsers"
+msgstr ""
+
+#: includes/Settings/FormFields.php:379
+msgid "Offer Apple Pay in Chrome, Edge and Firefox as well"
 msgstr ""
 
 #: includes/Settings/FormFields.php:381
-msgid "Buy with Apple Pay"
+msgid "Outside Safari the shopper pays by scanning a code with an iPhone (iOS 18 or later). This loads Apple's script, apple-pay-sdk.js from applepay.cdn-apple.com, on the pages that show a button. When off, the button only appears in Safari."
 msgstr ""
 
-#: includes/Settings/FormFields.php:382
-#: templates/checkout/card-fields.php:40
-msgid "Pay with Apple Pay"
-msgstr ""
-
-#: includes/Settings/FormFields.php:383
-msgid "Check out with Apple Pay"
-msgstr ""
-
-#: includes/Settings/FormFields.php:384
-msgid "Order with Apple Pay"
-msgstr ""
-
-#: includes/Settings/FormFields.php:388
-msgid "Name on the Payment Sheet"
+#: includes/Settings/FormFields.php:385
+msgid "Button Style"
 msgstr ""
 
 #: includes/Settings/FormFields.php:390
-msgid "Up to 64 characters. Defaults to the site title."
+msgid "Black"
+msgstr ""
+
+#: includes/Settings/FormFields.php:391
+msgid "White"
+msgstr ""
+
+#: includes/Settings/FormFields.php:392
+msgid "White with outline"
 msgstr ""
 
 #: includes/Settings/FormFields.php:396
-msgid "Connection Settings"
+msgid "Button Label"
 msgstr ""
 
 #: includes/Settings/FormFields.php:401
+msgid "Apple Pay logo only"
+msgstr ""
+
+#: includes/Settings/FormFields.php:402
+msgid "Buy with Apple Pay"
+msgstr ""
+
+#: includes/Settings/FormFields.php:403
+msgid "Pay with Apple Pay"
+msgstr ""
+
+#: includes/Settings/FormFields.php:404
+msgid "Check out with Apple Pay"
+msgstr ""
+
+#: includes/Settings/FormFields.php:405
+msgid "Order with Apple Pay"
+msgstr ""
+
+#: includes/Settings/FormFields.php:409
+msgid "Name on the Payment Sheet"
+msgstr ""
+
+#: includes/Settings/FormFields.php:411
+msgid "Up to 64 characters. Defaults to the site title."
+msgstr ""
+
+#: includes/Settings/FormFields.php:417
+msgid "Connection Settings"
+msgstr ""
+
+#: includes/Settings/FormFields.php:422
 msgid "Apple Merchant ID"
 msgstr ""
 
 #. translators: %s: link to the Apple developer account
-#: includes/Settings/FormFields.php:405
+#: includes/Settings/FormFields.php:426
 msgid "This is found in your %s. It is filled in for you when you upload the certificate."
 msgstr ""
 
 #. translators: %s: link to the Apple developer account
-#: includes/Settings/FormFields.php:406
+#: includes/Settings/FormFields.php:427
 msgid "Apple developer account"
 msgstr ""
 
-#: includes/Settings/FormFields.php:416
+#: includes/Settings/FormFields.php:437
 msgid "Certificate Path"
 msgstr ""
 
-#: includes/Settings/FormFields.php:418
+#: includes/Settings/FormFields.php:439
 msgid "Full server path to the PEM file that holds your Merchant Identity Certificate and its private key."
 msgstr ""
 
-#: includes/Settings/FormFields.php:422
+#: includes/Settings/FormFields.php:443
 msgid "Processing Gateway"
 msgstr ""
 
-#: includes/Settings/FormFields.php:427
+#: includes/Settings/FormFields.php:448
 msgid "Setup Check"
 msgstr ""
 
-#: includes/Settings/FormFields.php:439
+#: includes/Settings/FormFields.php:460
 msgid "Gateway receipts"
 msgstr ""
 
-#: includes/Settings/FormFields.php:441
+#: includes/Settings/FormFields.php:462
 msgid "CardPointe can return receipt details (merchant DBA, address, authorization code) with each transaction."
 msgstr ""
 
-#: includes/Settings/FormFields.php:444
+#: includes/Settings/FormFields.php:465
 msgid "Request receipts"
 msgstr ""
 
-#: includes/Settings/FormFields.php:445
+#: includes/Settings/FormFields.php:466
 msgid "Request gateway receipt data and store it with the order"
 msgstr ""
 
-#: includes/Settings/FormFields.php:450
+#: includes/Settings/FormFields.php:471
 msgid "Show on order pages"
 msgstr ""
 
-#: includes/Settings/FormFields.php:451
+#: includes/Settings/FormFields.php:472
 msgid "Display the receipt on the order received page and in My Account order details"
 msgstr ""
 
-#: includes/Settings/FormFields.php:456
+#: includes/Settings/FormFields.php:477
 msgid "Include in emails"
 msgstr ""
 
-#: includes/Settings/FormFields.php:457
+#: includes/Settings/FormFields.php:478
 msgid "Append the receipt to customer order emails"
 msgstr ""
 
@@ -1842,11 +1923,7 @@ msgstr ""
 msgid "Refresh status"
 msgstr ""
 
-#: templates/checkout/card-fields.php:41
-msgid "or enter your card details"
-msgstr ""
-
-#: templates/checkout/card-fields.php:50
+#: templates/checkout/card-fields.php:47
 msgid "Secure card entry form"
 msgstr ""
 
