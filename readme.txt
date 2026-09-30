@@ -1,10 +1,10 @@
-=== Paradox CardPointe Gateway for WooCommerce ===
+=== Paradox Gateway for CardPointe and WooCommerce ===
 Contributors: exgbrian
 Tags: woocommerce, payment gateway, cardpointe, credit card, ach
 Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.2.3
+Stable tag: 1.3.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,7 +12,7 @@ Accept credit cards and eChecks through CardPointe. Tokenized checkout, refunds,
 
 == Description ==
 
-Paradox CardPointe Gateway for WooCommerce, by [Paradox Solutions](https://paradoxsolutions.io), connects your WooCommerce store to the CardPointe (Fiserv / CardConnect) gateway.
+Paradox Gateway for CardPointe and WooCommerce, by [Paradox Solutions](https://paradoxsolutions.io), connects your WooCommerce store to the CardPointe (Fiserv / CardConnect) gateway.
 
 **Easy install.** Upload the plugin, enter your API credentials, flip sandbox mode off when you are ready, and start taking payments.
 
@@ -135,6 +135,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 
 == Changelog ==
 
+= 1.3.0 =
+* Renamed to Paradox Gateway for CardPointe and WooCommerce. Only the name shown in WordPress and on the plugin page changes. The plugin folder, settings, orders, saved payment methods and Apple Pay setup are untouched, and uploading this version over the previous one replaces it in place.
+
 = 1.2.3 =
 * Fixed Apple Pay express buttons showing the wrong total (for example one item's price when the cart held two) on sites behind a page cache that caches the REST API, such as LiteSpeed Cache with "Cache REST API" on. The cache was answering the plugin's read of the cart with an old copy, sometimes another shopper's. Reads of the cart are now made uncacheable. No wrong amount was ever charged: the plugin refuses a payment whose order total differs from the amount approved in the Apple Pay sheet.
 
@@ -181,6 +184,9 @@ Apple privacy policy: https://www.apple.com/legal/privacy/
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+The plugin is now called Paradox Gateway for CardPointe and WooCommerce. Nothing else changes; upload it over the existing installation.
 
 = 1.2.3 =
 Fixes Apple Pay express buttons showing a wrong total on sites whose page cache also caches the REST API (LiteSpeed Cache does by default).
