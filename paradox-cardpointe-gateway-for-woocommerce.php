@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Paradox CardPointe Gateway for WooCommerce
+ * Plugin Name: Paradox Gateway for CardPointe and WooCommerce
  * Plugin URI: https://github.com/ExGBrian/cardpointe-woocommerce-gateway
  * Description: Accept credit cards and eChecks (ACH) through CardPointe using the Hosted iFrame Tokenizer. Supports authorize/capture, refunds, saved payment methods, WooCommerce Subscriptions and Pre-Orders, and the block-based checkout.
- * Version: 1.2.3
+ * Version: 1.3.0
  * Author: Paradox Solutions
  * Author URI: https://paradoxsolutions.io
  * Text Domain: paradox-cardpointe-gateway-for-woocommerce
@@ -21,7 +21,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PARADOX_CARDPOINTE_VERSION', '1.2.3' );
+define( 'PARADOX_CARDPOINTE_VERSION', '1.3.0' );
 define( 'PARADOX_CARDPOINTE_FILE', __FILE__ );
 define( 'PARADOX_CARDPOINTE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PARADOX_CARDPOINTE_URL', plugin_dir_url( __FILE__ ) );

@@ -56,7 +56,7 @@ final class ExpressButtons {
 		$model   = '\\Objectiv\\Plugins\\Checkout\\Model\\DetectedPaymentGateway';
 		$support = '\\Objectiv\\Plugins\\Checkout\\Model\\GatewaySupport';
 		if ( is_array( $gateways ) && class_exists( $model ) && class_exists( $support ) ) {
-			$gateways[] = new $model( 'Paradox CardPointe Gateway for WooCommerce', $support::FULLY_SUPPORTED );
+			$gateways[] = new $model( 'Paradox Gateway for CardPointe and WooCommerce', $support::FULLY_SUPPORTED );
 		}
 		return $gateways;
 	}
